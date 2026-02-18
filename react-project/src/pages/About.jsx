@@ -57,12 +57,11 @@ const About = () => {
                     {/* Team */}
                     <Reveal className="mb-16">
                         <h2 className="font-display text-3xl font-bold text-[var(--fg)] mb-8 text-center">Our Team</h2>
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="flex flex-wrap justify-center gap-6">
                             {[
-                                { name: 'Arjun Sharma', role: 'Founder & Cultural Director', color: 'heritage-gold' },
-                                { name: 'Priya Venkatesh', role: 'Head of Research', color: 'heritage-teal' },
-                                { name: 'Rahul Mehta', role: 'Technology Lead', color: 'heritage-green' },
-                                { name: 'Ananya Iyer', role: 'Wellness Curator', color: 'heritage-brown' }
+                                { name: 'AKURI VENKATA SURYA VARUN', role: 'Founder & Lead Developer & UI/UX Designer', color: 'heritage-gold' },
+                                { name: 'GANGI REDDY GARI HEM SATHVIK REDDY', role: 'Co-Founder ', color: 'heritage-teal' },
+                                { name: 'MD .RUHAN', role: 'Backend Engineer', color: 'heritage-green' }
                             ].map((member, i) => (
                                 <div key={i} className="heritage-card p-6 text-center">
                                     <div className={`w-20 h-20 rounded-full bg-gradient-to-br from-${member.color} to-${member.color}Light mx-auto mb-4`}></div>

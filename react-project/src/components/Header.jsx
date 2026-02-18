@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import logo from '../assets/logo.webp';
 
 const Header = ({ theme, onToggleTheme, isMobileMenuOpen, onToggleMobileMenu }) => {
     const location = useLocation();
@@ -17,14 +18,12 @@ const Header = ({ theme, onToggleTheme, isMobileMenuOpen, onToggleMobileMenu }) 
                 <div className="flex items-center justify-between h-16 lg:h-20">
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-3 group" aria-label="Inner Root Home">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-heritage-green to-heritage-teal flex items-center justify-center shadow-lg group-hover:shadow-heritage-green/50 transition-all duration-300">
-                            <svg className="w-5 h-5 text-heritage-cream" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M12 2L12 22M12 2C12 2 8 6 8 12C8 18 12 22 12 22M12 2C12 2 16 6 16 12C16 18 12 22 12 22" />
-                                <circle cx="12" cy="12" r="3" />
-                            </svg>
+                        <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center transition-all duration-300">
+                            <img src={logo} alt="Inner Root Logo" className="w-full h-full object-cover" />
                         </div>
                         <span className="font-display text-2xl font-bold text-[var(--fg)] group-hover:text-heritage-gold transition-colors">Inner Root</span>
                     </Link>
+
 
                     {/* Desktop Navigation */}
                     <div className="hidden lg:flex items-center gap-8">
