@@ -1,0 +1,24 @@
+{
+    "properties": [
+        {
+            "name": "app.jwt.secret",
+            "type": "java.lang.String",
+            "description": "Secret key used for signing JWT tokens"
+        },
+        {
+            "name": "app.jwt.expiration-ms",
+            "type": "java.lang.Long",
+            "description": "JWT token expiration time in milliseconds"
+        },
+        {
+            "name": "app.google.client-id",
+            "type": "java.lang.String",
+            "description": "Google OAuth 2.0 Client ID"
+        },
+        {
+            "name": "app.cors.allowed-origins",
+            "type": "java.lang.String",
+            "description": "Comma-separated list of allowed CORS origins"
+        }
+    ]
+}
