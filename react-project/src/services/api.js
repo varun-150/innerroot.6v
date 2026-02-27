@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
 const api = axios.create({
     baseURL: API_URL,
@@ -32,6 +32,11 @@ export const communityAPI = {
 export const wisdomAPI = {
     getAll: () => api.get('/wisdom').then(res => res.data),
     getRandom: () => api.get('/wisdom/random').then(res => res.data),
+};
+
+export const moodAPI = {
+    getAll: () => api.get('/mood').then(res => res.data),
+    save: (moodData) => api.post('/mood', moodData).then(res => res.data),
 };
 
 export default api;

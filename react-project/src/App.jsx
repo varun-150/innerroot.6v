@@ -16,6 +16,10 @@ import About from './pages/About';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
+import Monetization from './pages/Monetization';
+import Contact from './pages/Contact';
 
 // Wrapper to get current location for Header
 const AppContent = () => {
@@ -52,8 +56,8 @@ const AppContent = () => {
         isMobileMenuOpen={isMobileMenuOpen}
         onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       />
-      <main className="relative z-10 pt-16 lg:pt-20">
-        <div className="page active" style={{ display: 'block', opacity: 1 }}>
+      <main className="relative pt-16 lg:pt-20">
+        <div className="page active">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/explore" element={<Explore />} />
@@ -62,8 +66,12 @@ const AppContent = () => {
             <Route path="/library" element={<Library />} />
             <Route path="/community" element={<Community />} />
             <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/monetization" element={<Monetization />} />
             <Route path="/dashboard" element={<Dashboard />} />
             {/* Fallback to Home */}
             <Route path="*" element={<Home />} />

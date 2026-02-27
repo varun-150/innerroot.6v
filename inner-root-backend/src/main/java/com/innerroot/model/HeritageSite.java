@@ -28,5 +28,7 @@ public class HeritageSite {
 
     private String imageUrl;
 
+    private String videoUrl;
+
     private String category;
 }

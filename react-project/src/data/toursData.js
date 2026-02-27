@@ -86,5 +86,49 @@ export const toursData = [
         rating: 4.9,
         image: 'https://upload.wikimedia.org/wikipedia/commons/0/07/Meenakshi_Amman_Temple%2C_Madurai.jpg',
         videoUrl: 'https://www.youtube.com/embed/VIDEO_ID_MADURAI'
+    },
+    {
+        id: 'ajanta',
+        title: 'Ajanta Caves',
+        location: 'Aurangabad, Maharashtra',
+        coordinates: [75.7033, 20.5519],
+        description: '30 rock-cut Buddhist cave monuments which date from the 2nd century BCE to about 480 CE. The caves include paintings and rock-cut sculptures described as among the finest examples of ancient Indian art.',
+        duration: '22 mins',
+        rating: 4.8,
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Ajanta_Caves_panorama.jpg/640px-Ajanta_Caves_panorama.jpg',
+        videoUrl: 'https://www.youtube.com/embed/VIDEO_ID_AJANTA'
+    },
+    {
+        id: 'jaisalmer',
+        title: 'Jaisalmer Golden Fort',
+        location: 'Jaisalmer, Rajasthan',
+        coordinates: [70.9126, 26.9124],
+        description: 'One of the very few "living forts" in the world, as nearly one-fourth of the old city\'s population still resides within the fort. Known for its golden yellow sandstone architecture.',
+        duration: '20 mins',
+        rating: 4.7,
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Jaisalmer_Fort_and_town.jpg/640px-Jaisalmer_Fort_and_town.jpg',
+        videoUrl: 'https://www.youtube.com/embed/VIDEO_ID_JAISALMER'
+    },
+    {
+        id: 'munnar',
+        title: 'Munnar Tea Gardens',
+        location: 'Idukki, Kerala',
+        coordinates: [77.0595, 10.0889],
+        description: 'Experience the lush green rolling hills of Munnar, famous for its vast tea plantations. A serene getaway in the Western Ghats known for its biodiversity and mist-covered peaks.',
+        duration: '15 mins',
+        rating: 4.9,
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Tea_garden_Munnar.jpg/640px-Tea_garden_Munnar.jpg',
+        videoUrl: 'https://www.youtube.com/embed/VIDEO_ID_MUNNAR'
+    },
+    {
+        id: 'sundarbans',
+        title: 'Sundarbans National Park',
+        location: 'West Bengal',
+        coordinates: [88.7940, 21.9497],
+        description: 'The world\'s largest mangrove forest and a UNESCO World Heritage site. Home to the Royal Bengal Tiger and a unique ecosystem where the tides dictate the rhythm of life.',
+        duration: '25 mins',
+        rating: 4.8,
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Sundarban_Mangroves.jpg/640px-Sundarban_Mangroves.jpg',
+        videoUrl: 'https://www.youtube.com/embed/VIDEO_ID_SUNDARBANS'
     }
 ];

@@ -30,7 +30,6 @@ const HeritageMap = ({ tours = [] }) => {
 
         return () => window.removeEventListener('resize', handleResize);
     }, []);
-
     // Fetch Map Data
     useEffect(() => {
         fetch(INDIA_GEO_JSON)
@@ -113,7 +112,7 @@ const HeritageMap = ({ tours = [] }) => {
 
                 {/* Map Features (States) */}
                 <g className="map-features">
-                    {geography && geography.length > 0 ? (
+                    {geography && geography.length > 0 && pathGenerator ? (
                         geography.map((feature, i) => (
                             <motion.path
                                 key={`path-${i}`}
@@ -130,13 +129,14 @@ const HeritageMap = ({ tours = [] }) => {
                             />
                         ))
                     ) : (
-                        <text x="50%" y="50%" textAnchor="middle" fill="white">No map features found</text>
+                        <text x="50%" y="50%" textAnchor="middle" fill="white">
+                            {!geography ? "Loading geography..." : !pathGenerator ? "Preparing projection..." : "No map features found"}
+                        </text>
                     )}
                 </g>
 
                 {/* Tour Markers */}
-                {tours.map((tour) => {
-                    if (!projection) return null;
+                {projection && tours.map((tour) => {
                     const coords = tour.coordinates;
                     if (!coords || coords.length !== 2) return null;
 
@@ -165,11 +165,15 @@ const HeritageMap = ({ tours = [] }) => {
                                     stroke="#fff"
                                     strokeWidth={1.5}
                                     data-tooltip-id="map-tooltip"
-                                    data-tooltip-content={`${tour.title} - ${tour.location}`}
+                                    data-tooltip-content={`${tour.name || tour.title} - ${tour.location}`}
                                     className="cursor-pointer focus:outline-none hover:stroke-heritage-gold"
                                     onClick={() => {
                                         const card = document.getElementById(`tour-card-${tour.id}`);
-                                        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                        if (card) {
+                                            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                            card.classList.add('ring-4', 'ring-heritage-gold', 'ring-offset-2');
+                                            setTimeout(() => card.classList.remove('ring-4', 'ring-ring-heritage-gold', 'ring-offset-2'), 2000);
+                                        }
                                     }}
                                 />
                             </motion.g>

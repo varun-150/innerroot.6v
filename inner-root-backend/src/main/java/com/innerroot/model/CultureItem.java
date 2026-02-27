@@ -16,13 +16,17 @@ public class CultureItem {
     private String id;
 
     private String title;
-
+    private String subtitle;
     private String category;
+    private String origin;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private String image;
+    @Column(columnDefinition = "TEXT")
+    private String significance;
 
+    private String image;
     private String wikiUrl;
+    private String color;
 }

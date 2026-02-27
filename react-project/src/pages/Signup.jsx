@@ -192,8 +192,8 @@ const Signup = () => {
                     learningGoals: formData.learningGoals,
                     usageIntent: formData.usageIntent,
                     occupation: formData.occupation,
-                    age: formData.ageGroup,
-                    address: formData.region
+                    ageGroup: formData.ageGroup,
+                    region: formData.region
                 }
             );
             navigate('/');
@@ -230,27 +230,32 @@ const Signup = () => {
 
             <div className="max-w-2xl w-full glass-card p-8 rounded-2xl shadow-2xl relative z-10 border border-white/20 backdrop-blur-xl bg-white/10">
                 {/* Progress Bar */}
-                <div className="mb-8">
-                    <div className="flex justify-between items-center mb-4">
-                        {[1, 2, 3].map((step) => (
-                            <div key={step} className="flex items-center flex-1">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${currentStep >= step
-                                        ? 'bg-gradient-to-r from-heritage-green to-heritage-teal text-white shadow-lg'
-                                        : 'bg-white/10 text-gray-400'
+                <div className="mb-10">
+                    <div className="flex justify-between items-center relative">
+                        {/* Connecting Line */}
+                        <div className="absolute top-5 left-0 w-full h-0.5 bg-white/10 -z-10"></div>
+                        <div
+                            className="absolute top-5 left-0 h-0.5 bg-gradient-to-r from-heritage-green to-heritage-teal transition-all duration-500 -z-10"
+                            style={{ width: `${((currentStep - 1) / (totalSteps - 1)) * 100}%` }}
+                        ></div>
+
+                        {[
+                            { number: 1, label: 'Account' },
+                            { number: 2, label: 'Interests' },
+                            { number: 3, label: 'Profile' }
+                        ].map((step) => (
+                            <div key={step.number} className="flex flex-col items-center group">
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-500 z-10 ${currentStep >= step.number
+                                    ? 'bg-gradient-to-r from-heritage-green to-heritage-teal text-white shadow-lg scale-110 shadow-heritage-green/20'
+                                    : 'bg-[var(--bg)] border-2 border-white/10 text-gray-400'
                                     }`}>
-                                    {currentStep > step ? <Check className="w-5 h-5" /> : step}
+                                    {currentStep > step.number ? <Check className="w-5 h-5" /> : step.number}
                                 </div>
-                                {step < 3 && (
-                                    <div className={`flex-1 h-1 mx-2 rounded transition-all duration-300 ${currentStep > step ? 'bg-heritage-green' : 'bg-white/10'
-                                        }`}></div>
-                                )}
+                                <span className={`text-[10px] font-bold uppercase tracking-widest mt-2 transition-colors duration-300 ${currentStep >= step.number ? 'text-heritage-green' : 'text-gray-500'}`}>
+                                    {step.label}
+                                </span>
                             </div>
                         ))}
-                    </div>
-                    <div className="text-center">
-                        <p className="text-sm text-[var(--text-secondary)]">
-                            Step {currentStep} of {totalSteps}
-                        </p>
                     </div>
                 </div>
 
@@ -285,7 +290,7 @@ const Signup = () => {
                                     className="w-full pl-10 pr-3 py-3 border border-white/10 rounded-lg bg-white/5
                                              text-[var(--fg)] placeholder-gray-400 focus:outline-none focus:ring-2
                                              focus:ring-heritage-gold/50 focus:border-transparent transition-all duration-300"
-                                    placeholder="Full Name" value={formData.name} onChange={handleChange} />
+                                    placeholder="Enter your full name" value={formData.name} onChange={handleChange} />
                             </div>
                             <div className="relative group">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -295,7 +300,7 @@ const Signup = () => {
                                     className="w-full pl-10 pr-3 py-3 border border-white/10 rounded-lg bg-white/5
                                              text-[var(--fg)] placeholder-gray-400 focus:outline-none focus:ring-2
                                              focus:ring-heritage-gold/50 focus:border-transparent transition-all duration-300"
-                                    placeholder="Email address" value={formData.email} onChange={handleChange} />
+                                    placeholder="e.g. name@example.com" value={formData.email} onChange={handleChange} />
                             </div>
                             <div className="relative group">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -305,7 +310,7 @@ const Signup = () => {
                                     className="w-full pl-10 pr-3 py-3 border border-white/10 rounded-lg bg-white/5
                                              text-[var(--fg)] placeholder-gray-400 focus:outline-none focus:ring-2
                                              focus:ring-heritage-gold/50 focus:border-transparent transition-all duration-300"
-                                    placeholder="Password" value={formData.password} onChange={handleChange} />
+                                    placeholder="Min. 8 characters" value={formData.password} onChange={handleChange} />
                             </div>
                             <div className="relative group">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -315,14 +320,24 @@ const Signup = () => {
                                     className="w-full pl-10 pr-3 py-3 border border-white/10 rounded-lg bg-white/5
                                              text-[var(--fg)] placeholder-gray-400 focus:outline-none focus:ring-2
                                              focus:ring-heritage-gold/50 focus:border-transparent transition-all duration-300"
-                                    placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} />
+                                    placeholder="Re-enter password" value={formData.confirmPassword} onChange={handleChange} />
                             </div>
 
-                            <div className="flex items-center text-sm">
-                                <label className="flex items-center text-[var(--text-secondary)] hover:text-[var(--fg)] cursor-pointer">
-                                    <input type="checkbox" required className="mr-2 rounded border-gray-300 text-heritage-gold focus:ring-heritage-gold" />
-                                    I accept the Terms and Conditions
-                                </label>
+                            <div className="flex items-start gap-4 p-4 rounded-xl bg-white/5 border border-white/10 group hover:border-heritage-gold/30 transition-all">
+                                <div className="flex items-center h-5">
+                                    <input
+                                        id="terms"
+                                        type="checkbox"
+                                        required
+                                        className="w-5 h-5 rounded border-white/20 bg-white/5 text-heritage-gold focus:ring-heritage-gold transition-all cursor-pointer"
+                                    />
+                                </div>
+                                <div className="text-sm">
+                                    <label htmlFor="terms" className="font-medium text-[var(--fg)] cursor-pointer">
+                                        I accept the <Link to="/terms" className="text-heritage-gold hover:underline">Terms of Use</Link> and <Link to="/privacy" className="text-heritage-gold hover:underline">Privacy Policy</Link>
+                                    </label>
+                                    <p className="text-[var(--muted)] text-xs mt-1">Join our community to explore and preserve India's timeless heritage.</p>
+                                </div>
                             </div>
 
                             {/* Divider */}

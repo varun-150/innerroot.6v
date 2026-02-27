@@ -1,26 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { getLibraryItems } from '../services/api';
+import { libraryData as localLibraryData } from '../data/libraryData';
 import { Reveal, Stagger } from '../components/Reveal';
-
-// Safelist for Tailwind classes used dynamically
-// from-heritage-gold/20 to-heritage-goldLight/20 text-heritage-gold
-// from-heritage-teal/20 to-heritage-tealLight/20 text-heritage-teal
-// from-heritage-green/20 to-heritage-greenLight/20 text-heritage-green
-// from-heritage-brown/20 to-heritage-brownLight/20 text-heritage-brown
+import Breadcrumbs from '../components/Breadcrumbs';
+import Button from '../components/ui/Button';
+import Card from '../components/ui/Card';
+import Input from '../components/ui/Input';
+import {
+    Search, BookOpen, Clock, User,
+    FileText, Loader2, ArrowRight, ExternalLink,
+    Book, Bookmark, Sparkles, Info
+} from 'lucide-react';
 
 const Library = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [libraryData, setLibraryData] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isSearching, setIsSearching] = useState(false);
 
-    React.useEffect(() => {
+    useEffect(() => {
         const fetchLibrary = async () => {
             try {
                 const response = await getLibraryItems();
-                setLibraryData(Array.isArray(response.data) ? response.data : []);
+                const data = Array.isArray(response.data) && response.data.length > 0
+                    ? response.data
+                    : localLibraryData;
+                setLibraryData(data);
             } catch (error) {
                 console.error("Failed to fetch library items:", error);
-                setLibraryData([]);
             } finally {
                 setLoading(false);
             }
@@ -28,118 +36,206 @@ const Library = () => {
         fetchLibrary();
     }, []);
 
-    // Filter logic
+    const handleSearch = (query) => {
+        setSearchQuery(query);
+        setIsSearching(true);
+        const timer = setTimeout(() => setIsSearching(false), 500);
+        return () => clearTimeout(timer);
+    };
+
     const filteredData = (Array.isArray(libraryData) ? libraryData : []).filter(item =>
         item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.category?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    if (loading) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center gap-6">
+                <Loader2 className="w-12 h-12 text-heritage-gold animate-spin" />
+                <p className="font-display text-xl text-[var(--muted)] animate-pulse">Consulting the archives...</p>
+            </div>
+        );
+    }
+
     return (
-        <section id="page-library" className="page active block opacity-100">
-            <div className="py-12 lg:py-20">
+        <section id="page-library" className="page active block opacity-100" aria-label="Digital Repository">
+            <div className="py-12 lg:py-24">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <Breadcrumbs />
+
                     {/* Header */}
-                    <Reveal className="text-center mb-12">
-                        <h1 className="font-display text-4xl sm:text-5xl font-bold text-[var(--fg)] mb-4">Digital Library</h1>
-                        <p className="text-[var(--muted)] max-w-2xl mx-auto">
-                            Scriptures, philosophy texts, and historical resources.
+                    <Reveal className="text-center mb-16 mt-8 relative">
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-heritage-gold/5 blur-[100px] pointer-events-none"></div>
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-heritage-gold/10 backdrop-blur-md border border-heritage-gold/20 text-heritage-gold font-bold text-xs uppercase tracking-[0.2em] mb-8">
+                            <Sparkles className="w-3.5 h-3.5" />
+                            <span>The Digital Akasha</span>
+                        </div>
+                        <h1 className="font-display text-5xl sm:text-7xl font-bold text-[var(--fg)] mb-8 tracking-tighter leading-none">
+                            Ancient Wisdom,<br />
+                            <span className="text-heritage-gold">Digitized</span>
+                        </h1>
+                        <p className="text-[var(--muted)] max-w-2xl mx-auto text-xl leading-relaxed italic font-medium">
+                            "Knowledge is the only wealth that grows as it is shared, and the only treasure that can't be stolen."
+                            <span className="block text-sm mt-3 font-bold uppercase tracking-widest text-heritage-gold/60">— Bhartṛhari, Nitiśataka</span>
                         </p>
                     </Reveal>
 
-                    {/* Search */}
-                    <Reveal className="max-w-xl mx-auto mb-12">
-                        <div className="relative">
-                            <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--muted)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <circle cx="11" cy="11" r="8" />
-                                <path d="M21 21l-4.35-4.35" />
-                            </svg>
-                            <input
-                                type="text"
+                    {/* Search Bar */}
+                    <Reveal className="max-w-2xl mx-auto mb-16">
+                        <Card className="p-6 !rounded-[32px] shadow-2xl border-[var(--border)] overflow-visible ring-4 ring-heritage-gold/5">
+                            <Input
                                 placeholder="Search scriptures, texts, articles..."
-                                className="search-input"
                                 value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onChange={(e) => handleSearch(e.target.value)}
+                                icon={Search}
+                                className="!py-4 !text-lg !border-none !bg-transparent"
+                                autoFocus
                             />
-                        </div>
+                        </Card>
                     </Reveal>
 
-                    {/* Categories */}
-                    <Stagger className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                    {/* Categories Quick Filter */}
+                    <Stagger className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16 px-4">
                         {[
-                            { id: 'vedas', title: 'Vedas', desc: '4 sacred texts', color: 'heritage-gold', letter: 'V' },
-                            { id: 'upanishads', title: 'Upanishads', desc: '108 principal texts', color: 'heritage-teal', letter: 'U' },
-                            { id: 'gita', title: 'Bhagavad Gita', desc: '18 chapters', color: 'heritage-green', letter: 'G' },
-                            { id: 'philosophy', title: 'Philosophy', desc: 'Darshanas & texts', color: 'heritage-brown', letter: 'P' }
-                        ].map(cat => (
-                            <div key={cat.id} className="heritage-card p-6 text-center cursor-pointer group" data-category={cat.id}>
-                                <div className={`w-16 h-16 rounded-full bg-gradient-to-br from-${cat.color}/20 to-${cat.color}Light/20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform`}>
-                                    <span className={`font-display text-2xl font-bold text-${cat.color}`}>{cat.letter}</span>
+                            { id: 'vedas', title: 'Vedas', desc: '4 Core Texts', icon: Book, color: 'text-amber-600', bg: 'bg-amber-600/10' },
+                            { id: 'upanishads', title: 'Upanishads', desc: '108 Upanishads', icon: BookOpen, color: 'text-teal-600', bg: 'bg-teal-600/10' },
+                            { id: 'gita', title: 'The Gita', desc: 'Divine Song', icon: Bookmark, color: 'text-emerald-600', bg: 'bg-emerald-600/10' },
+                            { id: 'philosophy', title: 'Darshanas', desc: '6 Schools', icon: FileText, color: 'text-rose-600', bg: 'bg-rose-600/10' }
+                        ].map(({ icon: Icon, ...cat }) => (
+                            <button
+                                key={cat.id}
+                                className={`group flex flex-col items-center p-8 rounded-[40px] border-2 transition-all duration-500 ${searchQuery.toLowerCase() === cat.title.toLowerCase()
+                                    ? 'bg-heritage-gold border-heritage-gold text-white shadow-2xl -translate-y-2'
+                                    : 'bg-[var(--bg)] border-[var(--border)] hover:border-heritage-gold/30 hover:-translate-y-1'
+                                    }`}
+                                onClick={() => handleSearch(cat.title)}
+                            >
+                                <div className={`w-20 h-20 rounded-3xl ${searchQuery.toLowerCase() === cat.title.toLowerCase() ? 'bg-white/20' : cat.bg} flex items-center justify-center mb-6 transition-all group-hover:scale-110 shadow-inner`}>
+                                    <Icon className={`w-10 h-10 ${searchQuery.toLowerCase() === cat.title.toLowerCase() ? 'text-white' : cat.color}`} />
                                 </div>
-                                <h3 className="font-display text-lg font-bold text-[var(--fg)] mb-1">{cat.title}</h3>
-                                <p className="text-sm text-[var(--muted)]">{cat.desc}</p>
-                            </div>
+                                <h3 className="font-display text-xl font-bold mb-1 tracking-tight">{cat.title}</h3>
+                                <p className={`text-xs font-bold uppercase tracking-widest ${searchQuery.toLowerCase() === cat.title.toLowerCase() ? 'text-white/70' : 'text-[var(--muted)]'}`}>
+                                    {cat.desc}
+                                </p>
+                            </button>
                         ))}
                     </Stagger>
 
-                    {/* Library Items */}
-                    <Reveal className="heritage-card">
-                        <div className="p-6 border-b border-[var(--border)]">
-                            <h3 className="font-display text-xl font-bold text-[var(--fg)]">Featured Texts ({filteredData.length})</h3>
+                    {/* Library Collection */}
+                    <Reveal>
+                        <div className="flex items-center justify-between mb-8 px-4">
+                            <h2 className="font-display text-3xl font-bold text-[var(--fg)] flex items-center gap-3">
+                                <Sparkles className="text-heritage-gold h-8 w-8" />
+                                Sacred Collection
+                            </h2>
+                            <div className="text-sm font-bold text-[var(--muted)] uppercase tracking-widest">
+                                {filteredData.length} Texts Revealed
+                            </div>
                         </div>
-                        <div className="divide-y divide-[var(--border)]">
-                            {filteredData.map((item) => (
-                                <div key={item.id} className="p-6 hover:bg-[var(--border)]/20 transition-colors group">
-                                    <div className="flex flex-col sm:flex-row items-start gap-6">
-                                        {/* Thumbnail */}
-                                        <div className="w-20 h-24 sm:w-24 sm:h-32 rounded-lg bg-gray-200 overflow-hidden flex-shrink-0 shadow-md">
-                                            <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+
+                        <div className="space-y-8">
+                            {filteredData.length > 0 ? filteredData.map((item) => (
+                                <Card
+                                    key={item.id}
+                                    className="p-0 overflow-hidden !rounded-[40px] group border-[var(--border)] hover:border-heritage-gold/20 shadow-xl hover:shadow-2xl transition-all duration-500"
+                                    animate={false}
+                                >
+                                    <div className="flex flex-col md:flex-row gap-0">
+                                        {/* Book Spine/Cover Overlay */}
+                                        <div className="md:w-64 aspect-[3/4] md:aspect-auto relative overflow-hidden bg-heritage-teal/5 flex-shrink-0">
+                                            <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                                            <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent opacity-60"></div>
+                                            <div className="absolute top-6 left-6 z-10">
+                                                <span className="px-3 py-1.5 rounded-xl bg-white/95 backdrop-blur-md text-heritage-brown text-[10px] font-bold uppercase tracking-[0.2em] shadow-2xl border border-white/50">
+                                                    {item.category}
+                                                </span>
+                                            </div>
+                                            <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/60 to-transparent">
+                                                <div className="flex items-center gap-3 text-white text-[10px] font-bold uppercase tracking-widest">
+                                                    <Clock className="w-3.5 h-3.5 text-heritage-gold" />
+                                                    {item.readTime || '5 min'} Read
+                                                </div>
+                                            </div>
                                         </div>
 
-                                        {/* Content */}
-                                        <div className="flex-1">
-                                            <div className="flex flex-wrap items-center gap-2 mb-2">
-                                                <h4 className="font-display text-lg font-bold text-[var(--fg)]">{item.title}</h4>
-                                                <span className="text-xs px-2 py-0.5 rounded-full bg-heritage-teal/10 text-heritage-teal border border-heritage-teal/20">{item.category}</span>
-                                            </div>
-                                            <p className="text-sm text-[var(--muted)] mb-3 line-clamp-2">{item.description}</p>
+                                        {/* Content Area */}
+                                        <div className="flex-1 p-8 md:p-12 flex flex-col justify-between">
+                                            <div>
+                                                <div className="flex justify-between items-start mb-6">
+                                                    <h3 className="font-display text-3xl md:text-4xl font-bold text-[var(--fg)] group-hover:text-heritage-gold transition-colors tracking-tight leading-none">
+                                                        {item.title}
+                                                    </h3>
+                                                    <div className="w-12 h-12 rounded-full border border-[var(--border)] flex items-center justify-center text-[var(--muted)] group-hover:bg-heritage-gold group-hover:text-white group-hover:border-heritage-gold transition-all">
+                                                        <ExternalLink className="w-5 h-5" />
+                                                    </div>
+                                                </div>
 
-                                            <div className="flex flex-wrap items-center gap-4 text-xs text-[var(--muted)] mb-4">
-                                                <span className="flex items-center gap-1">
-                                                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
-                                                    {item.author}
-                                                </span>
-                                                <span className="flex items-center gap-1">
-                                                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" /></svg>
-                                                    {item.chapters}
-                                                </span>
-                                                <span className="flex items-center gap-1">
-                                                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-                                                    ~{item.readTime} read
-                                                </span>
+                                                <p className="text-lg text-[var(--muted)] mb-6 leading-relaxed max-w-3xl line-clamp-3">
+                                                    {item.description}
+                                                </p>
+
+                                                {/* Excerpt Preview */}
+                                                <div className="mb-8 p-6 bg-heritage-gold/5 rounded-2xl border-l-4 border-heritage-gold/40 italic text-[var(--fg)]/80 text-sm leading-relaxed">
+                                                    <Sparkles className="w-4 h-4 text-heritage-gold mb-2" />
+                                                    "This is a sacred fragment of the eternal wisdom preserved within these verses. Explore the profound depth of human consciousness through these ancient lines..."
+                                                </div>
+
+                                                <div className="grid grid-cols-2 md:grid-cols-3 gap-6 pt-8 border-t border-[var(--border)]">
+                                                    <div className="space-y-1">
+                                                        <div className="text-[10px] font-bold text-[var(--muted)] uppercase tracking-widest">Scribe / Author</div>
+                                                        <div className="font-bold text-[var(--fg)] flex items-center gap-2">
+                                                            <User className="w-4 h-4 text-heritage-teal" />
+                                                            {item.author}
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <div className="text-[10px] font-bold text-[var(--muted)] uppercase tracking-widest">Chapters / Sections</div>
+                                                        <div className="font-bold text-[var(--fg)] flex items-center gap-2">
+                                                            <FileText className="w-4 h-4 text-heritage-teal" />
+                                                            {item.chapters}
+                                                        </div>
+                                                    </div>
+                                                    <div className="hidden md:block space-y-1">
+                                                        <div className="text-[10px] font-bold text-[var(--muted)] uppercase tracking-widest">Language</div>
+                                                        <div className="font-bold text-[var(--fg)]">Sanskrit / English</div>
+                                                    </div>
+                                                </div>
                                             </div>
 
-                                            <a
-                                                href={item.link}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="inline-flex items-center gap-2 text-sm font-medium text-heritage-gold hover:text-heritage-goldLight transition-colors"
-                                            >
-                                                <span>Read Text</span>
-                                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                                                    <polyline points="15 3 21 3 21 9" />
-                                                    <line x1="10" y1="14" x2="21" y2="3" />
-                                                </svg>
-                                            </a>
+                                            <div className="mt-10 flex items-center gap-4">
+                                                <Button
+                                                    variant="primary"
+                                                    rightIcon={ArrowRight}
+                                                    className="px-8 py-4 rounded-2xl flex-shrink-0"
+                                                    onClick={() => {
+                                                        if (item.link && item.link !== '#') {
+                                                            window.open(item.link, '_blank');
+                                                        } else {
+                                                            alert(`The full digital edition of "${item.title}" is being meticulously preserved and will be available shortly.`);
+                                                        }
+                                                    }}
+                                                >
+                                                    Open Digital Scripture
+                                                </Button>
+                                                <Button variant="secondary" className="px-5 py-4 rounded-2xl">
+                                                    <Bookmark className="w-5 h-5" />
+                                                </Button>
+                                            </div>
                                         </div>
                                     </div>
+                                </Card>
+                            )) : (
+                                <div className="text-center py-20 bg-[var(--bg)] border-2 border-dashed border-[var(--border)] rounded-[40px]">
+                                    <div className="w-20 h-20 bg-white shadow-xl rounded-3xl flex items-center justify-center mx-auto mb-6">
+                                        <Info className="w-10 h-10 text-heritage-gold" />
+                                    </div>
+                                    <h3 className="font-display text-2xl font-bold text-[var(--fg)] mb-2">The files are elusive</h3>
+                                    <p className="text-[var(--muted)] mb-8">Try searching for a different sacred text or category.</p>
+                                    <Button variant="secondary" onClick={() => handleSearch('')}>Restore Collection</Button>
                                 </div>
-                            ))}
+                            )}
                         </div>
-                        {filteredData.length === 0 && (
-                            <div className="p-8 text-center text-[var(--muted)]">No texts found matching your search.</div>
-                        )}
                     </Reveal>
                 </div>
             </div>

@@ -8,5 +8,7 @@ import java.util.List;
 
 @Repository
 public interface MoodEntryRepository extends JpaRepository<MoodEntry, String> {
+    List<MoodEntry> findByUserOrderByTimestampDesc(com.innerroot.model.User user);
+
     List<MoodEntry> findByUserIdOrderByTimestampDesc(String userId);
 }

@@ -44,6 +44,149 @@ export const libraryData = [
         link: 'https://www.sacred-texts.com/hin/upan/index.htm'
     },
     {
+        id: 'samaveda',
+        title: 'Samaveda',
+        author: 'Vyasa (Compiler)',
+        category: 'Vedas',
+        description: 'The Veda of Melodies and Chants. It consists of a collection of hymns, fragments of hymns, and detached verses, all but 75 taken from the Rigveda, to be sung during rituals.',
+        chapters: '1,875 Verses',
+        readTime: '15 hours',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Isha_Upanishad_Verse_1.jpg/640px-Isha_Upanishad_Verse_1.jpg',
+        link: 'https://www.sacred-texts.com/hin/sv.htm'
+    },
+    {
+        id: 'yajurveda',
+        title: 'Yajurveda',
+        author: 'Vyasa (Compiler)',
+        category: 'Vedas',
+        description: 'The Veda of Rituals and Yajnas. It contains prose mantras and verses intended to be recited during the performance of religious sacrifices.',
+        chapters: '40 Chapters',
+        readTime: '20 hours',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Shukla_Yajurveda_manuscript_sample.jpg/640px-Shukla_Yajurveda_manuscript_sample.jpg',
+        link: 'https://www.sacred-texts.com/hin/yv/index.htm'
+    },
+    {
+        id: 'atharvaveda',
+        title: 'Atharvaveda',
+        author: 'Vyasa (Compiler)',
+        category: 'Vedas',
+        description: 'The Veda of Everyday Life and Knowledge. It includes hymns on medicine, protection, and philosophy, providing a unique glimpse into the daily lives of ancient Indians.',
+        chapters: '20 Books',
+        readTime: '18 hours',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Atharva_Veda_manuscript_page_Kashmir.jpg/640px-Atharva_Veda_manuscript_page_Kashmir.jpg',
+        link: 'https://www.sacred-texts.com/hin/av/index.htm'
+    },
+    {
+        id: 'isha-upanishad',
+        title: 'Isha Upanishad',
+        author: 'Various Rishis',
+        category: 'Upanishads',
+        description: 'One of the shortest Upanishads, it focuses on the internal unity of the soul and the divine, emphasizing the concept of "All this is enveloped by the Lord."',
+        chapters: '18 Verses',
+        readTime: '30 mins',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Isha_Upanishad_Verse_1.jpg/640px-Isha_Upanishad_Verse_1.jpg',
+        link: 'https://www.sacred-texts.com/hin/upan/u01.htm'
+    },
+    {
+        id: 'kena-upanishad',
+        title: 'Kena Upanishad',
+        author: 'Various Rishis',
+        category: 'Upanishads',
+        description: 'Explores the nature of the divine power that lies behind the senses and the mind, famously asking "By whom (Kena) is the mind directed?"',
+        chapters: '4 Sections',
+        readTime: '45 mins',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Isha_Upanishad_Verse_1.jpg/640px-Isha_Upanishad_Verse_1.jpg',
+        link: 'https://www.sacred-texts.com/hin/upan/u02.htm'
+    },
+    {
+        id: 'katha-upanishad',
+        title: 'Katha Upanishad',
+        author: 'Various Rishis',
+        category: 'Upanishads',
+        description: 'The famous dialogue between the young Nachiketa and Yama (the God of Death) regarding the secrets of the soul and immortality.',
+        chapters: '2 Chapters',
+        readTime: '1.5 hours',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Isha_Upanishad_Verse_1.jpg/640px-Isha_Upanishad_Verse_1.jpg',
+        link: 'https://www.sacred-texts.com/hin/upan/u03.htm'
+    },
+    {
+        id: 'prashna-upanishad',
+        title: 'Prashna Upanishad',
+        author: 'Various Rishis',
+        category: 'Upanishads',
+        description: 'Contains six questions (Prashna) asked by six disciples to the sage Pippalada, covering topics from creation to the nature of "Om".',
+        chapters: '6 Questions',
+        readTime: '1 hour',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Isha_Upanishad_Verse_1.jpg/640px-Isha_Upanishad_Verse_1.jpg',
+        link: 'https://www.sacred-texts.com/hin/upan/u04.htm'
+    },
+    {
+        id: 'mundaka-upanishad',
+        title: 'Mundaka Upanishad',
+        author: 'Various Rishis',
+        category: 'Upanishads',
+        description: 'Distinguishes between higher and lower knowledge and contains the famous motto "Satyameva Jayate" (Truth alone triumphs).',
+        chapters: '3 Mundakas',
+        readTime: '1 hour',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Isha_Upanishad_Verse_1.jpg/640px-Isha_Upanishad_Verse_1.jpg',
+        link: 'https://www.sacred-texts.com/hin/upan/u05.htm'
+    },
+    {
+        id: 'mandukya-upanishad',
+        title: 'Mandukya Upanishad',
+        author: 'Various Rishis',
+        category: 'Upanishads',
+        description: 'The shortest Upanishad, it explains the four states of consciousness (Waking, Dreaming, Deep Sleep, and Turiya) through the syllable "Om".',
+        chapters: '12 Verses',
+        readTime: '30 mins',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Isha_Upanishad_Verse_1.jpg/640px-Isha_Upanishad_Verse_1.jpg',
+        link: 'https://www.sacred-texts.com/hin/upan/u06.htm'
+    },
+    {
+        id: 'taittiriya-upanishad',
+        title: 'Taittiriya Upanishad',
+        author: 'Various Rishis',
+        category: 'Upanishads',
+        description: 'Explores the five layers (Koshas) of the human personality and outlines ethical rules for students and teachers.',
+        chapters: '3 Vallis',
+        readTime: '2 hours',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Isha_Upanishad_Verse_1.jpg/640px-Isha_Upanishad_Verse_1.jpg',
+        link: 'https://www.sacred-texts.com/hin/upan/u07.htm'
+    },
+    {
+        id: 'aitareya-upanishad',
+        title: 'Aitareya Upanishad',
+        author: 'Various Rishis',
+        category: 'Upanishads',
+        description: 'Discusses the origins of the universe and the nature of consciousness, containing the Mahavakya "Prajnanam Brahma" (Consciousness is Brahman).',
+        chapters: '3 Chapters',
+        readTime: '1 hour',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Isha_Upanishad_Verse_1.jpg/640px-Isha_Upanishad_Verse_1.jpg',
+        link: 'https://www.sacred-texts.com/hin/upan/u08.htm'
+    },
+    {
+        id: 'chandogya-upanishad',
+        title: 'Chandogya Upanishad',
+        author: 'Various Rishis',
+        category: 'Upanishads',
+        description: 'One of the oldest and largest Upanishads, famous for the dialogue "Tat Tvam Asi" (That Thou Art) between Uddalaka and Shvetaketu.',
+        chapters: '8 Chapters',
+        readTime: '5 hours',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Isha_Upanishad_Verse_1.jpg/640px-Isha_Upanishad_Verse_1.jpg',
+        link: 'https://www.sacred-texts.com/hin/upan/u09.htm'
+    },
+    {
+        id: 'brihadaranyaka-upanishad',
+        title: 'Brihadaranyaka Upanishad',
+        author: 'Various Rishis',
+        category: 'Upanishads',
+        description: 'The "Great Forest" Upanishad, it is the largest and contains deep metaphysical discussions, including the famous "Lead me from the unreal to the real".',
+        chapters: '6 Chapters',
+        readTime: '7 hours',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Isha_Upanishad_Verse_1.jpg/640px-Isha_Upanishad_Verse_1.jpg',
+        link: 'https://www.sacred-texts.com/hin/upan/u10.htm'
+    },
+    {
         id: 'ramayana',
         title: 'Ramayana',
         author: 'Valmiki',
@@ -86,5 +229,93 @@ export const libraryData = [
         readTime: '15 hours',
         image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Nataraja_Musee_Guimet.jpg/480px-Nataraja_Musee_Guimet.jpg',
         link: 'https://en.wikipedia.org/wiki/Natya_Shastra'
+    },
+    {
+        id: 'vishnu-purana',
+        title: 'Vishnu Purana',
+        author: 'Vyasa',
+        category: 'Scriptures',
+        description: 'One of the eighteen Mahapuranas, a genre of ancient Indian literature. It is considered one of the most important Puranas and has been given the name "Puranaratna".',
+        chapters: '6 Amsas',
+        readTime: '15 hours',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Shukla_Yajurveda_manuscript_sample.jpg/640px-Shukla_Yajurveda_manuscript_sample.jpg',
+        link: 'https://www.sacred-texts.com/hin/vp/index.htm'
+    },
+    {
+        id: 'shiva-purana',
+        title: 'Shiva Purana',
+        author: 'Vyasa',
+        category: 'Scriptures',
+        description: 'Dedicated to Lord Shiva, this Purana explores the cosmology, mythology, and relationship between deities. It is an essential text for Shaivism.',
+        chapters: '7 Samhitas',
+        readTime: '20 hours',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Nataraja_Musee_Guimet.jpg/480px-Nataraja_Musee_Guimet.jpg',
+        link: 'https://www.sacred-texts.com/hin/siv/index.htm'
+    },
+    {
+        id: 'shakuntala',
+        title: 'Abhijnanashakuntalam',
+        author: 'Kalidasa',
+        category: 'Literature',
+        description: 'A celebrated Sanskrit play by Kalidasa, telling the tragic and beautiful story of Shakuntala and King Dushyanta. It is considered one of the masterpieces of world literature.',
+        chapters: '7 Acts',
+        readTime: '3 hours',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Shakuntala_by_Raja_Ravi_Varma.jpg/480px-Shakuntala_by_Raja_Ravi_Varma.jpg',
+        link: 'https://en.wikipedia.org/wiki/Abhijnanashakuntalam'
+    },
+    {
+        id: 'meghaduta',
+        title: 'Meghaduta',
+        author: 'Kalidasa',
+        category: 'Literature',
+        description: 'A lyric poem where a Yaksha, exiled to Central India, asks a passing cloud to take a message to his wife on Mount Kailasa in the Himalayas.',
+        chapters: '111 Stanzas',
+        readTime: '2 hours',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Meghaduta_manuscript.jpg/640px-Meghaduta_manuscript.jpg',
+        link: 'https://en.wikipedia.org/wiki/Meghaduta'
+    },
+    {
+        id: 'aryabhatiya',
+        title: 'Aryabhatiya',
+        author: 'Aryabhata',
+        category: 'Science',
+        description: 'An influential Sanskrit astronomical and mathematical treatise. It covers arithmetic, algebra, plane trigonometry, and spherical trigonometry.',
+        chapters: '4 Sections',
+        readTime: '4 hours',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Aryabhata_statue_at_IUCAA.jpg/480px-Aryabhata_statue_at_IUCAA.jpg',
+        link: 'https://en.wikipedia.org/wiki/Aryabhatiya'
+    },
+    {
+        id: 'sushruta-samhita',
+        title: 'Sushruta Samhita',
+        author: 'Sushruta',
+        category: 'Science',
+        description: 'One of the most important ancient medical treatises and a foundational text of Ayurveda. It is famous for its detailed descriptions of surgical procedures, including plastic surgery.',
+        chapters: '184 Chapters',
+        readTime: '25 hours',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Sushruta_statue.jpg/480px-Sushruta_statue.jpg',
+        link: 'https://en.wikipedia.org/wiki/Sushruta_Samhita'
+    },
+    {
+        id: 'charaka-samhita',
+        title: 'Charaka Samhita',
+        author: 'Charaka',
+        category: 'Science',
+        description: 'A comprehensive Sanskrit text on Ayurveda (Indian medicine). It is one of the two foundational Hindu texts of this field, the other being the Sushruta Samhita.',
+        chapters: '8 Sections',
+        readTime: '30 hours',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Charaka.jpg/480px-Charaka.jpg',
+        link: 'https://en.wikipedia.org/wiki/Charaka_Samhita'
+    },
+    {
+        id: 'brahma-sutras',
+        title: 'Brahma Sutras',
+        author: 'Badarayana',
+        category: 'Philosophy',
+        description: 'A foundational Sanskrit text of the Vedanta school of Hindu philosophy. It systematizes the teachings of the Upanishads.',
+        chapters: '4 Chapters',
+        readTime: '12 hours',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Isha_Upanishad_Verse_1.jpg/640px-Isha_Upanishad_Verse_1.jpg',
+        link: 'https://en.wikipedia.org/wiki/Brahma_Sutras'
     }
 ];

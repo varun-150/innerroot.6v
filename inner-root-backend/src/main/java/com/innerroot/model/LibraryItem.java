@@ -27,4 +27,8 @@ public class LibraryItem {
     private String author;
 
     private String fileUrl;
+
+    private String readTime;
+    private String link;
+    private String image;
 }

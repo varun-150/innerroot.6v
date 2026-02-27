@@ -21,7 +21,13 @@ export const Reveal = ({ children, className = '', style = {} }) => {
             { threshold: 0.1 }
         );
         if (ref.current) observer.observe(ref.current);
-        return () => observer.disconnect();
+
+        const fallback = setTimeout(() => setIsVisible(true), 2000);
+
+        return () => {
+            observer.disconnect();
+            clearTimeout(fallback);
+        };
     }, []);
 
     return (
@@ -52,7 +58,13 @@ export const Stagger = ({ children, className = '', id = '' }) => {
             { threshold: 0.01 }
         );
         if (ref.current) observer.observe(ref.current);
-        return () => observer.disconnect();
+
+        const fallback = setTimeout(() => setIsVisible(true), 2000);
+
+        return () => {
+            observer.disconnect();
+            clearTimeout(fallback);
+        };
     }, []);
 
     return (

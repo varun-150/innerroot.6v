@@ -1,16 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import Button from './ui/Button';
+import {
+    ChevronDown, Menu, X, Sun, Moon,
+    Map, Book, Library, Users, Sparkles, LogOut
+} from 'lucide-react';
 import logo from '../assets/logo.webp';
 
 const Header = ({ theme, onToggleTheme, isMobileMenuOpen, onToggleMobileMenu }) => {
     const location = useLocation();
     const navigate = useNavigate();
     const { user, isAuthenticated, logout } = useAuth();
+    const [isHeritageOpen, setIsHeritageOpen] = useState(false);
 
-    // Helper to determine active class
     const getLinkClass = ({ isActive }) =>
-        `nav-link ${isActive ? 'active' : ''} px-3 py-2 rounded-md text-sm font-medium transition-colors hover:text-heritage-gold`;
+        `nav-link ${isActive ? 'active text-heritage-gold' : 'text-[var(--muted)]'} px-3 py-2 rounded-md text-sm font-medium transition-colors hover:text-heritage-gold`;
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 bg-[var(--bg)]/90 backdrop-blur-md border-b border-[var(--border)] transition-colors duration-300">
@@ -18,168 +23,173 @@ const Header = ({ theme, onToggleTheme, isMobileMenuOpen, onToggleMobileMenu }) 
                 <div className="flex items-center justify-between h-16 lg:h-20">
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-3 group" aria-label="Inner Root Home">
-                        <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center transition-all duration-300">
-                            <img src={logo} alt="Inner Root Logo" className="w-full h-full object-cover" />
+                        <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full overflow-hidden flex items-center justify-center transition-all duration-300 group-hover:scale-105">
+                            <img src={logo} alt="" className="w-full h-full object-cover" />
                         </div>
-                        <span className="font-display text-2xl font-bold text-[var(--fg)] group-hover:text-heritage-gold transition-colors">Inner Root</span>
+                        <span className="font-display text-xl lg:text-2xl font-bold text-[var(--fg)] group-hover:text-heritage-gold transition-colors">Inner Root</span>
                     </Link>
 
-
                     {/* Desktop Navigation */}
-                    <div className="hidden lg:flex items-center gap-8">
-                        <NavLink to="/" className={getLinkClass} title="Home Page">Home</NavLink>
+                    <div className="hidden lg:flex items-center gap-6">
+                        <NavLink to="/" className={getLinkClass}>Home</NavLink>
 
-                        <NavLink
-                            to="/tours"
-                            className={getLinkClass}
-                            title="360° exploration of UNESCO heritage sites and ancient monuments."
+                        {/* Heritage Mega Menu */}
+                        <div
+                            className="relative group"
+                            onMouseEnter={() => setIsHeritageOpen(true)}
+                            onMouseLeave={() => setIsHeritageOpen(false)}
                         >
-                            Tours
-                        </NavLink>
+                            <button
+                                className={`flex items-center gap-1 px-3 py-2 text-sm font-medium transition-colors hover:text-heritage-gold ${isHeritageOpen ? 'text-heritage-gold' : 'text-[var(--muted)]'}`}
+                                aria-expanded={isHeritageOpen}
+                                aria-haspopup="true"
+                            >
+                                Heritage <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isHeritageOpen ? 'rotate-180' : ''}`} />
+                            </button>
 
-                        <NavLink
-                            to="/explore"
-                            className={getLinkClass}
-                            title="Traditions, festivals, arts, and scriptures explained."
-                        >
-                            Culture
-                        </NavLink>
+                            <div className={`absolute top-full left-1/2 -translate-x-1/2 w-64 pt-2 transition-all duration-300 ${isHeritageOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-2 pointer-events-none'}`}>
+                                <div className="glass-card rounded-2xl p-4 shadow-xl border border-[var(--border)]">
+                                    <div className="grid gap-2">
+                                        <Link to="/tours" className="flex items-center gap-3 p-3 rounded-xl hover:bg-heritage-gold/10 transition-colors group">
+                                            <Map className="w-5 h-5 text-heritage-teal group-hover:scale-110 transition-transform" />
+                                            <div className="text-left">
+                                                <p className="text-sm font-bold text-[var(--fg)]">Virtual Tours</p>
+                                                <p className="text-[10px] text-[var(--muted)]">Explore 360° sites</p>
+                                            </div>
+                                        </Link>
+                                        <Link to="/explore" className="flex items-center gap-3 p-3 rounded-xl hover:bg-heritage-gold/10 transition-colors group">
+                                            <Book className="w-5 h-5 text-heritage-teal group-hover:scale-110 transition-transform" />
+                                            <div className="text-left">
+                                                <p className="text-sm font-bold text-[var(--fg)]">Cultural Learning</p>
+                                                <p className="text-[10px] text-[var(--muted)]">Traditions & Arts</p>
+                                            </div>
+                                        </Link>
+                                        <Link to="/library" className="flex items-center gap-3 p-3 rounded-xl hover:bg-heritage-gold/10 transition-colors group">
+                                            <Library className="w-5 h-5 text-heritage-teal group-hover:scale-110 transition-transform" />
+                                            <div className="text-left">
+                                                <p className="text-sm font-bold text-[var(--fg)]">Digital Library</p>
+                                                <p className="text-[10px] text-[var(--muted)]">Sacred Scriptures</p>
+                                            </div>
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                        <NavLink
-                            to="/wellness"
-                            className={getLinkClass}
-                            title="Meditation, chanting guides, and emotional balance tools."
-                        >
-                            Wellness
-                        </NavLink>
-
-                        <NavLink
-                            to="/library"
-                            className={getLinkClass}
-                            title="Scriptures, philosophy texts, and historical resources."
-                        >
-                            Library
-                        </NavLink>
-
-                        <NavLink
-                            to="/community"
-                            className={getLinkClass}
-                            title="Connect with fellow culture enthusiasts."
-                        >
-                            Community
-                        </NavLink>
-
+                        <NavLink to="/wellness" className={getLinkClass}>Wellness</NavLink>
+                        <NavLink to="/community" className={getLinkClass}>Community</NavLink>
+                        <NavLink to="/monetization" className={getLinkClass}>Pricing & Plans</NavLink>
                         <NavLink to="/about" className={getLinkClass}>About</NavLink>
-                        {isAuthenticated && (
-                            <NavLink to="/dashboard" className={getLinkClass}>Dashboard</NavLink>
-                        )}
                     </div>
 
                     {/* Right Actions */}
-                    <div className="flex items-center gap-4">
-                        {/* Theme Toggle */}
+                    <div className="flex items-center gap-3">
                         <button
                             onClick={onToggleTheme}
-                            className="w-10 h-10 rounded-full border-2 border-[var(--border)] flex items-center justify-center hover:border-heritage-gold hover:text-heritage-gold transition-all duration-300"
-                            aria-label="Toggle theme"
+                            className="group flex items-center gap-2 h-10 px-3 rounded-full border border-[var(--border)] hover:border-heritage-gold transition-all"
+                            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
                         >
                             {theme === 'light' ? (
-                                <svg className="w-5 h-5 sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="5" /><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" /></svg>
-                            ) : (
-                                <svg className="w-5 h-5 moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
-                            )}
-                        </button>
-
-                        {/* Auth Buttons */}
-                        <div className="hidden sm:flex items-center gap-3">
-                            {isAuthenticated ? (
                                 <>
-                                    <Link to="/dashboard" className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[var(--border)] hover:border-heritage-gold transition-all duration-300 group">
-                                        {user.profilePicture ? (
-                                            <img src={user.profilePicture} alt={user.name} className="w-7 h-7 rounded-full object-cover" />
-                                        ) : (
-                                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-heritage-gold to-heritage-orange flex items-center justify-center text-white text-xs font-bold">
-                                                {user.name?.charAt(0).toUpperCase()}
-                                            </div>
-                                        )}
-                                        <span className="text-sm font-medium text-[var(--fg)] max-w-[100px] truncate group-hover:text-heritage-gold transition-colors">{user.name}</span>
-                                    </Link>
-                                    <button onClick={() => { logout(); navigate('/'); }}
-                                        className="px-4 py-2 text-sm font-medium text-red-400 hover:text-red-300 transition-colors">
-                                        Logout
-                                    </button>
+                                    <Sun className="w-5 h-5 text-heritage-gold animate-pulse-slow" />
+                                    <span className="text-[10px] font-bold uppercase tracking-wider hidden xl:block">Dark Mode</span>
                                 </>
                             ) : (
                                 <>
-                                    <Link to="/login" className="px-4 py-2 text-sm font-medium text-[var(--fg)] hover:text-heritage-gold transition-colors">
-                                        Log in
+                                    <Moon className="w-5 h-5 text-heritage-gold" />
+                                    <span className="text-[10px] font-bold uppercase tracking-wider hidden xl:block">Light Mode</span>
+                                </>
+                            )}
+                        </button>
+
+                        <div className="hidden sm:flex items-center gap-3">
+                            {isAuthenticated ? (
+                                <div className="flex items-center gap-2">
+                                    <Link to="/dashboard" className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[var(--border)] hover:border-heritage-gold transition-all group">
+                                        {user.profilePicture ? (
+                                            <img src={user.profilePicture} alt={user.name} className="w-7 h-7 rounded-full object-cover" />
+                                        ) : (
+                                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-heritage-gold to-heritage-orange flex items-center justify-center text-white text-xs font-bold font-display">
+                                                {user?.name?.charAt(0).toUpperCase() || 'S'}
+                                            </div>
+                                        )}
+                                        <span className="text-xs font-bold text-[var(--fg)] group-hover:text-heritage-gold transition-colors">{user?.name?.split(' ')[0] || 'Seeker'}</span>
                                     </Link>
-                                    <Link to="/signup" className="px-5 py-2.5 text-sm font-medium rounded-full text-white bg-gradient-to-r from-heritage-gold to-heritage-orange hover:from-heritage-goldLight hover:to-heritage-gold shadow-lg shadow-heritage-gold/20 transform hover:-translate-y-0.5 transition-all duration-300">
-                                        Sign up
-                                    </Link>
+                                    <button
+                                        onClick={() => { logout(); navigate('/'); }}
+                                        className="p-2 text-red-400 hover:bg-red-500/10 rounded-full transition-colors"
+                                        title="Logout"
+                                    >
+                                        <LogOut className="w-5 h-5" />
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    <Button variant="tertiary" onClick={() => navigate('/login')}>Log in</Button>
+                                    <Button size="sm" onClick={() => navigate('/signup')}>Sign up</Button>
                                 </>
                             )}
                         </div>
 
-                        {/* Mobile Menu Button */}
                         <button
                             className="lg:hidden w-10 h-10 flex items-center justify-center text-[var(--fg)]"
-                            aria-label="Open menu"
+                            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
                             onClick={onToggleMobileMenu}
                         >
-                            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M3 12h18M3 6h18M3 18h18" />
-                            </svg>
+                            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                         </button>
                     </div>
                 </div>
             </nav>
 
             {/* Mobile Menu Overlay */}
-            <div className={`fixed inset-0 z-50 bg-[var(--bg)] transition-transform duration-300 transform ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+            <div className={`fixed inset-0 z-50 bg-[var(--bg)] transition-transform duration-500 transform ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
                 <div className="flex flex-col h-full p-6">
                     <div className="flex justify-between items-center mb-8">
                         <span className="font-display text-2xl font-bold text-[var(--fg)]">Menu</span>
-                        <button
-                            className="w-10 h-10 flex items-center justify-center text-[var(--fg)] hover:text-heritage-gold transition-colors"
-                            aria-label="Close menu"
-                            onClick={onToggleMobileMenu}
-                        >
-                            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M18 6L6 18M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        {[
-                            { path: '/', label: 'Home' },
-                            { path: '/tours', label: 'Virtual Tours' },
-                            { path: '/explore', label: 'Culture' },
-                            { path: '/wellness', label: 'Wellness' },
-                            { path: '/library', label: 'Library' },
-                            { path: '/community', label: 'Community' },
-                            { path: '/about', label: 'About' },
-                            ...(isAuthenticated ? [{ path: '/dashboard', label: '📊 Dashboard' }] : [])
-                        ].map(({ path, label }) => (
-                            <NavLink
-                                key={path}
-                                to={path}
-                                className={({ isActive }) =>
-                                    `text-left py-4 text-lg font-medium border-b border-[var(--border)] transition-colors ${isActive ? 'text-heritage-gold' : 'text-[var(--fg)] hover:text-heritage-gold'}`
-                                }
-                                onClick={onToggleMobileMenu}
+                        <div className="flex items-center gap-4">
+                            <button
+                                onClick={onToggleTheme}
+                                className="flex items-center gap-2 px-4 py-2 rounded-full border border-[var(--border)] text-sm font-bold text-[var(--fg)]"
                             >
-                                {label}
-                            </NavLink>
-                        ))}
-                        <div className="flex flex-col gap-4 mt-8">
-                            <Link to="/login" onClick={onToggleMobileMenu} className="w-full text-center py-3 border border-[var(--border)] rounded-lg font-medium text-[var(--fg)] hover:border-heritage-gold hover:text-heritage-gold transition-colors">
-                                Log in
-                            </Link>
-                            <Link to="/signup" onClick={onToggleMobileMenu} className="w-full text-center py-3 bg-gradient-to-r from-heritage-gold to-heritage-orange text-white rounded-lg font-medium shadow-lg hover:shadow-heritage-gold/20 transition-all">
-                                Create Account
-                            </Link>
+                                {theme === 'light' ? <><Sun className="w-4 h-4" /> Dark</> : <><Moon className="w-4 h-4" /> Light</>}
+                            </button>
+                            <button onClick={onToggleMobileMenu} className="w-10 h-10 flex items-center justify-center text-[var(--fg)]"><X className="w-6 h-6" /></button>
                         </div>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto">
+                        <div className="flex flex-col gap-1">
+                            {[
+                                { path: '/', label: 'Home' },
+                                { path: '/tours', label: 'Virtual Tours' },
+                                { path: '/explore', label: 'Cultural Learning' },
+                                { path: '/library', label: 'Digital Library' },
+                                { path: '/wellness', label: 'Wellness' },
+                                { path: '/community', label: 'Community' },
+                                { path: '/monetization', label: 'Pricing & Plans' },
+                                { path: '/about', label: 'About' },
+                                ...(isAuthenticated ? [{ path: '/dashboard', label: 'Dashboard' }] : [])
+                            ].map(({ path, label }) => (
+                                <NavLink
+                                    key={path}
+                                    to={path}
+                                    className={({ isActive }) =>
+                                        `text-left py-4 text-xl font-bold border-b border-[var(--border)] transition-colors ${isActive ? 'text-heritage-gold translate-x-2' : 'text-[var(--fg)]'} transform duration-300`
+                                    }
+                                    onClick={onToggleMobileMenu}
+                                >
+                                    {label}
+                                </NavLink>
+                            ))}
+                        </div>
+
+                        {!isAuthenticated && (
+                            <div className="mt-12 flex flex-col gap-4">
+                                <Button className="w-full py-4 text-lg" onClick={() => { onToggleMobileMenu(); navigate('/signup'); }}>Get Started</Button>
+                                <Button variant="secondary" className="w-full py-4 text-lg" onClick={() => { onToggleMobileMenu(); navigate('/login'); }}>Log In</Button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -188,3 +198,4 @@ const Header = ({ theme, onToggleTheme, isMobileMenuOpen, onToggleMobileMenu }) 
 };
 
 export default Header;
+

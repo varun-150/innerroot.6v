@@ -241,6 +241,41 @@ export const wisdomData = [
         source: "Bhagavad Gita 6.19",
         theme: "Meditation"
     },
+    {
+        quote: "Truth alone triumphs, not falsehood.",
+        source: "Mundaka Upanishad",
+        theme: "Truth"
+    },
+    {
+        quote: "He who has no attachment can really love others, for his love is pure and divine.",
+        source: "Swami Vivekananda",
+        theme: "Love"
+    },
+    {
+        quote: "The mind is everything. What you think you become.",
+        source: "Gautama Buddha",
+        theme: "Mind"
+    },
+    {
+        quote: "That which is known as Brahman is the eternal truth, the supreme consciousness.",
+        source: "Taittiriya Upanishad",
+        theme: "Consciousness"
+    },
+    {
+        quote: "All the powers in the universe are already ours. It is we who have put our hands before our eyes and cry that it is dark.",
+        source: "Swami Vivekananda",
+        theme: "Strength"
+    },
+    {
+        quote: "Radiate boundless love towards the entire world — above, below, and across — unhindered, without ill will, without enmity.",
+        source: "Metta Sutta (Buddha)",
+        theme: "Compassion"
+    },
+    {
+        quote: "Lead me from the unreal to the real. Lead me from darkness to light. Lead me from death to immortality.",
+        source: "Brihadaranyaka Upanishad",
+        theme: "Enlightenment"
+    }
 ];
 
 export const moodMessages = {

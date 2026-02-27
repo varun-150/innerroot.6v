@@ -1,34 +1,67 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { getCultureItems } from '../services/api';
+import { exploreData as localExploreData } from '../data/exploreData';
 import { Reveal, Stagger } from '../components/Reveal';
 import SEO from '../components/SEO';
+import Breadcrumbs from '../components/Breadcrumbs';
+import Button from '../components/ui/Button';
+import Card from '../components/ui/Card';
+import Input from '../components/ui/Input';
+import {
+    Search, Filter, MapPin, ExternalLink,
+    Sparkles, BookOpen, Music, Users,
+    ArrowRight, Info, AlertTriangle, Loader2
+} from 'lucide-react';
 
-// Static configuration for categories (icons, labels, gradients)
 const CATEGORY_CONFIG = {
     festivals: {
         icon: '🎆',
         label: 'National Festivals',
-        gradient: 'from-amber-500/20 to-orange-500/20',
+        color: 'text-amber-500',
+        bg: 'bg-amber-500/10'
     },
     'state-festivals': {
         icon: '🏛️',
         label: 'State Festivals',
-        gradient: 'from-cyan-500/20 to-blue-500/20',
+        color: 'text-cyan-500',
+        bg: 'bg-cyan-500/10'
     },
     arts: {
         icon: '🎭',
         label: 'Arts & Dances',
-        gradient: 'from-emerald-500/20 to-teal-500/20',
+        color: 'text-emerald-500',
+        bg: 'bg-emerald-500/10'
     },
     traditions: {
         icon: '🙏',
         label: 'Traditions',
-        gradient: 'from-indigo-500/20 to-purple-500/20',
+        color: 'text-indigo-500',
+        bg: 'bg-indigo-500/10'
     },
     scriptures: {
         icon: '📜',
         label: 'Scriptures',
-        gradient: 'from-rose-500/20 to-pink-500/20',
+        color: 'text-rose-500',
+        bg: 'bg-rose-500/10'
+    },
+    temples: {
+        icon: '🛕',
+        label: 'Ancient Temples',
+        color: 'text-orange-500',
+        bg: 'bg-orange-500/10'
+    },
+    food: {
+        icon: '🍛',
+        label: 'Culinary Arts',
+        color: 'text-amber-600',
+        bg: 'bg-amber-600/10'
+    },
+    languages: {
+        icon: '🗣️',
+        label: 'Languages',
+        color: 'text-blue-500',
+        bg: 'bg-blue-500/10'
     },
 };
 
@@ -36,17 +69,18 @@ const Explore = () => {
     const [exploreData, setExploreData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
     const [filter, setFilter] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [imgErrors, setImgErrors] = useState({});
 
-    // Fetch data from Backend API
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await getCultureItems();
-                setExploreData(Array.isArray(response.data) ? response.data : []);
+                const data = Array.isArray(response.data) && response.data.length > 0
+                    ? response.data
+                    : localExploreData;
+                setExploreData(data);
                 setLoading(false);
             } catch (err) {
                 console.error("Error fetching culture data:", err);
@@ -75,7 +109,6 @@ const Explore = () => {
         setImgErrors(prev => ({ ...prev, [id]: true }));
     };
 
-    // Calculate dynamic counts
     const categoryMeta = useMemo(() => {
         const meta = {};
         Object.keys(CATEGORY_CONFIG).forEach(key => {
@@ -89,222 +122,231 @@ const Explore = () => {
 
     const categoryKeys = ['all', ...Object.keys(CATEGORY_CONFIG)];
 
-    // Gradient fallbacks for broken images
-    const fallbackGradients = {
-        'heritage-gold': 'from-amber-600 to-yellow-600',
-        'heritage-teal': 'from-teal-600 to-cyan-600',
-        'heritage-green': 'from-emerald-700 to-green-600',
-        'heritage-brown': 'from-amber-800 to-orange-700',
-    };
-
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-heritage-gold"></div>
+            <div className="min-h-screen flex flex-col items-center justify-center gap-6">
+                <Loader2 className="w-12 h-12 text-heritage-gold animate-spin" />
+                <p className="font-display text-xl text-[var(--muted)] animate-pulse">Consulting the archives...</p>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center text-center p-4">
-                <div className="text-4xl mb-4">⚠️</div>
-                <h2 className="text-2xl font-bold mb-2">Unable to load content</h2>
-                <p className="text-[var(--muted)] mb-4">{error}. Is the backend running?</p>
-                <p className="text-sm text-[var(--muted)]">Try ensuring MySQL is connected and Backend is started.</p>
+            <div className="min-h-screen flex flex-col items-center justify-center text-center p-8">
+                <div className="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center mb-6">
+                    <AlertTriangle className="w-10 h-10 text-red-500" />
+                </div>
+                <h2 className="font-display text-3xl font-bold text-[var(--fg)] mb-4">Discovery Interrupted</h2>
+                <p className="text-[var(--muted)] max-w-md mx-auto text-lg mb-8">{error}. Please ensure our wisdom servers are active.</p>
+                <Button onClick={() => window.location.reload()} variant="primary" size="lg">Retry Connection</Button>
             </div>
         );
     }
 
     return (
-        <section id="page-explore" className="page active block opacity-100">
+        <section id="page-explore" className="page active block opacity-100" aria-label="Cultural Discovery Engine">
             <SEO
                 title="Explore Indian Culture"
                 description="Discover Indian festivals, arts, traditions, and scriptures. A comprehensive guide to India's rich cultural heritage."
                 keywords="Indian festivals, art forms, traditions, vedas, upanishads, culture"
             />
-            <div className="py-12 lg:py-20">
+            <div className="py-12 lg:py-24">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <Breadcrumbs />
+
                     {/* Header */}
-                    <Reveal className="text-center mb-12">
-                        <h1 className="font-display text-4xl sm:text-5xl font-bold text-[var(--fg)] mb-4">
-                            Cultural Learning
+                    <Reveal className="text-center mb-20 mt-8">
+                        <span className="inline-block px-4 py-1 rounded-full bg-heritage-gold/20 text-heritage-gold font-bold text-xs uppercase tracking-widest mb-6 border border-heritage-gold/20">Discovery Engine</span>
+                        <h1 className="font-display text-4xl sm:text-6xl font-bold text-[var(--fg)] mb-6 tracking-tight">
+                            The Treasury of Heritage
                         </h1>
-                        <p className="text-[var(--muted)] max-w-2xl mx-auto text-lg">
-                            Traditions, festivals, arts, and scriptures explained.
+                        <p className="text-[var(--muted)] max-w-3xl mx-auto text-xl leading-relaxed font-medium">
+                            Explore the vibrant tapestry of India's cultural soul—from ancient scriptures to living traditions.
                         </p>
-                        <div className="mt-4 text-sm text-[var(--muted)]">
-                            <span className="text-heritage-gold font-semibold">{exploreData.length}</span> items across {Object.keys(CATEGORY_CONFIG).length} categories
-                        </div>
                     </Reveal>
 
-                    {/* Category Stats Cards */}
-                    <Stagger className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-10">
+                    {/* Category Quick Filters */}
+                    <Stagger className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-16">
                         {Object.entries(categoryMeta).map(([key, meta]) => (
                             <button
                                 key={key}
                                 onClick={() => setFilter(filter === key ? 'all' : key)}
-                                className={`heritage-card p-5 text-center cursor-pointer group transition-all duration-300 ${filter === key ? 'ring-2 ring-heritage-gold shadow-lg shadow-heritage-gold/10 scale-[1.02]' : 'hover:scale-[1.02]'
+                                className={`group relative p-6 rounded-[32px] border-2 transition-all duration-500 text-left overflow-hidden h-full ${filter === key
+                                    ? 'bg-heritage-gold border-heritage-gold shadow-2xl shadow-heritage-gold/20 -translate-y-2'
+                                    : 'bg-[var(--bg)] border-[var(--border)] hover:border-heritage-gold/30 hover:-translate-y-1'
                                     }`}
                             >
-                                <div className={`text-3xl mb-2 group-hover:scale-110 transition-transform`}>
+                                <div className={`text-4xl mb-6 transition-transform group-hover:scale-110 duration-500 ${filter === key ? 'grayscale-0' : 'grayscale group-hover:grayscale-0'}`}>
                                     {meta.icon}
                                 </div>
-                                <h3 className="font-display text-sm lg:text-base font-bold text-[var(--fg)]">{meta.label}</h3>
-                                <p className="text-sm text-[var(--muted)]">{meta.count} items</p>
+                                <h3 className={`font-display text-lg font-bold mb-2 ${filter === key ? 'text-white' : 'text-[var(--fg)]'}`}>
+                                    {meta.label}
+                                </h3>
+                                <p className={`text-sm font-bold uppercase tracking-widest ${filter === key ? 'text-white/80' : 'text-[var(--muted)]'}`}>
+                                    {meta.count} Wisdoms
+                                </p>
+                                {filter === key && (
+                                    <div className="absolute -bottom-2 -right-2 w-12 h-12 bg-white/20 rounded-full blur-xl"></div>
+                                )}
                             </button>
                         ))}
                     </Stagger>
 
-                    {/* Search & Filter */}
-                    <Reveal className="flex flex-col sm:flex-row gap-4 mb-10">
-                        <div className="relative flex-1">
-                            <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--muted)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <circle cx="11" cy="11" r="8" />
-                                <path d="M21 21l-4.35-4.35" />
-                            </svg>
-                            <input
-                                type="text"
-                                placeholder="Search festivals, arts, traditions, scriptures, states..."
-                                className="search-input"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
-                        </div>
-                        <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0">
-                            {categoryKeys.map(f => (
-                                <button
-                                    key={f}
-                                    className={`tab-btn whitespace-nowrap ${filter === f ? 'active' : ''}`}
-                                    onClick={() => setFilter(f)}
-                                >
-                                    {f === 'all' ? '✨ All' : `${categoryMeta[f]?.icon || ''} ${categoryMeta[f]?.label || f}`}
-                                </button>
-                            ))}
-                        </div>
+                    {/* Search & Filter Bar */}
+                    <Reveal className="mb-12">
+                        <Card className="p-8 !rounded-[40px] shadow-2xl border-[var(--border)] overflow-visible">
+                            <div className="flex flex-col lg:flex-row gap-8 items-end lg:items-center">
+                                <div className="flex-1 w-full">
+                                    <Input
+                                        placeholder="Search festivals, arts, traditions, states..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        icon={Search}
+                                        className="!py-4 !text-lg"
+                                        containerClassName="!space-y-3"
+                                        label="Search Wisdoms"
+                                    />
+                                </div>
+                                <div className="flex flex-wrap gap-3">
+                                    {categoryKeys.map(f => (
+                                        <button
+                                            key={f}
+                                            className={`px-5 py-2.5 rounded-2xl text-sm font-bold transition-all duration-300 flex items-center gap-2 border-2 ${filter === f
+                                                ? 'bg-heritage-gold border-heritage-gold text-white shadow-lg'
+                                                : 'bg-white border-[var(--border)] text-[var(--muted)] hover:border-heritage-gold/30'
+                                                }`}
+                                            onClick={() => setFilter(f)}
+                                        >
+                                            <span className={filter === f ? 'scale-110' : ''}>{f === 'all' ? '✨' : categoryMeta[f]?.icon}</span>
+                                            {f === 'all' ? 'All Wisdoms' : categoryMeta[f]?.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </Card>
                     </Reveal>
 
-                    {/* Results count */}
-                    <Reveal>
-                        <div className="flex items-center justify-between mb-6">
-                            <p className="text-sm text-[var(--muted)]">
-                                Showing <span className="font-semibold text-[var(--fg)]">{filteredData.length}</span> items
-                                {filter !== 'all' && (
-                                    <span> in <span className="text-heritage-gold capitalize">{categoryMeta[filter]?.label || filter}</span></span>
-                                )}
-                                {searchQuery && (
-                                    <span> matching "<span className="text-heritage-gold">{searchQuery}</span>"</span>
-                                )}
-                            </p>
-                            {(filter !== 'all' || searchQuery) && (
-                                <button
-                                    className="text-sm text-heritage-gold hover:underline"
-                                    onClick={() => { setFilter('all'); setSearchQuery(''); }}
-                                >
-                                    Clear filters
-                                </button>
-                            )}
-                        </div>
-                    </Reveal>
-
-                    {/* Culture Grid */}
-                    <Stagger className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {(Array.isArray(filteredData) ? filteredData : []).map(item => (
-                            <a
-                                key={item.id}
-                                href={item.wikiUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="heritage-card group cursor-pointer block no-underline transform hover:scale-[1.02] transition-all duration-300 hover:shadow-xl hover:shadow-heritage-gold/5"
-                                tabIndex="0"
-                                aria-label={`Learn about ${item.title} on Wikipedia`}
-                            >
-                                {/* Image */}
-                                <div className="aspect-[4/3] relative overflow-hidden rounded-t-2xl">
-                                    {imgErrors[item.id] ? (
-                                        <div className={`absolute inset-0 bg-gradient-to-br ${fallbackGradients['heritage-gold'] || 'from-heritage-green to-heritage-teal'} flex items-center justify-center`}>
-                                            <span className="text-6xl opacity-60">{categoryMeta[item.category]?.icon}</span>
-                                        </div>
-                                    ) : (
-                                        <img
-                                            src={item.image}
-                                            alt={item.title}
-                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                            loading="lazy"
-                                            onError={() => handleImgError(item.id)}
-                                        />
-                                    )}
-                                    {/* Overlay gradient */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                    {/* Category badge */}
-                                    <div className="absolute top-3 left-3">
-                                        <span className="text-xs font-semibold uppercase tracking-wider px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-sm text-white border border-white/10">
-                                            {categoryMeta[item.category]?.icon} {categoryMeta[item.category]?.label || item.category}
-                                        </span>
-                                    </div>
-                                    {/* Wikipedia link indicator */}
-                                    <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                        <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
-                                            <svg className="w-4 h-4 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                                                <polyline points="15 3 21 3 21 9" />
-                                                <line x1="10" y1="14" x2="21" y2="3" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Content */}
-                                <div className="p-5">
-                                    <h3 className="font-display text-xl font-bold text-[var(--fg)] mb-1 group-hover:text-heritage-gold transition-colors">
-                                        {item.title}
-                                    </h3>
-                                    <p className="text-sm font-medium text-heritage-gold/80 mb-2">{item.subtitle}</p>
-
-                                    {/* Origin badge */}
-                                    {item.origin && (
-                                        <div className="flex items-center gap-1.5 mb-3">
-                                            <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/10 text-[var(--muted)] border border-white/10">
-                                                📍 {item.origin}
-                                            </span>
-                                        </div>
-                                    )}
-
-                                    <p className="text-sm text-[var(--muted)] leading-relaxed line-clamp-3 mb-3">{item.description}</p>
-
-                                    {/* Significance */}
-                                    {item.significance && (
-                                        <p className="text-xs text-heritage-gold/70 italic line-clamp-1">
-                                            ✦ {item.significance}
-                                        </p>
-                                    )}
-
-                                    {/* Read more tag */}
-                                    <div className="mt-4 flex items-center gap-2 text-sm font-medium text-heritage-gold opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0">
-                                        <span>Read on Wikipedia</span>
-                                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <path d="M5 12h14M12 5l7 7-7 7" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            </a>
-                        ))}
-                    </Stagger>
-
-                    {/* Empty state */}
-                    {filteredData.length === 0 && (
-                        <Reveal className="text-center py-20">
-                            <div className="text-6xl mb-4">🔍</div>
-                            <h3 className="font-display text-2xl font-bold text-[var(--fg)] mb-2">No items found</h3>
-                            <p className="text-[var(--muted)] mb-6">
-                                Try adjusting your search or filter to explore more cultural heritage.
-                            </p>
-                            <button
-                                className="btn-primary"
+                    {/* Meta Info */}
+                    {(filter !== 'all' || searchQuery) && (
+                        <Reveal className="flex items-center justify-between mb-8 px-4">
+                            <div className="flex items-center gap-3 text-lg font-medium text-[var(--muted)]">
+                                <Filter className="w-5 h-5 text-heritage-gold" />
+                                <span>
+                                    Found <span className="text-[var(--fg)] font-bold">{filteredData.length}</span> artifacts
+                                    {filter !== 'all' && <> in <span className="text-heritage-gold font-bold">{categoryMeta[filter]?.label}</span></>}
+                                    {searchQuery && <> matching "<span className="text-heritage-gold font-bold">{searchQuery}</span>"</>}
+                                </span>
+                            </div>
+                            <Button
+                                variant="secondary"
+                                size="sm"
                                 onClick={() => { setFilter('all'); setSearchQuery(''); }}
                             >
-                                Show All Items
-                            </button>
+                                Clear Exploration
+                            </Button>
+                        </Reveal>
+                    )}
+
+                    {/* Culture Grid */}
+                    {filteredData.length > 0 ? (
+                        <Stagger className="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
+                            {filteredData.map((item) => (
+                                <Card
+                                    key={item.id}
+                                    className="p-0 overflow-hidden !rounded-[40px] group shadow-xl hover:shadow-2xl h-full border-[var(--border)]"
+                                    animate={false}
+                                >
+                                    {/* Media Area */}
+                                    <div className="aspect-[4/3] relative overflow-hidden">
+                                        {imgErrors[item.id] ? (
+                                            <div className="absolute inset-0 bg-gradient-to-br from-heritage-teal/20 to-heritage-gold/20 flex flex-col items-center justify-center p-8 text-center">
+                                                <span className="text-7xl mb-4 group-hover:scale-110 transition-transform duration-700">{categoryMeta[item.category]?.icon}</span>
+                                                <p className="font-display font-medium text-lg text-heritage-brown/60">Illuminating {item.title}...</p>
+                                            </div>
+                                        ) : (
+                                            <img
+                                                src={item.image}
+                                                alt={item.title}
+                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out"
+                                                loading="lazy"
+                                                onError={() => handleImgError(item.id)}
+                                            />
+                                        )}
+
+                                        {/* Overlays */}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg)] via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
+
+                                        {/* Badge */}
+                                        <div className="absolute top-6 left-6 z-10">
+                                            <span className="px-4 py-2 rounded-2xl bg-white/95 backdrop-blur-md text-heritage-brown text-xs font-bold uppercase tracking-widest shadow-2xl flex items-center gap-2 border border-white/50">
+                                                <span>{categoryMeta[item.category]?.icon}</span>
+                                                {categoryMeta[item.category]?.label}
+                                            </span>
+                                        </div>
+
+                                        {/* Origin Pin */}
+                                        {item.origin && (
+                                            <div className="absolute bottom-6 left-6 z-10 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/40 backdrop-blur-md text-white border border-white/10 group-hover:scale-105 transition-transform">
+                                                <MapPin className="w-3.5 h-3.5 text-heritage-gold" />
+                                                <span className="text-[10px] font-bold uppercase tracking-widest">{item.origin}</span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Interaction & Details */}
+                                    <div className="p-8 flex flex-col flex-1 relative bg-gradient-to-b from-transparent to-[var(--bg)]/10">
+                                        <div className="flex-1">
+                                            <h3 className="font-display text-3xl font-bold text-[var(--fg)] mb-3 group-hover:text-heritage-gold transition-colors tracking-tight">
+                                                {item.title}
+                                            </h3>
+                                            {item.subtitle && (
+                                                <p className="text-sm font-bold text-heritage-gold uppercase tracking-[0.1em] mb-4 opacity-90">{item.subtitle}</p>
+                                            )}
+                                            <p className="text-[var(--muted)] leading-relaxed text-lg line-clamp-3 mb-8">{item.description}</p>
+                                        </div>
+
+                                        {item.significance && (
+                                            <div className="mb-8 p-4 rounded-2xl bg-heritage-gold/5 border-l-4 border-heritage-gold italic text-sm text-[var(--muted)]/80 leading-relaxed font-medium">
+                                                "{item.significance}"
+                                            </div>
+                                        )}
+
+                                        <div className="flex items-center justify-between pt-6 border-t border-[var(--border)] mt-auto">
+                                            <a
+                                                href={item.wikiUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-sm font-bold text-heritage-gold hover:text-heritage-goldLight flex items-center gap-2 transition-colors"
+                                            >
+                                                Detailed Registry <ArrowRight className="w-4 h-4" />
+                                            </a>
+                                            <div className="w-10 h-10 rounded-full border border-[var(--border)] flex items-center justify-center text-[var(--muted)] group-hover:bg-heritage-gold group-hover:text-white group-hover:border-heritage-gold transition-all">
+                                                <ExternalLink className="w-4 h-4" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Card>
+                            ))}
+                        </Stagger>
+                    ) : (
+                        /* Empty State */
+                        <Reveal className="text-center py-32 bg-[var(--bg)] border-2 border-dashed border-[var(--border)] rounded-[40px] shadow-inner">
+                            <div className="w-24 h-24 bg-white shadow-xl rounded-[32px] flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-transform">
+                                <Info className="w-12 h-12 text-heritage-gold" />
+                            </div>
+                            <h3 className="font-display text-3xl font-bold text-[var(--fg)] mb-4">No artifacts found in this era</h3>
+                            <p className="text-[var(--muted)] max-w-md mx-auto text-lg mb-12">
+                                Try expanding your search parameters or explore all categories to find what you seek.
+                            </p>
+                            <Button
+                                variant="primary"
+                                size="lg"
+                                onClick={() => { setFilter('all'); setSearchQuery(''); }}
+                                leftIcon={Sparkles}
+                            >
+                                Show All Treasury
+                            </Button>
                         </Reveal>
                     )}
                 </div>

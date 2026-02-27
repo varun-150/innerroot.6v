@@ -282,6 +282,31 @@ export const exploreData = [
         wikiUrl: "https://en.wikipedia.org/wiki/Nanda_Devi_Raj_Jat", color: "heritage-brown"
     },
 
+    {
+        id: 125, title: "Onam", subtitle: "Harvest Festival of Kerala",
+        category: "state-festivals", origin: "Kerala",
+        description: "The most important harvest festival of Kerala, commemorating the homecoming of the mythical King Mahabali. Celebrated with Pookalam (floral carpets), Vallam Kali (boat races), and the grand Onasadya feast.",
+        significance: "Mythical King Mahabali's homecoming; cultural unity of Kerala",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Boat_Race_during_Onam%2C_Kerala.jpg/640px-Boat_Race_during_Onam%2C_Kerala.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Onam", color: "heritage-gold"
+    },
+    {
+        id: 126, title: "Pongal", subtitle: "Harvest Festival of Tamil Nadu",
+        category: "state-festivals", origin: "Tamil Nadu",
+        description: "A four-day harvest festival dedicated to the Sun God. Families boil the first rice of the season in a pot until it overflows, shouting 'Pongalo Pongal!' to symbolize abundance.",
+        significance: "Sun worship and thanksgiving; cattle celebration",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Pongal_Preparation.jpg/640px-Pongal_Preparation.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Pongal_(festival)", color: "heritage-teal"
+    },
+    {
+        id: 127, title: "Hornbill Festival", subtitle: "Festival of Festivals",
+        category: "state-festivals", origin: "Nagaland",
+        description: "A grand celebration of the 16 tribes of Nagaland, showcasing their unique traditions, music, dance, and crafts in a vibrant mountain setting.",
+        significance: "Naga tribal unity; collective cultural showcase",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Hornbill_Festival_Display.jpg/640px-Hornbill_Festival_Display.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Hornbill_Festival", color: "heritage-brown"
+    },
+
     // ═══════════════════════════════════════
     //  CLASSICAL & FOLK ARTS
     // ═══════════════════════════════════════
@@ -398,6 +423,23 @@ export const exploreData = [
         wikiUrl: "https://en.wikipedia.org/wiki/Warli_painting", color: "heritage-green"
     },
 
+    {
+        id: 215, title: "Tanjore Painting", subtitle: "Gold Leaf Art of Tamil Nadu",
+        category: "arts", origin: "Tamil Nadu",
+        description: "A classical South Indian painting style, which was inaugurated from the town of Thanjavur. Known for its rich, flat and vivid colors, simple iconic composition, and glittering gold foils.",
+        significance: "Glittering gold foil art; divine iconography",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Tanjore_Painting_of_Goddess_Saraswati.jpg/480px-Tanjore_Painting_of_Goddess_Saraswati.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Thanjavur_painting", color: "heritage-gold"
+    },
+    {
+        id: 216, title: "Pattachitra", subtitle: "Cloth Scroll Painting",
+        category: "arts", origin: "Odisha / Bengal",
+        description: "Traditional cloth-based scroll painting. Most of these paintings are based on Hindu mythology and specially inspired by Jagannath and Vaishnava sect.",
+        significance: "Mythological cloth scrolls; intricate line work",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Pattachitra_painting_of_Lord_Jagannath.jpg/480px-Pattachitra_painting_of_Lord_Jagannath.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Pattachitra", color: "heritage-brown"
+    },
+
     // ═══════════════════════════════════════
     //  TRADITIONS & CUSTOMS
     // ═══════════════════════════════════════
@@ -482,6 +524,39 @@ export const exploreData = [
         wikiUrl: "https://en.wikipedia.org/wiki/Vastu_shastra", color: "heritage-green"
     },
 
+    {
+        id: 311, title: "Atithi Devo Bhava", subtitle: "Guest is God",
+        category: "traditions", origin: "Pan-India",
+        description: "The ancient Indian philosophy of treating guests with the same reverence as God. It forms the core of Indian hospitality and social etiquette.",
+        significance: "Universal hospitality; selfless service to strangers",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Namaste2.jpg/480px-Namaste2.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Atithi_Devo_Bhava", color: "heritage-gold"
+    },
+    {
+        id: 312, title: "Sacred Rivers (Ganga, Yamuna, etc.)", subtitle: "Purification Rituals",
+        category: "traditions", origin: "Pan-India",
+        description: "The tradition of worshipping rivers as life-giving goddesses. Ritual bathing (snana) in the Ganges is believed to wash away sins and purify the soul.",
+        significance: "Spiritual purification; river goddess worship",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Morning_Yoga_at_Ganga.jpg/640px-Morning_Yoga_at_Ganga.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Ganges_in_Hinduism", color: "heritage-teal"
+    },
+    {
+        id: 313, title: "Traditional Handlooms", subtitle: "Weaving Heritage",
+        category: "traditions", origin: "Pan-India",
+        description: "India's rich heritage of hand-woven textiles like Banarasi silk, Kanjeevaram, and Khadi. Each region has unique weaving techniques passed down through generations.",
+        significance: "Artisan craftsmanship; sustainable heritage fashion",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Kanchipuram_Silk_Sari.jpg/480px-Kanchipuram_Silk_Sari.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Handloom_industry_in_India", color: "heritage-brown"
+    },
+    {
+        id: 314, title: "Deepavali Lamps (Diyas)", subtitle: "Illumination Traditions",
+        category: "traditions", origin: "Pan-India",
+        description: "The practice of lighting clay lamps (diyas) to invite prosperity and knowledge. It symbolizes the inner light that protects from spiritual darkness.",
+        significance: "Inner light symbol; victory over ignorance",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Diwali_Diya.jpg/640px-Diwali_Diya.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Diya_(lamp)", color: "heritage-gold"
+    },
+
     // ═══════════════════════════════════════
     //  KEY SCRIPTURES
     // ═══════════════════════════════════════
@@ -563,6 +638,369 @@ export const exploreData = [
         description: "Tamil masterpiece of 1,330 couplets on virtue, wealth, and love. Known as the 'Universal Veda' for its timeless, secular wisdom applicable to all humanity.",
         significance: "Universal ethics; 'Tamil Veda' of secular wisdom",
         image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Thiruvalluvar_Statue_Kanyakumari.jpg/480px-Thiruvalluvar_Statue_Kanyakumari.jpg",
-        wikiUrl: "https://en.wikipedia.org/wiki/Kural", color: "heritage-gold"
+    },
+
+    // ═══════════════════════════════════════
+    //  ANCIENT TEMPLES
+    // ═══════════════════════════════════════
+    {
+        id: 501, title: "Brihadeeswarar Temple", subtitle: "Thanjavur, Tamil Nadu",
+        category: "temples", origin: "Chola Dynasty (1010 CE)",
+        description: "A UNESCO World Heritage site dedicated to Lord Shiva. Famous for its massive vimana and the fact that its shadow never falls on the ground at noon.",
+        significance: "Chola architectural marvel; shadowless vimana",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Thanjavur_Temple.jpg/640px-Thanjavur_Temple.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Brihadisvara_Temple,_Thanjavur", color: "heritage-gold"
+    },
+    {
+        id: 502, title: "Konark Sun Temple", subtitle: "Odisha",
+        category: "temples", origin: "Eastern Ganga Dynasty (13th Century)",
+        description: "Designed as a colossal chariot of the Sun God Surya, with 24 wheels and 7 horses. Famous for its intricate stone carvings and erotic sculptures.",
+        significance: "Sun God chariot; architectural astronomy",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Konark_Sun_Temple_-_Wheel.jpg/640px-Konark_Sun_Temple_-_Wheel.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Konark_Sun_Temple", color: "heritage-brown"
+    },
+    {
+        id: 503, title: "Kedarnath Temple", subtitle: "Uttarakhand",
+        category: "temples", origin: "Pandavas / Adi Shankara",
+        description: "One of the Char Dhams and 12 Jyotirlingas, located in the Himalayas. dedicated to Lord Shiva. Accessible only by a steep trek.",
+        significance: "Himalayan Jyotirlinga; spiritual trekking",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Kedarnath_Temple.jpg/640px-Kedarnath_Temple.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Kedarnath_Temple", color: "heritage-item"
+    },
+    {
+        id: 504, title: "Khajuraho Group of Monuments", subtitle: "Madhya Pradesh",
+        category: "temples", origin: "Chandela Dynasty",
+        description: "Famous for their nagara-style architectural symbolism and erotic sculptures. A UNESCO World Heritage site depicting various aspects of life.",
+        significance: "Nagara architecture; celebration of life",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Khajuraho_Temple.jpg/640px-Khajuraho_Temple.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Khajuraho_Group_of_Monuments", color: "heritage-gold"
+    },
+    {
+        id: 505, title: "Meenakshi Amman Temple", subtitle: "Madurai, Tamil Nadu",
+        category: "temples", origin: "Pandya Dynasty",
+        description: "A historic Hindu temple located on the southern bank of the Vaigai River. Known for its towering gopurams filled with thousands of colorful statues.",
+        significance: "City of temples; colorful gopurams",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Madurai_Meenakshi_Amman_Temple.jpg/640px-Madurai_Meenakshi_Amman_Temple.jpg",
+    },
+    {
+        id: 506, title: "Golden Temple", subtitle: "Amritsar, Punjab",
+        category: "temples", origin: "Guru Arjan",
+        description: "The holiest Gurdwara of Sikhism, coated in gold and surrounded by the Sarovar (pool of nectar). A symbol of equality and brotherhood.",
+        significance: "Holiest Sikh shrine; symbol of equality",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Golden_Temple_India.jpg/640px-Golden_Temple_India.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Golden_Temple", color: "heritage-gold"
+    },
+    {
+        id: 507, title: "Tirumala Venkateswara Temple", subtitle: "Tirupati, Andhra Pradesh",
+        category: "temples", origin: "Pallava / Chola / Vijayanagara",
+        description: "The richest temple in the world, dedicated to Lord Venkateswara. Situated on the seven peaks of Tirumala Hills.",
+        significance: "Richest temple; spiritual pilgrimage",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Tirumala_090615.jpg/640px-Tirumala_090615.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Venkateswara_Temple,_Tirumala", color: "heritage-brown"
+    },
+    {
+        id: 508, title: "Virupaksha Temple", subtitle: "Hampi, Karnataka",
+        category: "temples", origin: "Vijayanagara Empire",
+        description: "Part of the Group of Monuments at Hampi, a UNESCO World Heritage site. Dedicated to Lord Shiva, known here as Virupaksha.",
+        significance: "Hampi ruins; Vijayanagara architecture",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Virupaksha_Temple_in_Hampi.jpg/640px-Virupaksha_Temple_in_Hampi.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Virupaksha_Temple,_Hampi", color: "heritage-teal"
+    },
+    {
+        id: 509, title: "Somnath Temple", subtitle: "Gujarat",
+        category: "temples", origin: "Prabhas Patan",
+        description: "The first among the twelve Jyotirlinga shrines of Shiva. Reconstructed several times in the past after repeated destruction.",
+        significance: "First Jyotirlinga; eternal shrine",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Somnath_Temple.jpg/640px-Somnath_Temple.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Somnath_temple", color: "heritage-gold"
+    },
+    {
+        id: 510, title: "Kailasa Temple", subtitle: "Ellora, Maharashtra",
+        category: "temples", origin: "Rashtrakuta Dynasty",
+        description: "A megalithic rock-cut temple carved from a single rock face. It is considered one of the most remarkable cave temples in the world.",
+        significance: "Largest monolithic rock excavation; architectural wonder",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Kailasa_temple_Ellora.jpg/640px-Kailasa_temple_Ellora.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Kailasa_Temple,_Ellora", color: "heritage-green"
+    },
+
+    {
+        id: 511, title: "Sun Temple, Modhera", subtitle: "Gujarat",
+        category: "temples", origin: "Chaulukya Dynasty (1026 CE)",
+        description: "An architectural masterpiece dedicated to the Sun God Surya. Known for its exquisite Surya Kund (stepped tank) and the fact that during equinoxes, the first rays of the sun fall directly on the deity.",
+        significance: "Architectural precision; equinox solar alignment",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Modhera_Sun_Temple_2016.jpg/640px-Modhera_Sun_Temple_2016.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Sun_Temple,_Modhera", color: "heritage-gold"
+    },
+    {
+        id: 512, title: "Shore Temple", subtitle: "Mahabalipuram, Tamil Nadu",
+        category: "temples", origin: "Pallava Dynasty (8th Century)",
+        description: "One of the oldest structural stone temples in South India, built right on the shore of the Bay of Bengal. Part of the UNESCO Group of Monuments at Mahabalipuram.",
+        significance: "Pallava stone architecture; maritime heritage landmark",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Shore_Temple_at_Mamallapuram.jpg/640px-Shore_Temple_at_Mamallapuram.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Shore_Temple", color: "heritage-teal"
+    },
+    {
+        id: 513, title: "Linga Bhairavi", subtitle: "Coimbatore, Tamil Nadu",
+        category: "temples", origin: "Isha Foundation",
+        description: "A unique contemporary temple dedicated to the divine feminine energy. The consecration and architecture blend ancient occult sciences with modern geometric precision.",
+        significance: "Divine feminine consecration; modern spiritual landmark",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Linga_Bhairavi.jpg/640px-Linga_Bhairavi.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Linga_Bhairavi", color: "heritage-brown"
+    },
+    {
+        id: 514, title: "Akshardham Temple", subtitle: "New Delhi",
+        category: "temples", origin: "BAPS (2005 CE)",
+        description: "A massive Hindu temple complex that showcases millennia of traditional Indian and Hindu culture, spirituality, and architecture.",
+        significance: "Modern architectural marvel; cultural showcase",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Akshardham_Temple_Delhi_2015.jpg/640px-Akshardham_Temple_Delhi_2015.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Akshardham_(Delhi)", color: "heritage-gold"
+    },
+
+    // ═══════════════════════════════════════
+    //  LANGUAGES
+    // ═══════════════════════════════════════
+    {
+        id: 601, title: "Sanskrit", subtitle: "Language of the Gods",
+        category: "languages", origin: "Ancient India",
+        description: "The classical language of Indian scriptures, philosophy, and science. Most Hindu texts like Vedas and Upanishads are written in Sanskrit.",
+        significance: "Root of Indo-Aryan languages; liturgical language",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Rigveda_MS2097.jpg/640px-Rigveda_MS2097.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Sanskrit", color: "heritage-gold"
+    },
+    {
+        id: 602, title: "Tamil", subtitle: "Oldest Living Classical Language",
+        category: "languages", origin: "Tamil Nadu / Sri Lanka",
+        description: "One of the longest-surviving classical languages in the world. Has a rich literary tradition dating back to the Sangam period (300 BCE).",
+        significance: "Classical language; Sangam literature",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Thiruvalluvar_Statue_Kanyakumari.jpg/480px-Thiruvalluvar_Statue_Kanyakumari.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Tamil_language", color: "heritage-brown"
+    },
+    {
+        id: 603, title: "Hindi", subtitle: "Official Language of India",
+        category: "languages", origin: "North India",
+        description: "An Indo-Aryan language spoken chiefly in North India. It serves as the lingua franca of the Hindi Belt.",
+        significance: "Most spoken language; Devanagari script",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Hindi_Sample.png/640px-Hindi_Sample.png",
+        wikiUrl: "https://en.wikipedia.org/wiki/Hindi", color: "heritage-teal"
+    },
+    {
+        id: 604, title: "Telugu", subtitle: "Italian of the East",
+        category: "languages", origin: "Andhra Pradesh / Telangana",
+        description: "A Dravidian language known for its sweetness and vowel-ending words. Has a vast literary history and is a classical language of India.",
+        significance: "Classical language; Carnatic music lyrics",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Telugu_Sample.png/640px-Telugu_Sample.png",
+        wikiUrl: "https://en.wikipedia.org/wiki/Telugu_language", color: "heritage-green"
+    },
+    {
+        id: 605, title: "Bengali", subtitle: "Language of Poetry",
+        category: "languages", origin: "West Bengal / Bangladesh",
+        description: "Known for its rich literary heritage, notably the works of Rabindranath Tagore. It is the second most spoken language in India.",
+        significance: "Tagore's literature; cultural richness",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Bengali_Script.svg/640px-Bengali_Script.svg.png",
+        wikiUrl: "https://en.wikipedia.org/wiki/Bengali_language", color: "heritage-gold"
+    },
+    {
+        id: 606, title: "Marathi", subtitle: "Language of Warriors",
+        category: "languages", origin: "Maharashtra",
+        description: "The official language of Maharashtra. Has a long history of literature starting from the 13th century saints like Dnyaneshwar.",
+        significance: "Saint literature; energetic expression",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Marathi_script.png/640px-Marathi_script.png",
+        wikiUrl: "https://en.wikipedia.org/wiki/Marathi_language", color: "heritage-brown"
+    },
+    {
+        id: 607, title: "Kannada", subtitle: "Classical Language of Karnataka",
+        category: "languages", origin: "Karnataka",
+        description: "Another classical language of India with an unbroken literary history of over a thousand years. Famous for its Champu style of poetry.",
+        significance: "Classical language; Champu poetry",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Kannada_script_vowels.svg/640px-Kannada_script_vowels.svg.png",
+        wikiUrl: "https://en.wikipedia.org/wiki/Kannada", color: "heritage-teal"
+    },
+    {
+        id: 608, title: "Malayalam", subtitle: "Language of Kerala",
+        category: "languages", origin: "Kerala",
+        description: "A Dravidian language with a rich literary tradition. It has the largest number of letters among Indian scripts.",
+        significance: "Rich literature; harmonious script",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Malayalam_Vowels.svg/640px-Malayalam_Vowels.svg.png",
+        wikiUrl: "https://en.wikipedia.org/wiki/Malayalam", color: "heritage-green"
+    },
+    {
+        id: 609, title: "Urdu", subtitle: "Language of Shayari",
+        category: "languages", origin: "North India (Deccan)",
+        description: "Known for its poetic beauty, ghazals, and polite mannerisms (Tehzeeb). Written in the Perso-Arabic script.",
+        significance: "Poetry (Shayari); Tehzeeb (Etiquette)",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Urdu_sample.svg/640px-Urdu_sample.svg.png",
+        wikiUrl: "https://en.wikipedia.org/wiki/Urdu", color: "heritage-gold"
+    },
+
+    // ═══════════════════════════════════════
+    //  FAMOUS FOODS
+    // ═══════════════════════════════════════
+    {
+        id: 701, title: "Biryani", subtitle: "Hyderabadi & Lucknowi",
+        category: "food", origin: "Telangana / UP",
+        description: "A fragrant rice dish made with aromatic spices, basmati rice, and meat (chicken, mutton, or fish). Famous variations include Hyderabadi and Lucknowi.",
+        significance: "Culinary masterpiece; blend of Persian and Indian flavors",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Hyderabadi_Chicken_Biryani.jpg/640px-Hyderabadi_Chicken_Biryani.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Biryani", color: "heritage-gold"
+    },
+    {
+        id: 702, title: "Dosa", subtitle: "South Indian Staple",
+        category: "food", origin: "South India",
+        description: "A thin, crispy crepe made from fermented rice and lentil batter. Served with sambar and coconut chutney. A breakfast favorite across India.",
+        significance: "Fermented healthy breakfast; global favorite",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Dosa_chutney_sambar.png/640px-Dosa_chutney_sambar.png",
+        wikiUrl: "https://en.wikipedia.org/wiki/Dosa", color: "heritage-brown"
+    },
+    {
+        id: 703, title: "Butter Chicken", subtitle: "Punjabi Delicacy",
+        category: "food", origin: "Punjab / Delhi",
+        description: "Chicken marinated in yogurt and spices, cooked in a tandoor, and served in a mild curry sauce rich in butter and cream.",
+        significance: "Global Indian curry icon; rich & creamy",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Chicken_makhani.jpg/640px-Chicken_makhani.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Butter_chicken", color: "heritage-teal"
+    },
+    {
+        id: 704, title: "Rasgulla", subtitle: "Bengali Sweet",
+        category: "food", origin: "West Bengal / Odisha",
+        description: "Syrupy dessert popular in the Indian subcontinent and regions with South Asian diaspora. Made from ball-shaped dumplings of chhena and semolina dough.",
+        significance: "Iconic sweet; melt-in-mouth texture",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Rasgulla_02.jpg/640px-Rasgulla_02.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Rasgulla", color: "heritage-item"
+    },
+    {
+        id: 705, title: "Vada Pav", subtitle: "Mumbai Street Food",
+        category: "food", origin: "Maharashtra",
+        description: "The Indian vegetarian burger. A deep-fried potato dumpling placed inside a bread bun (pav) sliced almost in half through the middle.",
+        significance: "Mumbai's lifeline; spicy street snack",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Vada_Pav.jpg/640px-Vada_Pav.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Vada_pav", color: "heritage-gold"
+    },
+    {
+        id: 706, title: "Dhokla", subtitle: "Gujarati Snack",
+        category: "food", origin: "Gujarat",
+        description: "A vegetarian culinary dish that is found mainly in the Indian state of Gujarat. It is made with a fermented batter derived from rice and split chickpeas.",
+        significance: "Fermented snack; light and spongy",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Dhokla_01.jpg/640px-Dhokla_01.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Dhokla", color: "heritage-green"
+    },
+    {
+        id: 707, title: "Litti Chokha", subtitle: "Bihari Cuisine",
+        category: "food", origin: "Bihar",
+        description: "Whole wheat dough balls stuffed with spiced gram flour (sattu), baked over coal, and served with mashed vegetables (chokha).",
+        significance: "Rustic earthy flavor; nutritious meal",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Litti_chokha.jpg/640px-Litti_chokha.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Litti", color: "heritage-brown"
+    },
+    {
+        id: 708, title: "Rogan Josh", subtitle: "Kashmiri Delight",
+        category: "food", origin: "Jammu & Kashmir",
+        description: "A staple of Kashmiri cuisine. It consists of braised lamb chunks cooked with a gravy based on browned onions, yogurt, garlic, ginger and aromatic spices.",
+        significance: "Aromatic lamb curry; Wazwan feast staple",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Rogan_Josh.jpg/640px-Rogan_Josh.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Rogan_josh", color: "heritage-teal"
+    },
+    {
+        id: 709, title: "Dal Baati Churma", subtitle: "Rajasthani Feast",
+        category: "food", origin: "Rajasthan",
+        description: "Hard wheat rolls (Baati) baked in desert sand/oven, served with spicy lentil curry (Dal) and crushed sweetened wheat (Churma).",
+        significance: "Desert survival food; complete meal",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Dal_Bati_Churma.jpg/640px-Dal_Bati_Churma.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Dal_bati", color: "heritage-gold"
+    },
+    {
+        id: 710, title: "Appam with Stew", subtitle: "Kerala Breakfast",
+        category: "food", origin: "Kerala",
+        description: "Soft, fluffy pancakes made from fermented rice batter and coconut milk, paired with a creamy vegetable or meat stew.",
+        significance: "Coconut-rich delicacy; soft & creamy",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Appam_stew.jpg/640px-Appam_stew.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Appam", color: "heritage-teal"
+    },
+    {
+        id: 711, title: "Vindaloo", subtitle: "Goan Curry",
+        category: "food", origin: "Goa",
+        description: "A spicy and tangy curry influenced by Portuguese cuisine ('Carne de vinha d'alhos'). Traditionally made with pork, vinegar, and garlic.",
+        significance: "Indo-Portuguese fusion; fiery & tangy",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Pork_Vindaloo.jpg/640px-Pork_Vindaloo.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Vindaloo", color: "heritage-brown"
+    },
+    {
+        id: 712, title: "Masor Tenga", subtitle: "Assamese Fish Curry",
+        category: "food", origin: "Assam",
+        description: "A light and tangy fish curry representing Assamese cuisine. The sourness usually comes from tomatoes, elephant apple (ou tenga), or lemon.",
+        significance: "Tangy river fish curry; refreshing flavor",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Masor_tenga.jpg/640px-Masor_tenga.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Assamese_cuisine", color: "heritage-green"
+    },
+    {
+        id: 713, title: "Momos", subtitle: "Himalayan Dumplings",
+        category: "food", origin: "Sikkim / Tibet",
+        description: "Steamed or fried dumplings filled with meat or vegetables. A staple of Himalayan cuisine that has become a favorite street food across India.",
+        significance: "Himalayan comfort food; spicy chutney pair",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Momo_nepal.jpg/640px-Momo_nepal.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Momo_(food)", color: "heritage-gold"
+    },
+    {
+        id: 714, title: "Pulihora", subtitle: "Tamarind Rice",
+        category: "food", origin: "Andhra Pradesh / Tamil Nadu",
+        description: "Also known as Chitrannum, this tangy, spicy rice dish is flavored with tamarind paste, peanuts, and curry leaves. Often offered as prasadam in temples.",
+        significance: "Temple prasadam; tangy festive rice",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Pulihora.jpg/640px-Pulihora.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Pulihora", color: "heritage-gold"
+    },
+    {
+        id: 715, title: "Macher Jhol", subtitle: "Bengali Fish Curry",
+        category: "food", origin: "West Bengal",
+        description: "A traditional spicy fish stew served with rice. The liberal use of mustard oil gives it a distinct pungent flavor.",
+        significance: "Staple Bengali diet; mustard oil pungency",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Macher_Jhol.jpg/640px-Macher_Jhol.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Machher_Jhol", color: "heritage-brown"
+    },
+    {
+        id: 716, title: "Chena Poda", subtitle: "Odisha's Roasted Cheese",
+        category: "food", origin: "Odisha",
+        description: "A unique sweet made from fresh paneer (chena), sugar, and semolina, baked until the crust turns golden brown. Lord Jagannath's favorite.",
+        significance: "Lord Jagannath's favorite; caramelized cheese",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Chhena_Poda.jpg/640px-Chhena_Poda.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Chhena_Poda", color: "heritage-item"
+    },
+    {
+        id: 717, title: "Hyderabadi Haleem", subtitle: "Ramadan Stew",
+        category: "food", origin: "Hyderabad, Telangana",
+        description: "A slow-cooked stew of meat, lentils, and cracked wheat, pounded to a thick paste. A GI-tagged delicacy famous during Ramadan.",
+        significance: "GI-tagged delicacy; rich energy food",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Hyderabadi_Haleem.jpg/640px-Hyderabadi_Haleem.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Hyderabadi_haleem", color: "heritage-gold"
+    },
+    {
+        id: 718, title: "Dhokla", subtitle: "Gujarati Steamed Treat",
+        category: "food", origin: "Gujarat",
+        description: "A savory, soft, and spongy steamed cake made from fermented chickpea batter. Garnished with mustard seeds, curry leaves, and green chilies.",
+        significance: "Gujarati culinary staple; light & nutritious",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Khaman_Dhokla.jpg/640px-Khaman_Dhokla.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Dhokla", color: "heritage-gold"
+    },
+    {
+        id: 719, title: "Bisi Bele Bath", subtitle: "Spicy Lentil Rice",
+        category: "food", origin: "Karnataka",
+        description: "A traditional South Indian dish involving a complex blend of rice, lentils, vegetables, and a secret masala. Served hot with ghee and potato chips/papadum.",
+        significance: "Karnataka comfort food; aromatic spice blend",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Bisi_Bele_Bath.JPG/640px-Bisi_Bele_Bath.JPG",
+        wikiUrl: "https://en.wikipedia.org/wiki/Bisi_Bele_Bath", color: "heritage-teal"
+    },
+    {
+        id: 720, title: "Litti Chokha", subtitle: "Bihari Rustic Meal",
+        category: "food", origin: "Bihar",
+        description: "A rustic complete meal consisting of Litti (whole wheat dough balls stuffed with roasted sattu) and Chokha (mashed vegetables like eggplant, tomatoes, and potatoes).",
+        significance: "Traditional Bihari soul food; earthy flavors",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Litti_Chokha_of_Bihar.jpg/640px-Litti_Chokha_of_Bihar.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Litti_(cuisine)", color: "heritage-brown"
+    },
+    {
+        id: 721, title: "Puran Poli", subtitle: "Sweet Lentil Flatbread",
+        category: "food", origin: "Maharashtra",
+        description: "A sweet flatbread stuffed with a sweet lentil filling made from chana dal and jaggery. A festive delicacy often prepared during Holi and Ganesh Chaturthi.",
+        significance: "Maharashtrian festive sweet; rich & comforting",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Puranpoli.jpg/640px-Puranpoli.jpg",
+        wikiUrl: "https://en.wikipedia.org/wiki/Puran_poli", color: "heritage-gold"
     },
 ];

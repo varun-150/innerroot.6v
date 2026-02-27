@@ -1,20 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getHeritageSites } from '../services/api';
+import { toursData as localToursData } from '../data/toursData';
 import { Reveal, Stagger } from '../components/Reveal';
 import HeritageMap from '../components/HeritageMap';
+import Breadcrumbs from '../components/Breadcrumbs';
+import Button from '../components/ui/Button';
+import Card from '../components/ui/Card';
+import {
+    MapPin, Star, Play, X, Loader2,
+    Map as MapIcon, Compass, Sparkles,
+    ArrowRight, Info, Eye, Clock
+} from 'lucide-react';
 
 const Tours = () => {
     const [activeTour, setActiveTour] = useState(null);
     const [toursData, setToursData] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    React.useEffect(() => {
+    useEffect(() => {
         const fetchTours = async () => {
             try {
                 const response = await getHeritageSites();
-                setToursData(Array.isArray(response.data) ? response.data : []);
+                const data = Array.isArray(response.data) && response.data.length > 0
+                    ? response.data
+                    : localToursData.map(t => ({
+                        ...t,
+                        name: t.title,
+                        imageUrl: t.image
+                    }));
+                setToursData(data);
             } catch (error) {
                 console.error("Failed to fetch tours:", error);
-                setToursData([]);
+            } finally {
+                setLoading(false);
             }
         };
         fetchTours();
@@ -24,121 +42,175 @@ const Tours = () => {
         setActiveTour(tour);
     };
 
-    const handleMapMarkerClick = (id) => {
-        // Direct mapping since IDs match, but keeping structure for extensibility
-        const tour = toursData.find(t => t.id === id);
-        if (tour) setActiveTour(tour);
-    };
+    if (loading) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center gap-6">
+                <Loader2 className="w-12 h-12 text-heritage-gold animate-spin" />
+                <p className="font-display text-xl text-[var(--muted)] animate-pulse">Charting your pilgrimage...</p>
+            </div>
+        );
+    }
 
     return (
-        <section id="page-tours" className="page active block opacity-100">
-            <div className="py-12 lg:py-20">
+        <section id="page-tours" className="page active block opacity-100" aria-label="Virtual Heritage Pilgrimage">
+            <div className="py-12 lg:py-24">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <Breadcrumbs />
+
                     {/* Header */}
-                    <Reveal className="text-center mb-12">
-                        <h1 className="font-display text-4xl sm:text-5xl font-bold text-[var(--fg)] mb-4">Discover India Through Its Heritage 🌏</h1>
-                        <p className="text-[var(--muted)] max-w-2xl mx-auto text-lg leading-relaxed">
-                            Click on the map points to uncover culture, history, and ancient roots.
+                    <Reveal className="text-center mb-16 mt-8">
+                        <span className="inline-block px-4 py-1 rounded-full bg-heritage-teal/10 text-heritage-teal font-bold text-xs uppercase tracking-widest mb-6 border border-heritage-teal/20">Digital Pilgrimage</span>
+                        <h1 className="font-display text-4xl sm:text-6xl font-bold text-[var(--fg)] mb-6 tracking-tight">Gateways to Immortality</h1>
+                        <p className="text-[var(--muted)] max-w-2xl mx-auto text-xl leading-relaxed">
+                            Embark on an immersive journey across India's most iconic heritage sites. Experience the grandeur of ancient architecture in breathtaking 360°.
                         </p>
                     </Reveal>
 
                     {/* Map Overview */}
-                    <Reveal className="mb-12">
-                        <div className="heritage-card p-6">
-                            {/* Interactive Map */}
-                            <div className="w-full">
+                    <Reveal className="mb-20">
+                        <Card className="p-4 !rounded-[40px] shadow-2xl border-[var(--border)] overflow-hidden bg-heritage-teal/5 ring-8 ring-heritage-teal/5">
+                            <div className="flex items-center gap-4 mb-4 px-4 pt-4">
+                                <MapIcon className="w-6 h-6 text-heritage-teal" />
+                                <h2 className="font-display text-2xl font-bold text-[var(--fg)] tracking-tight">Interactive Sacred Map</h2>
+                            </div>
+                            <div className="w-full relative rounded-[32px] overflow-hidden border border-[var(--border)] shadow-inner">
                                 <HeritageMap tours={toursData} />
                             </div>
-                        </div>
+                        </Card>
                     </Reveal>
 
+                    {/* Tour Collection Header */}
+                    <div className="flex items-center justify-between mb-12 px-2">
+                        <div className="flex items-center gap-3">
+                            <Compass className="w-8 h-8 text-heritage-gold" />
+                            <h2 className="font-display text-3xl font-bold text-[var(--fg)] tracking-tight">Guided Expeditions</h2>
+                        </div>
+                        <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-2xl bg-white shadow-sm border border-[var(--border)]">
+                            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                            <span className="text-xs font-bold text-[var(--muted)] uppercase tracking-widest">{toursData.length} Live Gateways</span>
+                        </div>
+                    </div>
+
                     {/* Tour Cards */}
-                    <Stagger className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {(Array.isArray(toursData) ? toursData : []).map(tour => (
-                            <article
+                    <Stagger className="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
+                        {toursData.map((tour) => (
+                            <Card
                                 key={tour.id}
-                                className="tour-card group cursor-pointer relative overflow-hidden rounded-xl h-[400px] shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                                className="p-0 group cursor-pointer relative overflow-hidden !rounded-[48px] h-[550px] border-[var(--border)] shadow-xl hover:shadow-2xl transition-all duration-700"
                                 onClick={() => handleTourClick(tour)}
-                                tabIndex="0"
-                                role="button"
-                                aria-label={`Start tour of ${tour.title}`}
+                                animate={false}
                             >
-                                {/* Background Image with Gradient Overlay */}
+                                {/* Media Layer */}
                                 <div className="absolute inset-0">
-                                    <img src={tour.image} alt={tour.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+                                    <img src={tour.imageUrl} alt={tour.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
                                 </div>
 
-                                {/* Content */}
-                                <div className="absolute inset-0 flex flex-col justify-end p-6 z-10 text-white">
-                                    <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <span className="text-xs font-semibold uppercase tracking-wider px-2 py-1 rounded bg-heritage-gold text-black">{tour.duration}</span>
-                                            <span className="text-xs font-medium text-white/80 flex items-center gap-1">
-                                                <svg className="w-3 h-3 text-heritage-gold" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
-                                                {tour.rating}
-                                            </span>
-                                        </div>
-
-                                        <h3 className="font-display text-2xl font-bold mb-1 leading-tight">{tour.title}</h3>
-                                        <p className="text-sm text-white/70 mb-3 font-medium flex items-center gap-1">
-                                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                            {tour.location}
-                                        </p>
-
-                                        <p className="text-white/60 text-sm line-clamp-3 mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
-                                            {tour.description}
-                                        </p>
-
-                                        <button className="flex items-center gap-2 text-sm font-bold text-heritage-gold group-hover:text-white transition-colors">
-                                            <span>Start Virtual Tour</span>
-                                            <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                                        </button>
+                                {/* Status Badges */}
+                                <div className="absolute top-8 left-8 z-20 flex gap-3">
+                                    <div className="px-4 py-2 rounded-2xl bg-white/95 backdrop-blur-md text-heritage-brown text-[10px] font-bold uppercase tracking-[0.2em] shadow-2xl border border-white/50 flex items-center gap-2">
+                                        <Star className="w-3 h-3 text-heritage-gold fill-heritage-gold" />
+                                        {tour.rating}
                                     </div>
                                 </div>
 
-                                {/* Play Icon Overlay */}
-                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/30 opacity-0 group-hover:opacity-100 transition-all duration-300 scale-50 group-hover:scale-100">
-                                    <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                                {/* Big Play Button Overlay */}
+                                <div className="absolute inset-0 flex items-center justify-center z-10">
+                                    <div className="w-24 h-24 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white scale-90 group-hover:scale-110 transition-all duration-700 shadow-2xl opacity-100 group-hover:opacity-0 group-hover:blur-xl">
+                                        <Play className="w-10 h-10 ml-1 fill-white" />
+                                    </div>
                                 </div>
-                            </article>
+
+                                {/* Content Overlay */}
+                                <div className="absolute inset-0 flex flex-col justify-end p-10 z-20 text-white">
+                                    <div className="transform translate-y-8 group-hover:translate-y-0 transition-all duration-700 ease-out">
+                                        <div className="flex items-center gap-2 mb-4 text-heritage-gold text-xs font-bold uppercase tracking-[0.2em]">
+                                            <MapPin className="w-4 h-4" />
+                                            {tour.location}
+                                        </div>
+
+                                        <h3 className="font-display text-4xl font-bold mb-4 tracking-tight group-hover:text-heritage-gold transition-colors leading-none">
+                                            {tour.name}
+                                        </h3>
+
+                                        <p className="text-white/70 text-lg line-clamp-2 mb-8 opacity-0 group-hover:opacity-100 transition-all duration-700 delay-100 italic leading-relaxed font-medium">
+                                            "{tour.description}"
+                                        </p>
+
+                                        <div className="opacity-0 group-hover:opacity-100 transition-all duration-700 delay-200">
+                                            <Button
+                                                variant="primary"
+                                                className="w-full !py-5 !rounded-[24px] !bg-heritage-gold !border-heritage-gold text-white font-bold tracking-widest text-xs uppercase"
+                                                rightIcon={Eye}
+                                            >
+                                                Step Into The Portal
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Interactive Glow */}
+                                <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-heritage-gold/20 rounded-full blur-[100px] group-hover:opacity-100 opacity-0 transition-opacity duration-1000"></div>
+                            </Card>
                         ))}
                     </Stagger>
                 </div>
             </div>
 
-            {/* Video Modal */}
+            {/* Immersive Video Modal */}
             {activeTour && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 transition-opacity duration-300 animate-in fade-in">
-                    <div className="absolute inset-0 bg-transparent" onClick={() => setActiveTour(null)}></div>
-                    <div className="relative w-full max-w-5xl bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/10 animate-in zoom-in-95 duration-200">
-                        {/* Header */}
-                        <div className="flex items-center justify-between p-4 border-b border-white/10 bg-white/5">
-                            <div>
-                                <h3 className="text-xl font-display font-bold text-white">{activeTour.title}</h3>
-                                <p className="text-sm text-white/50">{activeTour.location}</p>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl p-4 md:p-8 animate-in fade-in duration-500">
+                    <div className="absolute inset-0" onClick={() => setActiveTour(null)}></div>
+
+                    <Card className="relative w-full max-w-6xl !bg-black !rounded-[48px] overflow-hidden shadow-[0_0_100px_rgba(212,175,55,0.2)] border-heritage-gold/20 animate-in zoom-in-95 duration-500">
+                        {/* Modal Header */}
+                        <div className="absolute top-0 inset-x-0 z-50 flex items-center justify-between p-8 bg-gradient-to-b from-black/80 to-transparent">
+                            <div className="flex items-center gap-6">
+                                <div className="w-16 h-16 rounded-2xl bg-heritage-gold/10 border border-heritage-gold/20 flex items-center justify-center">
+                                    <Sparkles className="w-8 h-8 text-heritage-gold" />
+                                </div>
+                                <div>
+                                    <h3 className="text-3xl font-display font-bold text-white tracking-tight">{activeTour.name}</h3>
+                                    <div className="flex items-center gap-3 text-white/50 text-xs font-bold uppercase tracking-widest mt-1">
+                                        <MapPin className="w-3.5 h-3.5 text-heritage-gold" />
+                                        {activeTour.location}
+                                        <span className="mx-2 text-white/20">|</span>
+                                        <Clock className="w-3.5 h-3.5 text-heritage-gold" />
+                                        Immersive Experience
+                                    </div>
+                                </div>
                             </div>
-                            <button
+                            <Button
                                 onClick={() => setActiveTour(null)}
-                                className="p-2 rounded-full hover:bg-white/10 text-white/70 hover:text-white transition-colors"
-                            >
-                                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                            </button>
+                                variant="secondary"
+                                className="!rounded-2xl !p-4 !bg-white/10 !border-white/20 !text-white hover:!bg-white/20 translate-y-[-10px]"
+                                icon={X}
+                            />
                         </div>
 
-                        {/* Video Player Embed */}
-                        <div className="aspect-video w-full bg-black">
-                            {/* Assuming YouTube embed, handling slightly different formats if necessary */}
+                        {/* Video Aspect Ratio Buffer */}
+                        <div className="aspect-video w-full bg-black relative">
                             <iframe
                                 className="w-full h-full"
-                                src={`https://www.youtube.com/embed/${activeTour.videoUrl.split('/').pop().replace('watch?v=', '')}?autoplay=1`}
-                                title={activeTour.title}
+                                src={`https://www.youtube.com/embed/${activeTour.videoUrl?.split('/').pop().replace('watch?v=', '')}?autoplay=1&modestbranding=1&rel=0&iv_load_policy=3&showinfo=0`}
+                                title={activeTour.name}
                                 frameBorder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowFullScreen
                             ></iframe>
                         </div>
-                    </div>
+
+                        {/* Modal Footer / Progress */}
+                        <div className="p-8 bg-black/40 backdrop-blur-md flex items-center justify-between border-t border-white/5">
+                            <p className="text-white/60 text-sm max-w-2xl italic">
+                                You are now witnessing {activeTour.name} in high-fidelity 360°. Use your cursor to explore the sacred surroundings.
+                            </p>
+                            <div className="flex gap-4">
+                                <Button variant="secondary" className="!rounded-xl !bg-white/5 !border-white/10 !text-white px-6">Save Portal</Button>
+                                <Button variant="primary" className="!rounded-xl !bg-heritage-gold !border-heritage-gold text-white px-8">Share Wisdom</Button>
+                            </div>
+                        </div>
+                    </Card>
                 </div>
             )}
         </section>

@@ -214,6 +214,4 @@ Backend Engineer
 This project is licensed under the **MIT License**.
 See the LICENSE file for complete details.
 
----
 
-⭐ If you find this project interesting, consider giving it a star!

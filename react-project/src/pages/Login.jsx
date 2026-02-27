@@ -79,7 +79,7 @@ const Login = () => {
                                 className="block w-full pl-10 pr-3 py-3 border border-white/10 rounded-lg bg-white/5 
                                          text-[var(--fg)] placeholder-gray-400 focus:outline-none focus:ring-2 
                                          focus:ring-heritage-gold/50 focus:border-transparent transition-all duration-300"
-                                placeholder="Email address"
+                                placeholder="e.g. name@example.com"
                                 value={formData.email}
                                 onChange={handleChange}
                                 disabled={isLoading}
@@ -96,7 +96,7 @@ const Login = () => {
                                 className="block w-full pl-10 pr-3 py-3 border border-white/10 rounded-lg bg-white/5 
                                          text-[var(--fg)] placeholder-gray-400 focus:outline-none focus:ring-2 
                                          focus:ring-heritage-gold/50 focus:border-transparent transition-all duration-300"
-                                placeholder="Password"
+                                placeholder="Min. 8 characters"
                                 value={formData.password}
                                 onChange={handleChange}
                                 disabled={isLoading}
@@ -105,13 +105,17 @@ const Login = () => {
                     </div>
 
                     <div className="flex items-center justify-between text-sm">
-                        <label className="flex items-center text-[var(--text-secondary)] hover:text-[var(--fg)] cursor-pointer">
-                            <input type="checkbox" className="mr-2 rounded border-gray-300 text-heritage-gold focus:ring-heritage-gold" />
-                            Remember me
+                        <label className="flex items-center text-[var(--text-secondary)] hover:text-[var(--fg)] cursor-pointer group">
+                            <input type="checkbox" className="w-4 h-4 mr-2 rounded border-white/20 bg-white/5 text-heritage-gold focus:ring-heritage-gold transition-all" />
+                            <span className="group-hover:text-heritage-gold transition-colors">Remember me</span>
                         </label>
-                        <a href="#" className="font-medium text-heritage-gold hover:text-heritage-goldLight transition-colors">
+                        <button
+                            type="button"
+                            onClick={() => alert('Password reset functionality is coming soon. Please contact support@innerroot.in if you need immediate assistance.')}
+                            className="font-medium text-heritage-gold hover:text-heritage-goldLight transition-colors"
+                        >
                             Forgot password?
-                        </a>
+                        </button>
                     </div>
 
                     <button
