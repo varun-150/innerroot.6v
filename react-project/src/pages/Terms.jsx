@@ -1,7 +1,7 @@
 import React from 'react';
-import { Reveal } from '../components/Reveal';
-import SEO from '../components/SEO';
-import Breadcrumbs from '../components/Breadcrumbs';
+import { Reveal } from '../components/ui/Reveal';
+import SEO from '../components/ui/SEO';
+import Breadcrumbs from '../components/layout/Breadcrumbs';
 
 const Terms = () => {
     return (

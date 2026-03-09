@@ -1,37 +1,126 @@
 import React from 'react';
 
-const Card = ({
-    children,
-    variant = 'standard',
-    className = '',
-    padding = '6',
-    animate = true,
-    ...props
-}) => {
-    const baseClass = variant === 'glass' ? 'glass-card' : 'heritage-card';
-    const paddingClass = padding ? `p-${padding}` : 'p-6';
-    const animationClass = animate ? 'transition-all duration-300 hover:-translate-y-1 hover:shadow-lg' : '';
-
-    return (
-        <article
-            className={`${baseClass} ${paddingClass} ${animationClass} ${className}`}
-            {...props}
-        >
-            {children}
-        </article>
-    );
+/**
+ * Card – Elevation-aware surface card
+ *
+ * Usage:
+ *   <Card>…content…</Card>
+ *   <Card variant="glass" padding="lg">…</Card>
+ *   <Card variant="glow" hover onClick={…}>…</Card>
+ *
+ * Props:
+ *   variant – 'default' | 'glass' | 'glow' | 'stat' | 'heritage'
+ *   padding – 'none' | 'sm' | 'md' | 'lg' | 'xl'
+ *   hover   – boolean (enable hover lift)
+ *   as      – element tag
+ */
+const paddings = {
+    none: '0',
+    sm: 'var(--sp-4)',
+    md: 'var(--sp-6)',
+    lg: 'var(--sp-8)',
+    xl: 'var(--sp-10)',
 };
 
-export const CardHeader = ({ children, className = '' }) => (
-    <header className={`mb-4 ${className}`}>{children}</header>
-);
+const variantClass = {
+    default: 'card',
+    glass: 'glass-card',
+    glow: 'card-glow',
+    stat: 'stat-card',
+    heritage: 'heritage-card',
+};
 
-export const CardContent = ({ children, className = '' }) => (
-    <div className={className}>{children}</div>
-);
+export function Card({
+    variant = 'default',
+    padding = 'md',
+    hover = true,
+    as: Tag = 'div',
+    children,
+    className = '',
+    style = {},
+    ...rest
+}) {
+    const cls = [
+        variantClass[variant] || 'card',
+        !hover ? 'no-hover' : '',
+        className,
+    ].filter(Boolean).join(' ');
 
-export const CardFooter = ({ children, className = '' }) => (
-    <footer className={`mt-6 pt-4 border-t border-[var(--border)] ${className}`}>{children}</footer>
-);
+    return (
+        <Tag
+            className={cls}
+            style={{
+                padding: paddings[padding],
+                ...(variant === 'heritage' ? { padding: 0 } : {}),
+                ...style,
+            }}
+            {...rest}
+        >
+            {children}
+        </Tag>
+    );
+}
+
+export function CardHeader({ children, style = {}, className = '' }) {
+    return (
+        <div
+            className={className}
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: 'var(--sp-4)',
+                ...style,
+            }}
+        >
+            {children}
+        </div>
+    );
+}
+
+export function CardTitle({ children, style = {}, className = '' }) {
+    return (
+        <h3
+            className={className}
+            style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--text-base)',
+                fontWeight: 600,
+                color: 'var(--color-text)',
+                letterSpacing: '-0.01em',
+                ...style,
+            }}
+        >
+            {children}
+        </h3>
+    );
+}
+
+export function CardBody({ children, style = {}, className = '' }) {
+    return (
+        <div className={className} style={style}>
+            {children}
+        </div>
+    );
+}
+
+export function CardFooter({ children, style = {}, className = '' }) {
+    return (
+        <div
+            className={className}
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--sp-3)',
+                marginTop: 'var(--sp-4)',
+                paddingTop: 'var(--sp-4)',
+                borderTop: '1px solid var(--color-border)',
+                ...style,
+            }}
+        >
+            {children}
+        </div>
+    );
+}
 
 export default Card;

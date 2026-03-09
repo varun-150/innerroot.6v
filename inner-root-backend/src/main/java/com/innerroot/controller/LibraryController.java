@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class LibraryController {
     }
 
     @PostMapping
-    public ResponseEntity<LibraryItem> create(@RequestBody LibraryItem item) {
+    public ResponseEntity<LibraryItem> create(@Valid @RequestBody LibraryItem item) {
         return ResponseEntity.status(HttpStatus.CREATED).body(repository.save(item));
     }
 

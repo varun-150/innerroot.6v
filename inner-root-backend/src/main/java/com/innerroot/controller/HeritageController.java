@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -36,12 +37,12 @@ public class HeritageController {
     }
 
     @PostMapping
-    public ResponseEntity<HeritageSite> create(@RequestBody HeritageSite site) {
+    public ResponseEntity<HeritageSite> create(@Valid @RequestBody HeritageSite site) {
         return ResponseEntity.status(HttpStatus.CREATED).body(repository.save(site));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<HeritageSite> update(@PathVariable String id, @RequestBody HeritageSite site) {
+    public ResponseEntity<HeritageSite> update(@PathVariable String id, @Valid @RequestBody HeritageSite site) {
         return repository.findById(id).map(existing -> {
             existing.setName(site.getName());
             existing.setLocation(site.getLocation());

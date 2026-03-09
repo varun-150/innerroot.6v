@@ -1,6 +1,7 @@
 package com.innerroot.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Entity
@@ -15,17 +16,20 @@ public class HeritageSite {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @NotBlank
     private String name;
 
     private String location;
 
     @Column(columnDefinition = "TEXT")
+    @Size(max = 2000)
     private String description;
 
     private Double rating;
 
     private Integer reviews;
 
+    @NotBlank
     private String imageUrl;
 
     private String videoUrl;

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class MoodController {
     }
 
     @PostMapping
-    public ResponseEntity<MoodEntry> saveMood(@RequestBody MoodEntry entry) {
+    public ResponseEntity<MoodEntry> saveMood(@Valid @RequestBody MoodEntry entry) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
         User user = userRepository.findByEmail(email)

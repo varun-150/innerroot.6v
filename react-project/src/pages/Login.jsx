@@ -1,174 +1,341 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useGoogleLogin } from '@react-oauth/google';
+import { motion, AnimatePresence } from 'framer-motion';
+import { LogIn, Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, ShieldCheck, ArrowLeft, RefreshCcw } from 'lucide-react';
+import SEO from '../components/ui/SEO';
 import { useAuth } from '../context/AuthContext';
-import { Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
+
+import logo from '../assets/logo.webp';
+
+/* ── Google G SVG Icon ── */
+const GoogleIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.64 9.20455C17.64 8.56636 17.5827 7.95273 17.4764 7.36364H9V10.845H13.8436C13.635 11.97 13.0009 12.9232 12.0477 13.5614V15.8195H14.9564C16.6582 14.2527 17.64 11.9455 17.64 9.20455Z" fill="#4285F4" />
+        <path d="M9 18C11.43 18 13.4673 17.1941 14.9564 15.8195L12.0477 13.5614C11.2418 14.1014 10.2109 14.4205 9 14.4205C6.65591 14.4205 4.67182 12.8373 3.96409 10.71H0.957275V13.0418C2.43818 15.9832 5.48182 18 9 18Z" fill="#34A853" />
+        <path d="M3.96409 10.71C3.78409 10.17 3.68182 9.59318 3.68182 9C3.68182 8.40682 3.78409 7.83 3.96409 7.29V4.95818H0.957275C0.347727 6.17318 0 7.54773 0 9C0 10.4523 0.347727 11.8268 0.957275 13.0418L3.96409 10.71Z" fill="#FBBC05" />
+        <path d="M9 3.57955C10.3214 3.57955 11.5077 4.03364 12.4405 4.92545L15.0218 2.34409C13.4632 0.891818 11.4259 0 9 0C5.48182 0 2.43818 2.01682 0.957275 4.95818L3.96409 7.29C4.67182 5.16273 6.65591 3.57955 9 3.57955Z" fill="#EA4335" />
+    </svg>
+);
 
 const Login = () => {
-    const [formData, setFormData] = useState({ email: '', password: '' });
-    const [isLoading, setIsLoading] = useState(false);
-    const [errorMsg, setErrorMsg] = useState('');
     const navigate = useNavigate();
+    const [step, setStep] = useState('login'); // 'login' | 'verify'
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [googleLoading, setGoogleLoading] = useState(false);
+    const [error, setError] = useState('');
     const { login, googleAuth } = useAuth();
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-        setErrorMsg('');
-    };
+    // Verification Code State
+    const [otp, setOtp] = useState(['', '', '', '', '', '']);
+    const [timer, setTimer] = useState(30);
+    const otpRefs = useRef([]);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setIsLoading(true);
-        setErrorMsg('');
-        try {
-            await login(formData.email, formData.password);
-            navigate('/');
-        } catch (err) {
-            setErrorMsg(err.message || 'Invalid email or password');
-        } finally {
-            setIsLoading(false);
+    useEffect(() => {
+        let interval;
+        if (step === 'verify' && timer > 0) {
+            interval = setInterval(() => setTimer(t => t - 1), 1000);
+        }
+        return () => clearInterval(interval);
+    }, [step, timer]);
+
+    const handleOtpChange = (index, value) => {
+        if (!/^\d*$/.test(value)) return;
+        const newOtp = [...otp];
+        newOtp[index] = value.slice(-1);
+        setOtp(newOtp);
+
+        if (value && index < 5) {
+            otpRefs.current[index + 1].focus();
         }
     };
 
-    const handleGoogleLogin = useGoogleLogin({
-        onSuccess: async (tokenResponse) => {
-            setIsLoading(true);
-            setErrorMsg('');
-            try {
-                await googleAuth(tokenResponse.access_token);
-                navigate('/');
-            } catch (err) {
-                setErrorMsg(err.message || 'Google sign-in failed');
-            } finally {
-                setIsLoading(false);
-            }
-        },
-        onError: () => setErrorMsg('Google sign-in failed. Please try again.'),
-    });
+    const handleOtpKeyDown = (index, e) => {
+        if (e.key === 'Backspace' && !otp[index] && index > 0) {
+            otpRefs.current[index - 1].focus();
+        }
+    };
+
+    /* Email/password login */
+    const handleLoginSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        if (!email || !password) { setError('Please fill in all fields.'); return; }
+        setLoading(true);
+        try {
+            await login(email, password);
+            navigate('/dashboard');
+        } catch (err) {
+            setError(err.message || 'Invalid credentials.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    /* Verification Code Submit (Used for demo/consistent UI) */
+    const handleVerifySubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        const code = otp.join('');
+        if (code.length < 6) { setError('Please enter the full 6-digit code.'); return; }
+
+        setLoading(true);
+        // Simulated local verification
+        await new Promise(r => setTimeout(r, 1000));
+        setLoading(false);
+
+        if (code === '123456') {
+            navigate('/dashboard');
+        } else {
+            setError('Invalid verification code. Please try again.');
+        }
+    };
+
+    const resendCode = () => {
+        if (timer > 0) return;
+        setTimer(30);
+        setOtp(['', '', '', '', '', '']);
+        otpRefs.current[0].focus();
+        // Trigger resend API
+    };
+
+    /* Google login */
+    const handleGoogleAuth = async () => {
+        setGoogleLoading(true);
+        setError('');
+        try {
+            await googleAuth();
+        } catch (err) {
+            setError(err.message || 'Google sign-in failed.');
+        } finally {
+            setGoogleLoading(false);
+        }
+    };
 
     return (
-        <div className="min-h-screen flex items-center justify-center py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-            {/* Background elements */}
-            <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-                <div className="absolute top-[10%] left-[10%] w-72 h-72 bg-heritage-gold/20 rounded-full blur-3xl animate-pulse"></div>
-                <div className="absolute bottom-[10%] right-[10%] w-96 h-96 bg-heritage-green/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-            </div>
+        <>
+            <SEO title={step === 'login' ? "Sign In — Inner Root" : "Verify Account — Inner Root"} description="Sign in to your Inner Root account." />
+            <div className="min-h-screen flex items-center justify-center px-6 py-20 relative overflow-hidden">
+                <div className="sacred-geometry" style={{ opacity: 0.02 }} />
 
-            <div className="max-w-md w-full glass-card p-8 rounded-2xl shadow-2xl relative z-10 border border-white/20 backdrop-blur-xl bg-white/10">
-                <div className="text-center mb-10">
-                    <h2 className="text-4xl font-display font-bold text-[var(--fg)] mb-2">Welcome Back</h2>
-                    <p className="text-[var(--text-secondary)]">Sign in to continue your journey</p>
-                </div>
+                {/* Floating orbs */}
+                <div className="absolute w-96 h-96 rounded-full pointer-events-none"
+                    style={{ top: '10%', right: '-5%', background: 'radial-gradient(circle, rgba(217,119,6,0.06) 0%, transparent 70%)' }} />
+                <div className="absolute w-64 h-64 rounded-full pointer-events-none"
+                    style={{ bottom: '10%', left: '-5%', background: 'radial-gradient(circle, rgba(20,83,45,0.04) 0%, transparent 70%)' }} />
 
-                {errorMsg && (
-                    <div className="mb-6 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
-                        {errorMsg}
-                    </div>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="space-y-4">
-                        <div className="relative group">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-heritage-gold transition-colors" />
-                            </div>
-                            <input
-                                type="email"
-                                name="email"
-                                required
-                                className="block w-full pl-10 pr-3 py-3 border border-white/10 rounded-lg bg-white/5 
-                                         text-[var(--fg)] placeholder-gray-400 focus:outline-none focus:ring-2 
-                                         focus:ring-heritage-gold/50 focus:border-transparent transition-all duration-300"
-                                placeholder="e.g. name@example.com"
-                                value={formData.email}
-                                onChange={handleChange}
-                                disabled={isLoading}
-                            />
-                        </div>
-                        <div className="relative group">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Lock className="h-5 w-5 text-gray-400 group-focus-within:text-heritage-gold transition-colors" />
-                            </div>
-                            <input
-                                type="password"
-                                name="password"
-                                required
-                                className="block w-full pl-10 pr-3 py-3 border border-white/10 rounded-lg bg-white/5 
-                                         text-[var(--fg)] placeholder-gray-400 focus:outline-none focus:ring-2 
-                                         focus:ring-heritage-gold/50 focus:border-transparent transition-all duration-300"
-                                placeholder="Min. 8 characters"
-                                value={formData.password}
-                                onChange={handleChange}
-                                disabled={isLoading}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex items-center justify-between text-sm">
-                        <label className="flex items-center text-[var(--text-secondary)] hover:text-[var(--fg)] cursor-pointer group">
-                            <input type="checkbox" className="w-4 h-4 mr-2 rounded border-white/20 bg-white/5 text-heritage-gold focus:ring-heritage-gold transition-all" />
-                            <span className="group-hover:text-heritage-gold transition-colors">Remember me</span>
-                        </label>
-                        <button
-                            type="button"
-                            onClick={() => alert('Password reset functionality is coming soon. Please contact support@innerroot.in if you need immediate assistance.')}
-                            className="font-medium text-heritage-gold hover:text-heritage-goldLight transition-colors"
-                        >
-                            Forgot password?
-                        </button>
-                    </div>
-
-                    <button
-                        type="submit"
-                        disabled={isLoading}
-                        className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium 
-                                 text-white bg-gradient-to-r from-heritage-gold to-heritage-orange hover:from-heritage-goldLight 
-                                 hover:to-heritage-gold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-heritage-gold 
-                                 transform hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                    >
-                        {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <>Sign In <ArrowRight className="ml-2 h-4 w-4" /></>}
-                    </button>
-                </form>
-
-                {/* Divider */}
-                <div className="relative my-8">
-                    <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-white/10"></div>
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                        <span className="px-4 bg-[var(--bg)] text-[var(--text-secondary)]">or continue with</span>
-                    </div>
-                </div>
-
-                {/* Google Button */}
-                <button
-                    type="button"
-                    onClick={() => handleGoogleLogin()}
-                    disabled={isLoading}
-                    className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-white/10 rounded-lg 
-                             bg-white/5 hover:bg-white/10 text-[var(--fg)] font-medium text-sm 
-                             transform hover:scale-[1.02] transition-all duration-300 hover:border-white/30
-                             disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                <motion.div
+                    initial={{ opacity: 0, y: 32 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                    className="w-full max-w-md relative z-10"
                 >
-                    <svg className="w-5 h-5" viewBox="0 0 24 24">
-                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
-                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
-                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-                    </svg>
-                    Continue with Google
-                </button>
+                    {/* Card */}
+                    <div className="rounded-3xl p-8 sm:p-10" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary)', boxShadow: 'var(--shadow-xl)' }}>
 
-                <div className="mt-8 text-center">
-                    <p className="text-sm text-[var(--text-secondary)]">
-                        Don't have an account?{' '}
-                        <Link to="/signup" className="font-medium text-heritage-gold hover:text-heritage-goldLight transition-colors">
-                            Create account
-                        </Link>
+                        <AnimatePresence mode="wait">
+                            {step === 'login' ? (
+                                <motion.div
+                                    key="login-step"
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 20 }}
+                                    transition={{ duration: 0.3 }}
+                                >
+                                    {/* Logo + Heading */}
+                                    <div className="text-center mb-8">
+                                        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 overflow-hidden"
+                                            style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-primary)' }}>
+                                            <img src={logo} alt="Inner Root Logo" className="w-full h-full object-contain" />
+                                        </div>
+                                        <h1 className="text-2xl font-bold mb-1" style={{ fontFamily: 'var(--font-display)' }}>Welcome Back</h1>
+                                        <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>Continue your inner journey</p>
+                                    </div>
+
+                                    {/* Google Button */}
+                                    <button
+                                        onClick={handleGoogleAuth}
+                                        disabled={googleLoading || loading}
+                                        className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 mb-5"
+                                        style={{
+                                            background: 'var(--bg-secondary)',
+                                            border: '1.5px solid var(--border-primary)',
+                                            color: 'var(--text-primary)',
+                                        }}
+                                        onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--accent)'}
+                                        onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border-primary)'}
+                                    >
+                                        {googleLoading ? (
+                                            <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin"
+                                                style={{ borderColor: 'var(--accent)', borderTopColor: 'transparent' }} />
+                                        ) : <GoogleIcon />}
+                                        {googleLoading ? 'Signing in...' : 'Continue with Google'}
+                                    </button>
+
+                                    {/* Divider */}
+                                    <div className="flex items-center gap-3 mb-5">
+                                        <div className="flex-1 h-px" style={{ background: 'var(--border-primary)' }} />
+                                        <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>or sign in with email</span>
+                                        <div className="flex-1 h-px" style={{ background: 'var(--border-primary)' }} />
+                                    </div>
+
+                                    {/* Error */}
+                                    {error && (
+                                        <motion.div
+                                            initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
+                                            className="flex items-center gap-2 rounded-xl p-3 mb-5 text-sm overflow-hidden"
+                                            style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444' }}
+                                        >
+                                            <AlertCircle size={15} /> {error}
+                                        </motion.div>
+                                    )}
+
+                                    {/* Main Form */}
+                                    <form onSubmit={handleLoginSubmit} className="space-y-4">
+                                        <div>
+                                            <label className="block text-xs font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>Email</label>
+                                            <div className="relative">
+                                                <Mail size={15} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-tertiary)' }} />
+                                                <input
+                                                    type="email" value={email} onChange={e => setEmail(e.target.value)}
+                                                    placeholder="you@example.com" className="input"
+                                                    style={{ paddingLeft: '2.75rem' }}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div className="flex items-center justify-between mb-2">
+                                                <label className="block text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Password</label>
+                                                <a href="#" className="text-xs" style={{ color: 'var(--accent)' }}>Forgot password?</a>
+                                            </div>
+                                            <div className="relative">
+                                                <Lock size={15} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-tertiary)' }} />
+                                                <input
+                                                    type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)}
+                                                    placeholder="••••••••" className="input"
+                                                    style={{ paddingLeft: '2.75rem', paddingRight: '2.75rem' }}
+                                                />
+                                                <button type="button" onClick={() => setShowPassword(s => !s)}
+                                                    className="absolute right-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-tertiary)' }}>
+                                                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <button type="submit" disabled={loading}
+                                            className="btn btn-primary w-full justify-center" style={{ height: 48 }}>
+                                            {loading ? (
+                                                <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                                            ) : <><LogIn size={17} /> Next Step</>}
+                                        </button>
+                                    </form>
+                                </motion.div>
+                            ) : (
+                                <motion.div
+                                    key="verify-step"
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -20 }}
+                                    transition={{ duration: 0.3 }}
+                                >
+                                    <button
+                                        onClick={() => setStep('login')}
+                                        className="flex items-center gap-1.5 text-xs mb-6 hover:translate-x-[-2px] transition-transform"
+                                        style={{ color: 'var(--text-tertiary)' }}
+                                    >
+                                        <ArrowLeft size={14} /> Back to Sign In
+                                    </button>
+
+                                    <div className="text-center mb-8">
+                                        <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                                            style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}>
+                                            <ShieldCheck size={28} />
+                                        </div>
+                                        <h1 className="text-2xl font-bold mb-1" style={{ fontFamily: 'var(--font-display)' }}>Verify Identity</h1>
+                                        <p className="text-sm px-4" style={{ color: 'var(--text-tertiary)' }}>
+                                            We've sent a 6-digit code to <span className="font-medium text-[var(--text-secondary)]">{email}</span>
+                                        </p>
+                                    </div>
+
+                                    {error && (
+                                        <motion.div
+                                            initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
+                                            className="flex items-center gap-2 rounded-xl p-3 mb-6 text-sm overflow-hidden"
+                                            style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444' }}
+                                        >
+                                            <AlertCircle size={15} /> {error}
+                                        </motion.div>
+                                    )}
+
+                                    <form onSubmit={handleVerifySubmit}>
+                                        <div className="flex justify-between gap-2 mb-8">
+                                            {otp.map((digit, i) => (
+                                                <input
+                                                    key={i}
+                                                    ref={el => otpRefs.current[i] = el}
+                                                    type="text"
+                                                    value={digit}
+                                                    onChange={e => handleOtpChange(i, e.target.value)}
+                                                    onKeyDown={e => handleOtpKeyDown(i, e)}
+                                                    className="w-12 h-14 text-center text-xl font-bold rounded-xl border-2 transition-all outline-none"
+                                                    style={{
+                                                        borderColor: digit ? 'var(--accent)' : 'var(--border-primary)',
+                                                        background: digit ? 'var(--accent-soft)' : 'var(--bg-secondary)',
+                                                        color: 'var(--text-primary)'
+                                                    }}
+                                                    maxLength={1}
+                                                />
+                                            ))}
+                                        </div>
+
+                                        <button type="submit" disabled={loading}
+                                            className="btn btn-primary w-full justify-center mb-6" style={{ height: 48 }}>
+                                            {loading ? (
+                                                <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                                            ) : 'Verify & Sign In'}
+                                        </button>
+
+                                        <div className="text-center">
+                                            <p className="text-xs mb-2" style={{ color: 'var(--text-tertiary)' }}>Didn't receive the code?</p>
+                                            <button
+                                                type="button"
+                                                onClick={resendCode}
+                                                disabled={timer > 0}
+                                                className="flex items-center gap-2 mx-auto text-xs font-semibold px-4 py-2 rounded-lg transition-all"
+                                                style={{
+                                                    color: timer > 0 ? 'var(--text-tertiary)' : 'var(--accent)',
+                                                    background: timer > 0 ? 'transparent' : 'var(--accent-soft)'
+                                                }}
+                                            >
+                                                <RefreshCcw size={14} className={timer > 0 ? '' : 'animate-spin-slow'} />
+                                                {timer > 0 ? `Resend in ${timer}s` : 'Resend Code Now'}
+                                            </button>
+                                        </div>
+                                    </form>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        <div className="divider my-6" />
+
+                        <p className="text-center text-sm" style={{ color: 'var(--text-tertiary)' }}>
+                            Don't have an account?{' '}
+                            <Link to="/signup" className="font-semibold" style={{ color: 'var(--accent)' }}>Create one</Link>
+                        </p>
+                    </div>
+
+                    {/* Trust badges */}
+                    <p className="text-center text-xs mt-5" style={{ color: 'var(--text-tertiary)' }}>
+                        By signing in, you agree to our{' '}
+                        <Link to="/terms" style={{ color: 'var(--accent)' }}>Terms</Link> &amp;{' '}
+                        <Link to="/privacy" style={{ color: 'var(--accent)' }}>Privacy Policy</Link>
                     </p>
-                </div>
+                </motion.div>
             </div>
-        </div>
+        </>
     );
 };
 

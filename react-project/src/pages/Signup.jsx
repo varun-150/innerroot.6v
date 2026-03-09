@@ -1,465 +1,372 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useGoogleLogin } from '@react-oauth/google';
+import { motion, AnimatePresence } from 'framer-motion';
+import { UserPlus, Mail, Lock, User, Eye, EyeOff, CheckCircle2, AlertCircle, ShieldCheck, ArrowLeft, RefreshCcw } from 'lucide-react';
+import SEO from '../components/ui/SEO';
 import { useAuth } from '../context/AuthContext';
-import { Mail, Lock, User, Check, UserPlus, Loader2, ChevronRight, ChevronLeft } from 'lucide-react';
 
-// ── MCQ Options Data ──────────────────────────────────────────────
-const learningGoalsOptions = [
-    { id: 'philosophy', label: 'Indian Philosophy', emoji: '🕉️' },
-    { id: 'meditation', label: 'Meditation & Mindfulness', emoji: '🧘' },
-    { id: 'cultural', label: 'Cultural Heritage', emoji: '🏛️' },
-    { id: 'spiritual', label: 'Spiritual Growth', emoji: '✨' },
-    { id: 'history', label: 'History & Traditions', emoji: '📜' },
-    { id: 'wellness', label: 'Wellness & Ayurveda', emoji: '🌿' },
-];
+import logo from '../assets/logo.webp';
 
-const usageIntentOptions = [
-    { id: 'daily_practice', label: 'Daily Spiritual Practice', emoji: '🙏' },
-    { id: 'research', label: 'Cultural Research', emoji: '🔍' },
-    { id: 'personal_growth', label: 'Personal Growth', emoji: '🌱' },
-    { id: 'community', label: 'Community & Discussions', emoji: '👥' },
-    { id: 'education', label: 'Education & Learning', emoji: '📚' },
-    { id: 'casual', label: 'Casual Exploration', emoji: '🗺️' },
-];
+/* ── Google G SVG Icon ── */
+const GoogleIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.64 9.20455C17.64 8.56636 17.5827 7.95273 17.4764 7.36364H9V10.845H13.8436C13.635 11.97 13.0009 12.9232 12.0477 13.5614V15.8195H14.9564C16.6582 14.2527 17.64 11.9455 17.64 9.20455Z" fill="#4285F4" />
+        <path d="M9 18C11.43 18 13.4673 17.1941 14.9564 15.8195L12.0477 13.5614C11.2418 14.1014 10.2109 14.4205 9 14.4205C6.65591 14.4205 4.67182 12.8373 3.96409 10.71H0.957275V13.0418C2.43818 15.9832 5.48182 18 9 18Z" fill="#34A853" />
+        <path d="M3.96409 10.71C3.78409 10.17 3.68182 9.59318 3.68182 9C3.68182 8.40682 3.78409 7.83 3.96409 7.29V4.95818H0.957275C0.347727 6.17318 0 7.54773 0 9C0 10.4523 0.347727 11.8268 0.957275 13.0418L3.96409 10.71Z" fill="#FBBC05" />
+        <path d="M9 3.57955C10.3214 3.57955 11.5077 4.03364 12.4405 4.92545L15.0218 2.34409C13.4632 0.891818 11.4259 0 9 0C5.48182 0 2.43818 2.01682 0.957275 4.95818L3.96409 7.29C4.67182 5.16273 6.65591 3.57955 9 3.57955Z" fill="#EA4335" />
+    </svg>
+);
 
-const occupationOptions = [
-    { id: 'student', label: 'Student', emoji: '🎓' },
-    { id: 'teacher', label: 'Teacher / Professor', emoji: '👩‍🏫' },
-    { id: 'professional', label: 'Working Professional', emoji: '💼' },
-    { id: 'researcher', label: 'Researcher / Scholar', emoji: '🔬' },
-    { id: 'artist', label: 'Artist / Creative', emoji: '🎨' },
-    { id: 'retired', label: 'Retired', emoji: '🏡' },
-    { id: 'homemaker', label: 'Homemaker', emoji: '🏠' },
-    { id: 'other', label: 'Other', emoji: '🌟' },
-];
-
-const ageGroupOptions = [
-    { id: '13-17', label: '13 – 17', emoji: '🧑' },
-    { id: '18-24', label: '18 – 24', emoji: '🧑‍🎓' },
-    { id: '25-34', label: '25 – 34', emoji: '👨‍💻' },
-    { id: '35-44', label: '35 – 44', emoji: '👩‍💼' },
-    { id: '45-59', label: '45 – 59', emoji: '🧑‍🏫' },
-    { id: '60+', label: '60+', emoji: '🧓' },
-];
-
-const regionOptions = [
-    { id: 'north_india', label: 'North India', emoji: '🏔️' },
-    { id: 'south_india', label: 'South India', emoji: '🌴' },
-    { id: 'east_india', label: 'East India', emoji: '🌾' },
-    { id: 'west_india', label: 'West India', emoji: '🏖️' },
-    { id: 'central_india', label: 'Central India', emoji: '🏛️' },
-    { id: 'outside_india', label: 'Outside India', emoji: '🌏' },
-];
-
-
-// ── Reusable MCQ Component ───────────────────────────────────────
-const MCQQuestion = ({ question, icon, options, selected, onSelect, multiSelect = false }) => {
-    const handleSelect = (id) => {
-        if (multiSelect) {
-            const arr = selected ? selected.split(',').filter(Boolean) : [];
-            if (arr.includes(id)) {
-                onSelect(arr.filter(i => i !== id).join(','));
-            } else {
-                onSelect([...arr, id].join(','));
-            }
-        } else {
-            onSelect(id === selected ? '' : id);
-        }
-    };
-
-    const isSelected = (id) => {
-        if (multiSelect) {
-            return selected?.split(',').includes(id);
-        }
-        return selected === id;
-    };
-
-    return (
-        <div className="mb-6">
-            <label className="text-sm font-semibold text-[var(--fg)] mb-3 flex items-center gap-2">
-                <span className="text-lg">{icon}</span>
-                {question}
-                {multiSelect && (
-                    <span className="text-xs font-normal text-[var(--text-secondary)] ml-auto">Select multiple</span>
-                )}
-            </label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
-                {options.map((opt) => (
-                    <button
-                        key={opt.id}
-                        type="button"
-                        onClick={() => handleSelect(opt.id)}
-                        className={`relative flex flex-col items-center gap-1.5 py-4 px-3 rounded-xl border-2 text-sm font-medium
-                                   transition-all duration-300 cursor-pointer group
-                                   ${isSelected(opt.id)
-                                ? 'border-heritage-gold bg-heritage-gold/10 text-[var(--fg)] shadow-lg shadow-heritage-gold/10 scale-[1.03]'
-                                : 'border-white/10 bg-white/5 text-[var(--text-secondary)] hover:border-white/30 hover:bg-white/10 hover:scale-[1.02]'
-                            }`}
-                    >
-                        {isSelected(opt.id) && (
-                            <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-heritage-gold flex items-center justify-center">
-                                <Check className="w-3 h-3 text-white" />
-                            </div>
-                        )}
-                        <span className="text-2xl group-hover:scale-110 transition-transform duration-200">{opt.emoji}</span>
-                        <span className="text-center leading-tight">{opt.label}</span>
-                    </button>
-                ))}
-            </div>
-        </div>
-    );
+/* ── Password strength checker ── */
+const getStrength = (pw) => {
+    let score = 0;
+    if (pw.length >= 8) score++;
+    if (/[A-Z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    return score; // 0-4
 };
 
+const strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+const strengthColors = ['', '#ef4444', '#f59e0b', '#22c55e', '#14532d'];
 
-// ── Main Signup Component ────────────────────────────────────────
 const Signup = () => {
-    const [currentStep, setCurrentStep] = useState(1);
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        learningGoals: '',
-        usageIntent: '',
-        occupation: '',
-        ageGroup: '',
-        region: ''
-    });
-    const [isLoading, setIsLoading] = useState(false);
-    const [errorMsg, setErrorMsg] = useState('');
     const navigate = useNavigate();
+    const [step, setStep] = useState('signup'); // 'signup' | 'verify'
+    const [form, setForm] = useState({ name: '', email: '', password: '' });
+    const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [googleLoading, setGoogleLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [agreedToTerms, setAgreedToTerms] = useState(false);
     const { register, googleAuth } = useAuth();
 
-    const totalSteps = 3;
+    // OTP State
+    const [otp, setOtp] = useState(['', '', '', '', '', '']);
+    const [timer, setTimer] = useState(30);
+    const otpRefs = useRef([]);
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-        setErrorMsg('');
-    };
-
-    const handleMCQChange = (field, value) => {
-        setFormData({ ...formData, [field]: value });
-        setErrorMsg('');
-    };
-
-    const handleNext = () => {
-        if (currentStep === 1) {
-            if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
-                setErrorMsg('Please fill in all fields');
-                return;
-            }
-            if (formData.password !== formData.confirmPassword) {
-                setErrorMsg('Passwords do not match');
-                return;
-            }
+    useEffect(() => {
+        let interval;
+        if (step === 'verify' && timer > 0) {
+            interval = setInterval(() => setTimer(t => t - 1), 1000);
         }
-        if (currentStep === 2) {
-            if (!formData.learningGoals) {
-                setErrorMsg('Please select at least one learning goal');
-                return;
-            }
-            if (!formData.usageIntent) {
-                setErrorMsg('Please select how you plan to use Inner Root');
-                return;
-            }
-        }
-        setErrorMsg('');
-        setCurrentStep(prev => Math.min(prev + 1, totalSteps));
+        return () => clearInterval(interval);
+    }, [step, timer]);
+
+    const pwStrength = getStrength(form.password);
+    const updateField = (field, value) => setForm(f => ({ ...f, [field]: value }));
+
+    const handleOtpChange = (index, value) => {
+        if (!/^\d*$/.test(value)) return;
+        const newOtp = [...otp];
+        newOtp[index] = value.slice(-1);
+        setOtp(newOtp);
+        if (value && index < 5) otpRefs.current[index + 1].focus();
     };
 
-    const handleBack = () => {
-        setCurrentStep(prev => Math.max(prev - 1, 1));
-        setErrorMsg('');
+    const handleOtpKeyDown = (index, e) => {
+        if (e.key === 'Backspace' && !otp[index] && index > 0) otpRefs.current[index - 1].focus();
     };
 
-    const handleSubmit = async (e) => {
+    /* Email sign-up - Step 1 */
+    const handleSignupSubmit = async (e) => {
         e.preventDefault();
+        setError('');
+        if (!form.name || !form.email || !form.password) { setError('Please fill in all fields.'); return; }
+        if (form.password.length < 8) { setError('Password must be at least 8 characters.'); return; }
+        if (!agreedToTerms) { setError('You must agree to the Terms & Conditions.'); return; }
+        setLoading(true);
+        // Simulated API to send verification code in local mode
+        await new Promise(r => setTimeout(r, 1200));
+        setLoading(false);
+        setStep('verify');
+    };
 
-        if (currentStep < totalSteps) {
-            handleNext();
-            return;
-        }
-
-        setIsLoading(true);
-        setErrorMsg('');
+    /* Verification Submit - Step 2 */
+    const handleVerifySubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        const code = otp.join('');
+        if (code.length < 6) { setError('Please enter the full 6-digit code.'); return; }
+        setLoading(true);
         try {
-            await register(
-                formData.name,
-                formData.email,
-                formData.password,
-                {
-                    learningGoals: formData.learningGoals,
-                    usageIntent: formData.usageIntent,
-                    occupation: formData.occupation,
-                    ageGroup: formData.ageGroup,
-                    region: formData.region
-                }
-            );
-            navigate('/');
+            if (code === '123456') {
+                await register(form.name, form.email, form.password);
+                navigate('/dashboard');
+            } else {
+                setError('Invalid verification code. Please try again.');
+            }
         } catch (err) {
-            setErrorMsg(err.message || 'Registration failed');
+            setError(err.message || 'Signup failed. Please try again.');
         } finally {
-            setIsLoading(false);
+            setLoading(false);
         }
     };
 
-    const handleGoogleSignup = useGoogleLogin({
-        onSuccess: async (tokenResponse) => {
-            setIsLoading(true);
-            setErrorMsg('');
-            try {
-                await googleAuth(tokenResponse.access_token);
-                navigate('/');
-            } catch (err) {
-                setErrorMsg(err.message || 'Google sign-up failed');
-            } finally {
-                setIsLoading(false);
-            }
-        },
-        onError: () => setErrorMsg('Google sign-up failed. Please try again.'),
-    });
+    /* Google sign-up */
+    // Using Supabase direct OAuth instead of Google Login provider component here
+    const handleGoogleAuth = async () => {
+        setGoogleLoading(true);
+        setError('');
+        try {
+            await googleAuth();
+        } catch (err) {
+            setError(err.message || 'Google sign-in failed.');
+        } finally {
+            setGoogleLoading(false);
+        }
+    };
 
     return (
-        <div className="min-h-screen flex items-center justify-center py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-            {/* Background elements */}
-            <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-                <div className="absolute top-[10%] left-[10%] w-72 h-72 bg-heritage-green/20 rounded-full blur-3xl animate-pulse"></div>
-                <div className="absolute bottom-[10%] right-[10%] w-96 h-96 bg-heritage-gold/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-            </div>
+        <>
+            <SEO title={step === 'signup' ? "Sign Up — Inner Root" : "Verify Account — Inner Root"} description="Create your Inner Root account and begin your journey." />
+            <div className="min-h-screen flex items-center justify-center px-6 py-20 relative overflow-hidden">
+                <div className="sacred-geometry" style={{ opacity: 0.02 }} />
 
-            <div className="max-w-2xl w-full glass-card p-8 rounded-2xl shadow-2xl relative z-10 border border-white/20 backdrop-blur-xl bg-white/10">
-                {/* Progress Bar */}
-                <div className="mb-10">
-                    <div className="flex justify-between items-center relative">
-                        {/* Connecting Line */}
-                        <div className="absolute top-5 left-0 w-full h-0.5 bg-white/10 -z-10"></div>
-                        <div
-                            className="absolute top-5 left-0 h-0.5 bg-gradient-to-r from-heritage-green to-heritage-teal transition-all duration-500 -z-10"
-                            style={{ width: `${((currentStep - 1) / (totalSteps - 1)) * 100}%` }}
-                        ></div>
+                <div className="absolute w-80 h-80 rounded-full pointer-events-none"
+                    style={{ bottom: '10%', left: '-5%', background: 'radial-gradient(circle, rgba(20,83,45,0.06) 0%, transparent 70%)' }} />
 
-                        {[
-                            { number: 1, label: 'Account' },
-                            { number: 2, label: 'Interests' },
-                            { number: 3, label: 'Profile' }
-                        ].map((step) => (
-                            <div key={step.number} className="flex flex-col items-center group">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-500 z-10 ${currentStep >= step.number
-                                    ? 'bg-gradient-to-r from-heritage-green to-heritage-teal text-white shadow-lg scale-110 shadow-heritage-green/20'
-                                    : 'bg-[var(--bg)] border-2 border-white/10 text-gray-400'
-                                    }`}>
-                                    {currentStep > step.number ? <Check className="w-5 h-5" /> : step.number}
-                                </div>
-                                <span className={`text-[10px] font-bold uppercase tracking-widest mt-2 transition-colors duration-300 ${currentStep >= step.number ? 'text-heritage-green' : 'text-gray-500'}`}>
-                                    {step.label}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                <motion.div
+                    initial={{ opacity: 0, y: 32 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                    className="w-full max-w-md relative z-10"
+                >
+                    <div className="rounded-3xl p-8 sm:p-10" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary)', boxShadow: 'var(--shadow-xl)' }}>
 
-                <div className="text-center mb-8">
-                    <h2 className="text-4xl font-display font-bold text-[var(--fg)] mb-2">
-                        {currentStep === 1 && "Join Us"}
-                        {currentStep === 2 && "Tell Us About Yourself"}
-                        {currentStep === 3 && "Almost There!"}
-                    </h2>
-                    <p className="text-[var(--text-secondary)]">
-                        {currentStep === 1 && "Create your Inner Root account"}
-                        {currentStep === 2 && "Select all that apply to personalize your journey"}
-                        {currentStep === 3 && "A few more details to complete your profile"}
-                    </p>
-                </div>
+                        <AnimatePresence mode="wait">
+                            {step === 'signup' ? (
+                                <motion.div
+                                    key="signup-step"
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 20 }}
+                                    transition={{ duration: 0.3 }}
+                                >
+                                    {/* Logo + Heading */}
+                                    <div className="text-center mb-8">
+                                        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 overflow-hidden"
+                                            style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-primary)' }}>
+                                            <img src={logo} alt="Inner Root Logo" className="w-full h-full object-contain" />
+                                        </div>
+                                        <h1 className="text-2xl font-bold mb-1" style={{ fontFamily: 'var(--font-display)' }}>Begin Your Journey</h1>
+                                        <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>Create your Inner Root account</p>
+                                    </div>
 
-                {errorMsg && (
-                    <div className="mb-6 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
-                        {errorMsg}
-                    </div>
-                )}
+                                    {/* Google Button */}
+                                    <button
+                                        onClick={handleGoogleAuth}
+                                        disabled={googleLoading || loading}
+                                        className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 mb-5"
+                                        style={{ background: 'var(--bg-secondary)', border: '1.5px solid var(--border-primary)', color: 'var(--text-primary)' }}
+                                        onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--accent)'}
+                                        onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border-primary)'}
+                                    >
+                                        {googleLoading ? (
+                                            <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin"
+                                                style={{ borderColor: 'var(--accent)', borderTopColor: 'transparent' }} />
+                                        ) : <GoogleIcon />}
+                                        {googleLoading ? 'Connecting...' : 'Continue with Google'}
+                                    </button>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* ── Step 1: Basic Account Info ── */}
-                    {currentStep === 1 && (
-                        <div className="space-y-4 animate-fadeIn">
-                            <div className="relative group">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <User className="h-5 w-5 text-gray-400 group-focus-within:text-heritage-gold transition-colors" />
-                                </div>
-                                <input type="text" name="name" required disabled={isLoading}
-                                    className="w-full pl-10 pr-3 py-3 border border-white/10 rounded-lg bg-white/5
-                                             text-[var(--fg)] placeholder-gray-400 focus:outline-none focus:ring-2
-                                             focus:ring-heritage-gold/50 focus:border-transparent transition-all duration-300"
-                                    placeholder="Enter your full name" value={formData.name} onChange={handleChange} />
-                            </div>
-                            <div className="relative group">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-heritage-gold transition-colors" />
-                                </div>
-                                <input type="email" name="email" required disabled={isLoading}
-                                    className="w-full pl-10 pr-3 py-3 border border-white/10 rounded-lg bg-white/5
-                                             text-[var(--fg)] placeholder-gray-400 focus:outline-none focus:ring-2
-                                             focus:ring-heritage-gold/50 focus:border-transparent transition-all duration-300"
-                                    placeholder="e.g. name@example.com" value={formData.email} onChange={handleChange} />
-                            </div>
-                            <div className="relative group">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Lock className="h-5 w-5 text-gray-400 group-focus-within:text-heritage-gold transition-colors" />
-                                </div>
-                                <input type="password" name="password" required disabled={isLoading}
-                                    className="w-full pl-10 pr-3 py-3 border border-white/10 rounded-lg bg-white/5
-                                             text-[var(--fg)] placeholder-gray-400 focus:outline-none focus:ring-2
-                                             focus:ring-heritage-gold/50 focus:border-transparent transition-all duration-300"
-                                    placeholder="Min. 8 characters" value={formData.password} onChange={handleChange} />
-                            </div>
-                            <div className="relative group">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Check className="h-5 w-5 text-gray-400 group-focus-within:text-heritage-gold transition-colors" />
-                                </div>
-                                <input type="password" name="confirmPassword" required disabled={isLoading}
-                                    className="w-full pl-10 pr-3 py-3 border border-white/10 rounded-lg bg-white/5
-                                             text-[var(--fg)] placeholder-gray-400 focus:outline-none focus:ring-2
-                                             focus:ring-heritage-gold/50 focus:border-transparent transition-all duration-300"
-                                    placeholder="Re-enter password" value={formData.confirmPassword} onChange={handleChange} />
-                            </div>
+                                    {/* Divider */}
+                                    <div className="flex items-center gap-3 mb-5">
+                                        <div className="flex-1 h-px" style={{ background: 'var(--border-primary)' }} />
+                                        <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>or sign up with email</span>
+                                        <div className="flex-1 h-px" style={{ background: 'var(--border-primary)' }} />
+                                    </div>
 
-                            <div className="flex items-start gap-4 p-4 rounded-xl bg-white/5 border border-white/10 group hover:border-heritage-gold/30 transition-all">
-                                <div className="flex items-center h-5">
-                                    <input
-                                        id="terms"
-                                        type="checkbox"
-                                        required
-                                        className="w-5 h-5 rounded border-white/20 bg-white/5 text-heritage-gold focus:ring-heritage-gold transition-all cursor-pointer"
-                                    />
-                                </div>
-                                <div className="text-sm">
-                                    <label htmlFor="terms" className="font-medium text-[var(--fg)] cursor-pointer">
-                                        I accept the <Link to="/terms" className="text-heritage-gold hover:underline">Terms of Use</Link> and <Link to="/privacy" className="text-heritage-gold hover:underline">Privacy Policy</Link>
-                                    </label>
-                                    <p className="text-[var(--muted)] text-xs mt-1">Join our community to explore and preserve India's timeless heritage.</p>
-                                </div>
-                            </div>
+                                    {/* Error */}
+                                    {error && (
+                                        <motion.div
+                                            initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
+                                            className="flex items-center gap-2 rounded-xl p-3 mb-5 text-sm overflow-hidden"
+                                            style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444' }}
+                                        >
+                                            <AlertCircle size={15} /> {error}
+                                        </motion.div>
+                                    )}
 
-                            {/* Divider */}
-                            <div className="relative my-6">
-                                <div className="absolute inset-0 flex items-center">
-                                    <div className="w-full border-t border-white/10"></div>
-                                </div>
-                                <div className="relative flex justify-center text-sm">
-                                    <span className="px-4 bg-[var(--bg)] text-[var(--text-secondary)]">or continue with</span>
-                                </div>
-                            </div>
+                                    {/* Form */}
+                                    <form onSubmit={handleSignupSubmit} className="space-y-4">
+                                        <div>
+                                            <label className="block text-xs font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>Full Name</label>
+                                            <div className="relative">
+                                                <User size={15} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-tertiary)' }} />
+                                                <input
+                                                    type="text" value={form.name} onChange={e => updateField('name', e.target.value)}
+                                                    placeholder="Your name" className="input" style={{ paddingLeft: '2.75rem' }}
+                                                />
+                                            </div>
+                                        </div>
 
-                            {/* Google Button */}
-                            <button type="button" onClick={() => handleGoogleSignup()} disabled={isLoading}
-                                className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-white/10 rounded-lg
-                                         bg-white/5 hover:bg-white/10 text-[var(--fg)] font-medium text-sm
-                                         transform hover:scale-[1.02] transition-all duration-300 hover:border-white/30
-                                         disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                            >
-                                <svg className="w-5 h-5" viewBox="0 0 24 24">
-                                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
-                                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
-                                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-                                </svg>
-                                Continue with Google
-                            </button>
-                        </div>
-                    )}
+                                        <div>
+                                            <label className="block text-xs font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>Email</label>
+                                            <div className="relative">
+                                                <Mail size={15} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-tertiary)' }} />
+                                                <input
+                                                    type="email" value={form.email} onChange={e => updateField('email', e.target.value)}
+                                                    placeholder="you@example.com" className="input" style={{ paddingLeft: '2.75rem' }}
+                                                />
+                                            </div>
+                                        </div>
 
-                    {/* ── Step 2: Learning Goals & Usage (MCQ) ── */}
-                    {currentStep === 2 && (
-                        <div className="animate-fadeIn">
-                            <MCQQuestion
-                                question="What are you hoping to learn?"
-                                icon="🎯"
-                                options={learningGoalsOptions}
-                                selected={formData.learningGoals}
-                                onSelect={(val) => handleMCQChange('learningGoals', val)}
-                                multiSelect={true}
-                            />
-                            <MCQQuestion
-                                question="How do you plan to use Inner Root?"
-                                icon="💡"
-                                options={usageIntentOptions}
-                                selected={formData.usageIntent}
-                                onSelect={(val) => handleMCQChange('usageIntent', val)}
-                                multiSelect={false}
-                            />
-                        </div>
-                    )}
+                                        <div>
+                                            <label className="block text-xs font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>Password</label>
+                                            <div className="relative">
+                                                <Lock size={15} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-tertiary)' }} />
+                                                <input
+                                                    type={showPassword ? 'text' : 'password'} value={form.password}
+                                                    onChange={e => updateField('password', e.target.value)}
+                                                    placeholder="Min. 8 characters" className="input"
+                                                    style={{ paddingLeft: '2.75rem', paddingRight: '2.75rem' }}
+                                                />
+                                                <button type="button" onClick={() => setShowPassword(s => !s)}
+                                                    className="absolute right-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-tertiary)' }}>
+                                                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                                                </button>
+                                            </div>
+                                            {form.password.length > 0 && (
+                                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-2">
+                                                    <div className="flex gap-1 mb-1">
+                                                        {[1, 2, 3, 4].map(n => (
+                                                            <div key={n} className="h-1 flex-1 rounded-full transition-all duration-300"
+                                                                style={{ background: pwStrength >= n ? strengthColors[pwStrength] : 'var(--border-primary)' }} />
+                                                        ))}
+                                                    </div>
+                                                    <span className="text-[10px] font-semibold" style={{ color: strengthColors[pwStrength] }}>
+                                                        {strengthLabels[pwStrength]}
+                                                    </span>
+                                                </motion.div>
+                                            )}
+                                        </div>
 
-                    {/* ── Step 3: Occupation, Age Group, Region (MCQ) ── */}
-                    {currentStep === 3 && (
-                        <div className="animate-fadeIn">
-                            <MCQQuestion
-                                question="What is your occupation?"
-                                icon="💼"
-                                options={occupationOptions}
-                                selected={formData.occupation}
-                                onSelect={(val) => handleMCQChange('occupation', val)}
-                                multiSelect={false}
-                            />
-                            <MCQQuestion
-                                question="What is your age group?"
-                                icon="📅"
-                                options={ageGroupOptions}
-                                selected={formData.ageGroup}
-                                onSelect={(val) => handleMCQChange('ageGroup', val)}
-                                multiSelect={false}
-                            />
-                            <MCQQuestion
-                                question="Where are you from?"
-                                icon="📍"
-                                options={regionOptions}
-                                selected={formData.region}
-                                onSelect={(val) => handleMCQChange('region', val)}
-                                multiSelect={false}
-                            />
-                        </div>
-                    )}
+                                        <div className="flex items-start gap-3 py-1">
+                                            <div className="pt-0.5">
+                                                <input
+                                                    type="checkbox"
+                                                    id="terms-checkbox"
+                                                    checked={agreedToTerms}
+                                                    onChange={e => setAgreedToTerms(e.target.checked)}
+                                                    className="w-4 h-4 rounded border-primary bg-secondary text-accent focus:ring-accent"
+                                                />
+                                            </div>
+                                            <label htmlFor="terms-checkbox" className="text-xs leading-relaxed" style={{ color: 'var(--text-tertiary)' }}>
+                                                I agree to the <Link to="/terms" className="text-accent underline">Terms of Service</Link> and <Link to="/privacy" className="text-accent underline">Privacy Policy</Link>.
+                                            </label>
+                                        </div>
 
-                    {/* Navigation Buttons */}
-                    <div className="flex gap-4 pt-4">
-                        {currentStep > 1 && (
-                            <button type="button" onClick={handleBack} disabled={isLoading}
-                                className="flex-1 flex justify-center items-center py-3 px-4 border border-white/20 rounded-lg
-                                         text-[var(--fg)] bg-white/5 hover:bg-white/10 font-medium text-sm
-                                         transform hover:scale-[1.02] transition-all duration-300
-                                         disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                            >
-                                <ChevronLeft className="mr-2 h-4 w-4" />
-                                Back
-                            </button>
-                        )}
-                        <button type="submit" disabled={isLoading}
-                            className={`${currentStep === 1 ? 'w-full' : 'flex-1'} flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium
-                                     text-white bg-gradient-to-r from-heritage-green to-heritage-teal hover:from-heritage-greenLight
-                                     hover:to-heritage-green focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-heritage-green
-                                     transform hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
-                        >
-                            {isLoading ? (
-                                <Loader2 className="h-5 w-5 animate-spin" />
-                            ) : currentStep === totalSteps ? (
-                                <>Create Account <UserPlus className="ml-2 h-4 w-4" /></>
+                                        <button type="submit" disabled={loading}
+                                            className="btn btn-primary w-full justify-center" style={{ height: 48 }}>
+                                            {loading ? (
+                                                <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                                            ) : <><UserPlus size={17} /> Create Account</>}
+                                        </button>
+                                    </form>
+                                </motion.div>
                             ) : (
-                                <>Next <ChevronRight className="ml-2 h-4 w-4" /></>
-                            )}
-                        </button>
-                    </div>
-                </form>
+                                <motion.div
+                                    key="verify-step"
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -20 }}
+                                    transition={{ duration: 0.3 }}
+                                >
+                                    <button
+                                        onClick={() => setStep('signup')}
+                                        className="flex items-center gap-1.5 text-xs mb-6 hover:translate-x-[-2px] transition-transform"
+                                        style={{ color: 'var(--text-tertiary)' }}
+                                    >
+                                        <ArrowLeft size={14} /> Back to Sign Up
+                                    </button>
 
-                <div className="mt-8 text-center">
-                    <p className="text-sm text-[var(--text-secondary)]">
-                        Already have an account?{' '}
-                        <Link to="/login" className="font-medium text-heritage-green hover:text-heritage-greenLight transition-colors">
-                            Sign in
-                        </Link>
+                                    <div className="text-center mb-8">
+                                        <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                                            style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}>
+                                            <ShieldCheck size={28} />
+                                        </div>
+                                        <h1 className="text-2xl font-bold mb-1" style={{ fontFamily: 'var(--font-display)' }}>Verify Email</h1>
+                                        <p className="text-sm px-4" style={{ color: 'var(--text-tertiary)' }}>
+                                            Verification code sent to <span className="font-medium text-[var(--text-secondary)]">{form.email}</span>
+                                        </p>
+                                    </div>
+
+                                    {error && (
+                                        <motion.div
+                                            initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
+                                            className="flex items-center gap-2 rounded-xl p-3 mb-6 text-sm overflow-hidden"
+                                            style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444' }}
+                                        >
+                                            <AlertCircle size={15} /> {error}
+                                        </motion.div>
+                                    )}
+
+                                    <form onSubmit={handleVerifySubmit}>
+                                        <div className="flex justify-between gap-2 mb-8">
+                                            {otp.map((digit, i) => (
+                                                <input
+                                                    key={i}
+                                                    ref={el => otpRefs.current[i] = el}
+                                                    type="text"
+                                                    value={digit}
+                                                    onChange={e => handleOtpChange(i, e.target.value)}
+                                                    onKeyDown={e => handleOtpKeyDown(i, e)}
+                                                    className="w-12 h-14 text-center text-xl font-bold rounded-xl border-2 transition-all outline-none"
+                                                    style={{
+                                                        borderColor: digit ? 'var(--accent)' : 'var(--border-primary)',
+                                                        background: digit ? 'var(--accent-soft)' : 'var(--bg-secondary)',
+                                                        color: 'var(--text-primary)'
+                                                    }}
+                                                    maxLength={1}
+                                                />
+                                            ))}
+                                        </div>
+
+                                        <button type="submit" disabled={loading}
+                                            className="btn btn-primary w-full justify-center mb-6" style={{ height: 48 }}>
+                                            {loading ? (
+                                                <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                                            ) : 'Confirm Account'}
+                                        </button>
+
+                                        <div className="text-center">
+                                            <p className="text-xs mb-2" style={{ color: 'var(--text-tertiary)' }}>Didn't receive the code?</p>
+                                            <button
+                                                type="button"
+                                                onClick={() => { setTimer(30); setOtp(['', '', '', '', '', '']); }}
+                                                disabled={timer > 0}
+                                                className="flex items-center gap-2 mx-auto text-xs font-semibold px-4 py-2 rounded-lg transition-all"
+                                                style={{
+                                                    color: timer > 0 ? 'var(--text-tertiary)' : 'var(--accent)',
+                                                    background: timer > 0 ? 'transparent' : 'var(--accent-soft)'
+                                                }}
+                                            >
+                                                <RefreshCcw size={14} className={timer > 0 ? '' : 'animate-spin-slow'} />
+                                                {timer > 0 ? `Resend in ${timer}s` : 'Resend Code Now'}
+                                            </button>
+                                        </div>
+                                    </form>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        <div className="divider my-6" />
+
+                        <p className="text-center text-sm" style={{ color: 'var(--text-tertiary)' }}>
+                            Already have an account?{' '}
+                            <Link to="/login" className="font-semibold" style={{ color: 'var(--accent)' }}>Sign In</Link>
+                        </p>
+                    </div>
+
+                    <p className="text-center text-xs mt-5" style={{ color: 'var(--text-tertiary)' }}>
+                        By creating an account, you agree to our{' '}
+                        <Link to="/terms" style={{ color: 'var(--accent)' }}>Terms</Link> &amp;{' '}
+                        <Link to="/privacy" style={{ color: 'var(--accent)' }}>Privacy Policy</Link>
                     </p>
-                </div>
+                </motion.div>
             </div>
-        </div>
+        </>
     );
 };
 

@@ -5,6 +5,7 @@ import com.innerroot.repository.GuideRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class GuideController {
     }
 
     @PostMapping
-    public ResponseEntity<Guide> create(@RequestBody Guide guide) {
+    public ResponseEntity<Guide> create(@Valid @RequestBody Guide guide) {
         return ResponseEntity.ok(repository.save(guide));
     }
 }

@@ -1,199 +1,215 @@
 import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Reveal, Stagger } from '../components/Reveal';
-import Breadcrumbs from '../components/Breadcrumbs';
-import Button from '../components/ui/Button';
-import Card from '../components/ui/Card';
-import Input from '../components/ui/Input';
+import { motion, useInView } from 'framer-motion';
 import {
-    Users, Target, Sparkles, Send,
-    User, Mail, MessageSquare, Info
+    Heart, Target, Globe, Users, Sparkles,
+    ArrowRight, Award, BookOpen, Linkedin, Twitter, Github
 } from 'lucide-react';
+import SEO from '../components/ui/SEO';
+
+const values = [
+    { icon: Heart, title: 'Compassion', desc: 'Rooted in the ancient Indian philosophy of Ahimsa — non-violence and deep empathy.', color: '#d97706' },
+    { icon: Target, title: 'Purpose', desc: 'Every feature serves a higher purpose — self-discovery, cultural preservation, and inner peace.', color: '#14532d' },
+    { icon: Globe, title: 'Inclusivity', desc: 'Open to all seekers regardless of background, caste, or creed.', color: '#7c3aed' },
+    { icon: Sparkles, title: 'Innovation', desc: 'Blending AI intelligence with spiritual wisdom for modern seekers.', color: '#c9a227' },
+];
+
+const teamMembers = [
+    {
+        name: 'AKURI VENKATA SURYA VARUN',
+        role: 'Founder & Lead Developer',
+        initials: 'AV',
+        bio: 'Visionary engineer blending ancient Vedic wisdom with cutting-edge AI architecture and immersive UX.',
+        social: { linkedin: '#', twitter: '#', github: '#' }
+    },
+    {
+        name: 'GANGI REDDY GARI HEM SATHVIK REDDY',
+        role: 'Co-Founder',
+        initials: 'GR',
+        bio: 'Heritage enthusiast dedicated to digitizing India\'s lost architectural history and sacred geometry.',
+        social: { linkedin: '#', twitter: '#' }
+    },
+    {
+        name: 'MD. RUHAN',
+        role: 'Backend Engineer',
+        initials: 'MR',
+        bio: 'Specialist in high-performance spiritual data systems and secure, scalable cloud infrastructure.',
+        social: { github: '#', linkedin: '#' }
+    },
+];
+
+const timeline = [
+    { year: '2024', event: 'The Vision', desc: 'Concept born from a deep curiosity about the intersection of technology and dharma.' },
+    { year: '2025', event: 'V1 Launch', desc: 'Released the first iteration of the Heritage Map documentation for 100+ sites.' },
+    { year: '2026', event: 'AI Integration', desc: 'Introduced the Spiritual synthesis engine and personalized wellness tracking.' },
+];
 
 const About = () => {
-    const formRef = useRef(null);
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        alert('Thank you for your message! We will get back to you soon.');
-        if (formRef.current) formRef.current.reset();
-    };
+    const heroRef = useRef(null);
+    const valuesRef = useRef(null);
+    const teamRef = useRef(null);
+    const heroInView = useInView(heroRef, { once: true });
+    const valuesInView = useInView(valuesRef, { once: true, margin: '-80px' });
+    const teamInView = useInView(teamRef, { once: true, margin: '-80px' });
 
     return (
-        <section id="page-about" className="page active block opacity-100" aria-label="About Us">
-            <div className="py-12 lg:py-20">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <Breadcrumbs />
+        <>
+            <SEO title="About — Inner Root" description="Learn about Inner Root's mission to bridge Indian heritage with AI-driven wellness." />
 
-                    {/* Header */}
-                    <Reveal className="text-center mb-24 mt-12 relative">
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-heritage-gold/5 blur-[100px] pointer-events-none"></div>
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-heritage-gold/10 backdrop-blur-md border border-heritage-gold/20 text-heritage-gold font-bold text-xs uppercase tracking-[0.2em] mb-10">
-                            <Sparkles className="w-3.5 h-3.5" />
-                            <span>The Vision of Bharat</span>
-                        </div>
-                        <h1 className="font-display text-5xl sm:text-7xl lg:text-8xl font-bold text-[var(--fg)] mb-8 tracking-tighter leading-[0.9]">
-                            About <br />
-                            <span className="text-heritage-gold">Inner Root</span>
+            {/* Hero */}
+            <section ref={heroRef} className="relative overflow-hidden section-padding">
+                <div className="sacred-geometry" style={{ opacity: 0.02 }} />
+                <div className="max-w-4xl mx-auto px-6 text-center">
+                    <motion.div initial={{ opacity: 0, y: 30 }} animate={heroInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.7 }}>
+                        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 text-xs font-semibold tracking-widest uppercase" style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}>
+                            <Award size={14} /> Our Story
+                        </span>
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-5" style={{ fontFamily: 'var(--font-display)' }}>
+                            Built With <span className="text-gradient">Heart & Heritage</span>
                         </h1>
-                        <p className="text-[var(--muted)] max-w-2xl mx-auto text-xl leading-relaxed italic font-medium">
-                            "Connecting the roots of the past with the wings of the future."
+                        <p className="text-base sm:text-lg max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
+                            Inner Root is a labor of love — a platform born from a desire to make India's extraordinary cultural heritage accessible, and to blend ancient wisdom with modern technology for inner well-being.
                         </p>
-                    </Reveal>
+                    </motion.div>
+                </div>
+            </section>
 
-                    {/* Mission Section */}
-                    <div className="grid lg:grid-cols-2 gap-16 items-center mb-32">
-                        <Reveal>
-                            <div className="flex items-center gap-3 mb-6">
-                                <Target className="text-heritage-gold w-6 h-6" />
-                                <h2 className="font-display text-3xl font-bold text-[var(--fg)]">Our Mission</h2>
-                            </div>
-                            <div className="space-y-6 text-[var(--muted)] text-lg leading-relaxed">
-                                <p>
-                                    Inner Root is dedicated to connecting modern seekers with India's ancient cultural and spiritual roots
-                                    through technology, education, immersive experiences, and wellness guidance.
-                                </p>
-                                <p>
-                                    We believe that understanding our heritage is essential for personal growth and cultural identity.
-                                    Our platform makes thousands of years of wisdom accessible to everyone, anywhere in the world.
-                                </p>
-                                <p className="font-medium text-[var(--fg)]">
-                                    By combining traditional knowledge with modern technology,
-                                    we help individuals cultivate peace, self-awareness, and emotional balance.
-                                </p>
-                            </div>
-                            <div className="mt-8">
-                                <Button variant="secondary" onClick={() => window.scrollTo(0, document.body.scrollHeight)}>
-                                    Contact Our Team
-                                </Button>
-                            </div>
-                        </Reveal>
-                        <Reveal>
-                            <div className="relative group">
-                                <div className="absolute -inset-4 bg-heritage-gold/10 rounded-[40px] blur-3xl group-hover:bg-heritage-gold/20 transition-all duration-700"></div>
-                                <div className="relative aspect-[4/3] overflow-hidden rounded-[32px] shadow-2xl border border-white/10">
-                                    <img
-                                        src="https://images.unsplash.com/photo-1548013146-72479768bbaa?auto=format&fit=crop&q=80&w=1000"
-                                        alt="Indian Temple Architecture"
-                                        className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-1000"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[var(--fg)]/40 to-transparent"></div>
+            {/* Mission */}
+            <section className="pb-16 px-6">
+                <div className="max-w-4xl mx-auto">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6 }}
+                        className="rounded-3xl p-8 sm:p-12 text-center"
+                        style={{ background: 'var(--bg-glass-strong)', backdropFilter: 'blur(24px)', border: '1px solid var(--border-glass)', boxShadow: 'var(--shadow-lg)' }}
+                    >
+                        <h2 className="text-2xl sm:text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-display)' }}>Our Mission</h2>
+                        <p className="text-base sm:text-lg leading-relaxed max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-display)' }}>
+                            "To bridge the timeless heritage of India with AI-powered self-awareness, creating a space where every seeker can explore their roots, nurture their spirit, and grow as a conscious being."
+                        </p>
+                    </motion.div>
+                </div>
+            </section>
+
+            {/* Values */}
+            <section ref={valuesRef} className="pb-24" style={{ paddingTop: 'var(--sp-8)' }}>
+                <div className="max-w-5xl mx-auto px-6">
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={valuesInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6 }} className="text-center mb-12">
+                        <span className="text-xs font-semibold tracking-widest uppercase mb-3 block" style={{ color: 'var(--accent)' }}>Our Values</span>
+                        <h2 className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-display)' }}>What Guides Us</h2>
+                    </motion.div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        {values.map((v, i) => (
+                            <motion.div
+                                key={v.title}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={valuesInView ? { opacity: 1, y: 0 } : {}}
+                                transition={{ delay: i * 0.1, duration: 0.5 }}
+                                className="card p-6 sm:p-8"
+                            >
+                                <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4" style={{ background: `${v.color}12`, color: v.color }}>
+                                    <v.icon size={24} strokeWidth={1.5} />
                                 </div>
-                                <div className="absolute -bottom-6 -right-6 glass-card p-6 rounded-2xl shadow-xl animate-float">
-                                    <div className="text-heritage-gold font-display text-3xl font-bold">5000+</div>
-                                    <div className="text-[10px] uppercase font-bold tracking-widest text-[var(--muted)]">Years of History</div>
-                                </div>
-                            </div>
-                        </Reveal>
-                    </div>
-
-                    {/* Team Section */}
-                    <div className="mb-32">
-                        <Reveal className="text-center mb-16">
-                            <div className="flex items-center justify-center gap-3 mb-4">
-                                <Users className="text-heritage-gold w-6 h-6" />
-                                <h2 className="font-display text-3xl sm:text-4xl font-bold text-[var(--fg)]">Our Visionaries</h2>
-                            </div>
-                            <p className="text-[var(--muted)] max-w-xl mx-auto text-lg leading-relaxed">The passionate minds dedicated to preserving the cultural essence of Bharat.</p>
-                        </Reveal>
-                        <Stagger className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {[
-                                { name: 'A.V. Surya Varun', role: 'Founder & UI/UX Expert', color: 'bg-heritage-gold', initials: 'AV' },
-                                { name: 'G. Hem Sathvik Reddy', role: 'Strategic Director', color: 'bg-heritage-teal', initials: 'HS' },
-                                { name: 'Md. Ruhan', role: 'Technical Architect', color: 'bg-heritage-green', initials: 'RU' }
-                            ].map((member, i) => (
-                                <Card key={i} className="p-8 text-center group hover:border-heritage-gold !rounded-3xl transition-all duration-500 hover:shadow-2xl hover:shadow-heritage-gold/5" animate={true}>
-                                    <div className={`w-24 h-24 rounded-full ${member.color} mx-auto mb-8 flex items-center justify-center text-white text-3xl font-bold font-display shadow-lg ring-4 ring-white/10 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
-                                        {member.initials}
-                                    </div>
-                                    <h3 className="font-display text-2xl font-bold text-[var(--fg)] mb-2">{member.name}</h3>
-                                    <p className="text-sm text-heritage-gold font-bold uppercase tracking-widest">{member.role}</p>
-                                </Card>
-                            ))}
-                        </Stagger>
-                    </div>
-
-                    {/* Contact Form Section */}
-                    <div id="contact" className="max-w-5xl mx-auto mb-20">
-                        <Card variant="glass" className="p-0 overflow-hidden !rounded-[40px] shadow-2xl border-white/5" animate={false}>
-                            <div className="grid lg:grid-cols-5">
-                                {/* Form Sidebar */}
-                                <div className="lg:col-span-2 bg-gradient-to-br from-heritage-green to-heritage-teal p-10 lg:p-12 text-white relative overflow-hidden">
-                                    <div className="relative z-10">
-                                        <h2 className="font-display text-3xl font-bold mb-6">Get in Touch</h2>
-                                        <p className="text-white/80 mb-10 leading-relaxed">Have questions or want to collaborate? We'd love to hear from you and build the future of heritage together.</p>
-
-                                        <div className="space-y-8">
-                                            <div className="flex gap-4 items-start">
-                                                <div className="p-3 bg-white/10 rounded-xl"><Mail className="w-5 h-5" /></div>
-                                                <div>
-                                                    <div className="text-xs font-bold uppercase tracking-widest opacity-60">Email Us</div>
-                                                    <div className="font-medium">contact@innerroot.com</div>
-                                                </div>
-                                            </div>
-                                            <div className="flex gap-4 items-start">
-                                                <div className="p-3 bg-white/10 rounded-xl"><Info className="w-5 h-5" /></div>
-                                                <div>
-                                                    <div className="text-xs font-bold uppercase tracking-widest opacity-60">Working Hours</div>
-                                                    <div className="font-medium">Mon - Fri: 9:00 AM - 6:00 PM</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <Sparkles className="absolute -bottom-10 -right-10 w-48 h-48 text-white/5 rotate-12" strokeWidth={0.5} />
-                                </div>
-
-                                {/* Form Content */}
-                                <div className="lg:col-span-3 p-10 lg:p-12 bg-white/40">
-                                    <form ref={formRef} onSubmit={handleSubmit} className="space-y-8">
-                                        <div className="grid sm:grid-cols-2 gap-6">
-                                            <Input
-                                                label="Name"
-                                                id="contact-name"
-                                                placeholder="Your name"
-                                                icon={User}
-                                                required
-                                            />
-                                            <Input
-                                                label="Email Address"
-                                                id="contact-email"
-                                                type="email"
-                                                placeholder="your@email.com"
-                                                icon={Mail}
-                                                required
-                                            />
-                                        </div>
-                                        <Input
-                                            label="Subject"
-                                            id="contact-subject"
-                                            as="select"
-                                            icon={Info}
-                                        >
-                                            <option value="general">General Inquiry</option>
-                                            <option value="partnership">Partnership</option>
-                                            <option value="suggestion">Content Suggestion</option>
-                                            <option value="support">Technical Support</option>
-                                        </Input>
-                                        <Input
-                                            label="Message"
-                                            id="contact-message"
-                                            as="textarea"
-                                            placeholder="How can we help you?"
-                                            icon={MessageSquare}
-                                            required
-                                            rows={5}
-                                        />
-                                        <Button type="submit" size="lg" className="w-full sm:w-auto !px-12" rightIcon={Send}>
-                                            Send Message
-                                        </Button>
-                                    </form>
-                                </div>
-                            </div>
-                        </Card>
+                                <h3 className="text-lg font-semibold mb-2" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>{v.title}</h3>
+                                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{v.desc}</p>
+                            </motion.div>
+                        ))}
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+
+            {/* Journey Timeline */}
+            <section className="pb-24 px-6 overflow-hidden">
+                <div className="max-w-4xl mx-auto">
+                    <div className="relative">
+                        {/* Line */}
+                        <div className="absolute top-1/2 left-0 w-full h-px bg-primary -translate-y-1/2 hidden md:block" />
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative z-10">
+                            {timeline.map((item, i) => (
+                                <motion.div
+                                    key={item.year}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: i * 0.1 }}
+                                    className="text-center"
+                                >
+                                    <div className="w-12 h-12 rounded-full border border-accent bg-primary mx-auto mb-4 flex items-center justify-center font-bold text-accent">
+                                        {item.year}
+                                    </div>
+                                    <h4 className="font-bold mb-1" style={{ color: 'var(--text-primary)' }}>{item.event}</h4>
+                                    <p className="text-xs leading-relaxed" style={{ color: 'var(--text-tertiary)' }}>{item.desc}</p>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Team Section */}
+            <section ref={teamRef} className="pb-24">
+                <div className="max-w-5xl mx-auto px-6">
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={teamInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6 }} className="text-center mb-12">
+                        <span className="text-xs font-semibold tracking-widest uppercase mb-3 block" style={{ color: 'var(--accent)' }}>The Collective</span>
+                        <h2 className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-display)' }}>Our Team</h2>
+                    </motion.div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {teamMembers.map((member, i) => (
+                            <motion.div
+                                key={member.name}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={teamInView ? { opacity: 1, y: 0 } : {}}
+                                transition={{ delay: i * 0.1, duration: 0.5 }}
+                                className="flex flex-col items-center text-center group"
+                            >
+                                <div className="w-24 h-24 rounded-full flex items-center justify-center mb-6 relative transition-transform duration-500 group-hover:scale-105"
+                                    style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent-hover))', boxShadow: '0 10px 25px -5px var(--accent-glow)' }}>
+                                    <span className="text-white text-3xl font-bold tracking-tighter">{member.initials}</span>
+                                    {/* Subtle decorative ring */}
+                                    <div className="absolute inset-[-4px] rounded-full border border-dashed opacity-20 animate-spin-slow"
+                                        style={{ borderColor: 'var(--accent)' }} />
+                                </div>
+                                <h3 className="text-xl font-bold mb-1" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>{member.name}</h3>
+                                <p className="text-sm font-medium mb-3" style={{ color: 'var(--accent)' }}>{member.role}</p>
+                                <p className="text-xs leading-relaxed mb-4 max-w-[240px]" style={{ color: 'var(--text-secondary)' }}>{member.bio}</p>
+
+                                <div className="flex items-center gap-3">
+                                    {member.social.linkedin && <a href={member.social.linkedin} className="text-tertiary hover:text-accent transition-colors"><Linkedin size={16} /></a>}
+                                    {member.social.twitter && <a href={member.social.twitter} className="text-tertiary hover:text-accent transition-colors"><Twitter size={16} /></a>}
+                                    {member.social.github && <a href={member.social.github} className="text-tertiary hover:text-accent transition-colors"><Github size={16} /></a>}
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* CTA */}
+            <section className="pb-24">
+                <div className="max-w-3xl mx-auto px-6 text-center">
+                    <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+                        <h2 className="text-2xl sm:text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-display)' }}>
+                            Join the Journey
+                        </h2>
+                        <p className="text-base mb-8" style={{ color: 'var(--text-secondary)' }}>
+                            Whether you're seeking cultural knowledge or inner peace, Inner Root welcomes you.
+                        </p>
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                            <Link to="/explore" className="btn btn-primary btn-lg">
+                                Explore Heritage <ArrowRight size={18} />
+                            </Link>
+                            <Link to="/wellness" className="btn btn-secondary btn-lg">
+                                Start Wellness <Heart size={18} />
+                            </Link>
+                        </div>
+                    </motion.div>
+                </div>
+            </section>
+        </>
     );
 };
 

@@ -1,6 +1,7 @@
 package com.innerroot.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -22,10 +23,14 @@ public class MoodEntry {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @NotBlank
     private String mood; // happy, sad, anxious, calm
 
+    @Size(max = 500)
     private String note;
 
+    @Min(1)
+    @Max(10)
     private Integer intensity; // 1-10
 
     @CreationTimestamp

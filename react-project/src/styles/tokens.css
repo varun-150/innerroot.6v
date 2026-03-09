@@ -1,0 +1,34 @@
+/* tokens.css – CSS variables for colors, spacing, typography */
+:root {
+    /* Color palette */
+    --color-primary: hsl(45, 90%, 55%);
+    /* gold */
+    --color-secondary: hsl(180, 70%, 45%);
+    /* teal */
+    --color-neutral-100: hsl(0, 0%, 100%);
+    --color-neutral-200: hsl(0, 0%, 95%);
+    --color-neutral-300: hsl(0, 0%, 85%);
+    --color-neutral-400: hsl(0, 0%, 70%);
+    --color-neutral-500: hsl(0, 0%, 50%);
+    --color-neutral-600: hsl(0, 0%, 35%);
+    --color-neutral-700: hsl(0, 0%, 20%);
+    --color-neutral-800: hsl(0, 0%, 15%);
+    --color-neutral-900: hsl(0, 0%, 10%);
+
+    /* Spacing */
+    --gap-xs: 0.25rem;
+    --gap-sm: 0.5rem;
+    --gap-md: 1rem;
+    --gap-lg: 2rem;
+    --gap-xl: 4rem;
+
+    /* Typography */
+    --font-family-base: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.5rem;
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-bold: 700;
+}

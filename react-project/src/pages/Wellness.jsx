@@ -1,438 +1,708 @@
-import React, { useState, useEffect } from 'react';
-import { getWisdomQuotes, moodAPI } from '../services/api';
-import { wisdomData as localWisdom } from '../data';
-import { moodMessages } from '../data/wellnessData';
-import { useAuth } from '../context/AuthContext';
-import { Reveal, Stagger } from '../components/Reveal';
-import Breadcrumbs from '../components/Breadcrumbs';
-import Button from '../components/ui/Button';
-import Card from '../components/ui/Card';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
 import {
-    Smile, Frown, Sparkles, Coffee, Heart,
-    Play, Pause, RotateCcw, Volume2,
-    Clock, Award, Flame, Star, Quote,
-    ChevronRight, Music
+    Heart, Brain, Sparkles, BookOpen, Wind, Sun,
+    ChevronRight, Clock, Star, Flower2, ArrowRight,
+    PenLine, Smile, Frown, Meh, Zap, Coffee,
+    Plus, Minus, RotateCcw, Volume2, VolumeX, Bell,
+    X, Check
 } from 'lucide-react';
+import SEO from '../components/ui/SEO';
+import { moodAPI } from '../services/api';
 
-const MANTRAS = [
-    { name: 'Om Namah Shivaya', meaning: 'I bow to the divinity within myself.' },
-    { name: 'Om Mani Padme Hum', meaning: 'The jewel is in the lotus.' },
-    { name: 'Gayatri Mantra', meaning: 'Divine light that enlightens the intellect.' },
-    { name: 'Hare Krishna', meaning: 'Ultimate peace and divine love.' },
-    { name: 'Custom', meaning: 'Your personal focal point or affirmation.' },
+// ──────────── Data ────────────
+const moods = [
+    { emoji: '😌', label: 'Calm', color: '#22c55e' },
+    { emoji: '😊', label: 'Happy', color: '#d97706' },
+    { emoji: '😐', label: 'Neutral', color: '#94a3b8' },
+    { emoji: '😟', label: 'Anxious', color: '#f59e0b' },
+    { emoji: '😢', label: 'Sad', color: '#6366f1' },
+    { emoji: '😴', label: 'Tired', color: '#8b5cf6' },
 ];
 
-const TOTAL_BEADS = 108;
+const practices = [
+    { title: 'Morning Pranayama', duration: '10 min', category: 'Breathwork', desc: 'Alternate nostril breathing to balance your energy channels.', icon: Wind, color: '#14532d' },
+    { title: 'Loving-Kindness Meditation', duration: '15 min', category: 'Meditation', desc: 'Cultivate compassion for yourself and others through metta practice.', icon: Heart, color: '#d97706' },
+    { title: 'Gratitude Journaling', duration: '5 min', category: 'Reflection', desc: 'Write three things you are grateful for to shift your perspective.', icon: PenLine, color: '#7c3aed' },
+    { title: 'Chakra Visualization', duration: '20 min', category: 'Deep Practice', desc: 'Guide your awareness through each energy center for alignment.', icon: Sparkles, color: '#c9a227' },
+];
 
-const Wellness = () => {
-    const [mood, setMood] = useState(null);
-    const [moodMessage, setMoodMessage] = useState('');
-    const [wisdomData, setWisdomData] = useState([]);
-    const [timerSeconds, setTimerSeconds] = useState(600);
-    const [timerRunning, setTimerRunning] = useState(false);
-    const [beadCount, setBeadCount] = useState(0);
-    const [rounds, setRounds] = useState(0);
-    const [selectedMantra, setSelectedMantra] = useState(0);
-    const [showCelebration, setShowCelebration] = useState(false);
-    const [pulsing, setPulsing] = useState(false);
-    const { isAuthenticated } = useAuth();
+const recommendations = {
+    0: { text: "You're in a great space. Try a gratitude meditation to deepen this calm.", practice: 'Gratitude Journaling' },
+    1: { text: 'Wonderful energy! Channel this joy into a loving-kindness meditation.', practice: 'Loving-Kindness Meditation' },
+    2: { text: 'A balanced state. Pranayama can help you find deeper clarity.', practice: 'Morning Pranayama' },
+    3: { text: "Let's ground that energy. Try breathwork to calm your nervous system.", practice: 'Morning Pranayama' },
+    4: { text: 'Be gentle with yourself. A guided visualization can help shift your energy.', practice: 'Chakra Visualization' },
+    5: { text: 'Rest is wisdom. Try a short breathing exercise to restore energy.', practice: 'Morning Pranayama' },
+};
 
-    useEffect(() => {
-        const fetchWisdom = async () => {
-            try {
-                const response = await getWisdomQuotes();
-                const data = Array.isArray(response.data) && response.data.length > 0
-                    ? response.data
-                    : localWisdom;
-                setWisdomData(data);
-            } catch (err) {
-                console.error('Failed to fetch wisdom data:', err);
-                setWisdomData(localWisdom);
+// Mala presets (standard bead counts)
+const malas = [
+    { label: '108', value: 108 },
+    { label: '54', value: 54 },
+    { label: '27', value: 27 },
+    { label: 'Custom', value: 0 },
+];
+
+// ──────────── Japa Counter Component ────────────
+const JapaCounter = () => {
+    const [count, setCount] = useState(0);
+    const [target, setTarget] = useState(108);
+    const [customTarget, setCustomTarget] = useState('');
+    const [selectedMala, setSelectedMala] = useState(108);
+    const [totalMalas, setTotalMalas] = useState(0);
+    const [soundOn, setSoundOn] = useState(true);
+    const [showCustom, setShowCustom] = useState(false);
+    const [shake, setShake] = useState(false);
+    const [celebrate, setCelebrate] = useState(false);
+
+    // Audio beep on each count
+    const playClick = useCallback(() => {
+        if (!soundOn) return;
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(440, ctx.currentTime);
+            gain.gain.setValueAtTime(0.15, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.15);
+        } catch (_) { }
+    }, [soundOn]);
+
+    const playBell = useCallback(() => {
+        if (!soundOn) return;
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            [523, 659, 784].forEach((freq, i) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.12);
+                gain.gain.setValueAtTime(0.2, ctx.currentTime + i * 0.12);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.5);
+                osc.start(ctx.currentTime + i * 0.12);
+                osc.stop(ctx.currentTime + i * 0.12 + 0.5);
+            });
+        } catch (_) { }
+    }, [soundOn]);
+
+    const increment = () => {
+        playClick();
+        setCount(prev => {
+            const next = prev + 1;
+            if (next >= target) {
+                setTotalMalas(m => m + 1);
+                setCelebrate(true);
+                playBell();
+                setTimeout(() => { setCelebrate(false); setCount(0); }, 1800);
+                return prev; // freeze count until celebrate finishes
             }
-        };
-        fetchWisdom();
-    }, []);
-
-    useEffect(() => {
-        let interval = null;
-        if (timerRunning && timerSeconds > 0) {
-            interval = setInterval(() => {
-                setTimerSeconds(s => s - 1);
-            }, 1000);
-        } else if (timerSeconds === 0) {
-            setTimerRunning(false);
-        }
-        return () => clearInterval(interval);
-    }, [timerRunning, timerSeconds]);
-
-    const handleMoodClick = async (selectedMood) => {
-        setMood(selectedMood);
-        setMoodMessage(moodMessages[selectedMood]);
-        
-        if (isAuthenticated) {
-            try {
-                await moodAPI.save({ 
-                    mood: selectedMood, 
-                    intensity: 5, // Default intensity
-                    note: `Feeling ${selectedMood} during wellness session.`
-                });
-            } catch (err) {
-                console.error('Failed to save mood:', err);
-            }
-        }
+            return next;
+        });
     };
 
-    const toggleTimer = () => setTimerRunning(!timerRunning);
-    const resetTimer = () => {
-        setTimerRunning(false);
-        setTimerSeconds(600);
+    const decrement = () => {
+        if (count === 0) { setShake(true); setTimeout(() => setShake(false), 400); return; }
+        setCount(c => c - 1);
     };
 
-    const setPreset = (mins) => {
-        setTimerRunning(false);
-        setTimerSeconds(mins * 60);
+    const reset = () => { setCount(0); };
+
+    const fullReset = () => { setCount(0); setTotalMalas(0); };
+
+    const handleMalaSelect = (val) => {
+        if (val === 0) { setShowCustom(true); return; }
+        setSelectedMala(val);
+        setTarget(val);
+        setShowCustom(false);
+        setCount(0);
     };
 
-    const timeDisplay = `${Math.floor(timerSeconds / 60)}:${(timerSeconds % 60).toString().padStart(2, '0')}`;
-    const offset = 565.48 - (timerSeconds / 600) * 565.48;
-
-    const handleBeadClick = () => {
-        setPulsing(true);
-        setTimeout(() => setPulsing(false), 150);
-
-        if (beadCount + 1 >= TOTAL_BEADS) {
-            setBeadCount(0);
-            setRounds(r => r + 1);
-            setShowCelebration(true);
-            setTimeout(() => setShowCelebration(false), 3000);
-        } else {
-            setBeadCount(b => b + 1);
-        }
+    const applyCustomTarget = () => {
+        const n = parseInt(customTarget, 10);
+        if (n > 0) { setTarget(n); setSelectedMala(0); setCount(0); }
+        setShowCustom(false);
     };
 
-    const beadProgress = beadCount / TOTAL_BEADS;
-    const beadCircumference = 2 * Math.PI * 110;
-    const beadOffset = beadCircumference - beadProgress * beadCircumference;
+    const progress = target > 0 ? (count / target) * 100 : 0;
+    const RADIUS = 70;
+    const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+    const strokeDash = CIRCUMFERENCE - (progress / 100) * CIRCUMFERENCE;
 
     return (
-        <section id="page-wellness" className="page active block opacity-100" aria-label="Spiritual Wellness">
-            <div className="py-12 lg:py-24">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <Breadcrumbs />
-
-                    {/* Header */}
-                    <Reveal className="text-center mb-24 mt-12 relative">
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-heritage-teal/5 blur-[120px] pointer-events-none"></div>
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-heritage-teal/10 backdrop-blur-md border border-heritage-teal/20 text-heritage-teal font-bold text-xs uppercase tracking-[0.2em] mb-10">
-                            <Sparkles className="w-3.5 h-3.5" />
-                            <span>Sanctuary of Peace</span>
-                        </div>
-                        <h1 className="font-display text-5xl sm:text-7xl lg:text-8xl font-bold text-[var(--fg)] mb-8 tracking-tighter leading-[0.9]">
-                            Heal Your <br />
-                            <span className="text-heritage-teal">Inner Temple</span>
-                        </h1>
-                        <p className="text-[var(--muted)] max-w-2xl mx-auto text-xl leading-relaxed italic font-medium">
-                            "When the mind is still, the entire universe surrenders." — Lao Tzu
-                        </p>
-                    </Reveal>
-
-                    {/* Mood Tracker */}
-                    <Reveal className="mb-16">
-                        <Card className="p-8 sm:p-12 !rounded-[40px] border-[var(--border)] shadow-2xl relative overflow-hidden bg-gradient-to-br from-[var(--bg)] to-transparent">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-heritage-teal/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
-                            <h2 className="font-display text-3xl font-bold text-[var(--fg)] mb-8 flex items-center gap-3">
-                                <Heart className="text-red-500 w-8 h-8" />
-                                How is your spirit today?
-                            </h2>
-                            <div className="flex flex-wrap gap-6 mb-10">
-                                {[
-                                    { k: 'peaceful', icon: Smile, color: 'bg-heritage-teal/10 text-heritage-teal' },
-                                    { k: 'anxious', icon: Frown, color: 'bg-yellow-500/10 text-yellow-600' },
-                                    { k: 'joyful', icon: Star, color: 'bg-heritage-gold/10 text-heritage-gold' },
-                                    { k: 'tired', icon: Coffee, color: 'bg-blue-500/10 text-blue-600' },
-                                    { k: 'inspired', icon: Sparkles, color: 'bg-purple-500/10 text-purple-600' }
-                                ].map(({ icon: Icon, ...m }) => (
-                                    <button
-                                        key={m.k}
-                                        onClick={() => handleMoodClick(m.k)}
-                                        className={`group flex flex-col items-center gap-4 transition-all duration-300 ${mood === m.k ? 'scale-110' : 'hover:scale-105 opacity-60 hover:opacity-100'}`}
-                                    >
-                                        <div className={`w-20 h-20 rounded-[28px] ${m.color} flex items-center justify-center border-2 ${mood === m.k ? 'border-current' : 'border-transparent shadow-lg'} transition-all`}>
-                                            <Icon className="w-10 h-10" />
-                                        </div>
-                                        <span className="text-xs font-bold uppercase tracking-widest text-[var(--muted)]">{m.k}</span>
-                                    </button>
-                                ))}
-                            </div>
-                            {moodMessage && (
-                                <div className="bg-heritage-teal/5 border border-heritage-teal/20 p-6 rounded-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                    <p className="text-lg text-[var(--fg)] leading-relaxed italic flex items-start gap-4">
-                                        <Quote className="w-6 h-6 text-heritage-teal flex-shrink-0" />
-                                        {moodMessage}
-                                    </p>
-                                </div>
-                            )}
-                        </Card>
-                    </Reveal>
-
-                    {/* Meditation Tools */}
-                    <div className="grid lg:grid-cols-2 gap-12 mb-16">
-                        {/* Audio Chanting */}
-                        <Reveal>
-                            <Card className="p-0 overflow-hidden !rounded-[40px] group shadow-xl h-full" animate={false}>
-                                <div className="aspect-[16/10] relative overflow-hidden">
-                                    <div className="absolute inset-0 bg-gradient-to-br from-heritage-teal to-heritage-green"></div>
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                        <Button
-                                            variant="unstyled"
-                                            className="w-24 h-24 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center hover:bg-white/30 transition-all hover:scale-110 shadow-2xl"
-                                        >
-                                            <Play className="w-10 h-10 text-white fill-white ml-2" />
-                                        </Button>
-                                    </div>
-                                    <div className="absolute bottom-6 left-6 right-6">
-                                        <div className="bg-black/30 backdrop-blur-lg rounded-2xl p-5 border border-white/10 flex items-center justify-between">
-                                            <div>
-                                                <div className="text-white font-display text-xl font-bold mb-1">Om Namah Shivaya</div>
-                                                <div className="text-white/70 text-sm font-medium tracking-wide uppercase">Traditional Chanting</div>
-                                            </div>
-                                            <Volume2 className="text-white/60 w-6 h-6" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="p-8">
-                                    <h3 className="font-display text-2xl font-bold text-[var(--fg)] mb-4">Sacred Soundscapes</h3>
-                                    <p className="text-[var(--muted)] text-lg mb-8 leading-relaxed">Experience the transformative vibrations of ancient Sanskrit mantras. Let the rhythm guide you into deep stillness.</p>
-                                    <div className="flex items-center gap-6 text-sm font-bold text-heritage-teal uppercase tracking-widest">
-                                        <span className="flex items-center gap-2"><Clock className="w-4 h-4" /> 15 MIN</span>
-                                        <span className="flex items-center gap-2"><Music className="w-4 h-4" /> BINAURAL</span>
-                                    </div>
-                                </div>
-                            </Card>
-                        </Reveal>
-
-                        {/* Meditation Timer */}
-                        <Reveal>
-                            <Card className="p-10 !rounded-[40px] shadow-xl h-full flex flex-col items-center justify-center border-[var(--border)]" animate={true}>
-                                <h3 className="font-display text-2xl font-bold text-[var(--fg)] mb-10">Mindfulness Timer</h3>
-                                <div className="relative mb-12">
-                                    <svg className="w-64 h-64 transform -rotate-90" viewBox="0 0 200 200">
-                                        <circle cx="100" cy="100" r="90" fill="none" stroke="var(--border)" strokeWidth="4" opacity="0.1" />
-                                        <circle
-                                            cx="100" cy="100" r="90" fill="none"
-                                            stroke="var(--accent)" strokeWidth="6"
-                                            strokeDasharray="565.48"
-                                            strokeDashoffset={offset}
-                                            strokeLinecap="round"
-                                            className="transition-all duration-1000 ease-linear shadow-accent shadow-2xl"
-                                        />
-                                    </svg>
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                                        <span className="font-display text-6xl font-bold text-[var(--fg)] tabular-nums mb-1">{timeDisplay}</span>
-                                        <span className="text-[var(--muted)] text-xs font-bold uppercase tracking-widest">Remaining</span>
-                                    </div>
-                                </div>
-
-                                <div className="flex gap-2 mb-8">
-                                    {[5, 10, 20].map(m => (
-                                        <button
-                                            key={m}
-                                            onClick={() => setPreset(m)}
-                                            className={`px-4 py-2 rounded-xl border-2 font-bold text-xs transition-all ${timerSeconds === m * 60 ? 'bg-heritage-teal border-heritage-teal text-white' : 'border-[var(--border)] text-[var(--muted)] hover:border-heritage-teal/30'}`}
-                                        >
-                                            {m}m
-                                        </button>
-                                    ))}
-                                </div>
-
-                                <div className="flex gap-4 w-full max-w-sm">
-                                    <Button
-                                        className="flex-1 text-lg py-6"
-                                        onClick={toggleTimer}
-                                        leftIcon={timerRunning ? Pause : Play}
-                                    >
-                                        {timerRunning ? 'Pause' : 'Start Session'}
-                                    </Button>
-                                    <Button
-                                        variant="secondary"
-                                        className="px-6 py-6"
-                                        onClick={resetTimer}
-                                        leftIcon={RotateCcw}
-                                    />
-                                </div>
-                            </Card>
-                        </Reveal>
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.6 }}
+            className="rounded-3xl p-8 sm:p-10"
+            style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary)', boxShadow: 'var(--shadow-lg)' }}
+        >
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}>
+                        <Bell size={22} />
                     </div>
+                    <div>
+                        <h2 className="text-xl font-bold" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
+                            Japa Counter
+                        </h2>
+                        <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                            Mantra repetition tracker — माला गणना
+                        </p>
+                    </div>
+                </div>
+                <button
+                    onClick={() => setSoundOn(s => !s)}
+                    className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+                    style={{ background: soundOn ? 'var(--accent-soft)' : 'var(--bg-secondary)', color: soundOn ? 'var(--accent)' : 'var(--text-tertiary)' }}
+                    title={soundOn ? 'Mute' : 'Unmute'}
+                >
+                    {soundOn ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                </button>
+            </div>
 
-                    {/* Japa Mala Counter */}
-                    <Reveal className="mb-16">
-                        <Card className="p-8 sm:p-12 !rounded-[40px] border-[var(--border)] shadow-2xl overflow-hidden relative" animate={false}>
-                            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-heritage-gold via-heritage-goldLight to-heritage-gold"></div>
-                            <div className="flex flex-col lg:flex-row gap-16 items-center">
-                                {/* Mala Ring Visual */}
-                                <div className="relative group">
-                                    {showCelebration && (
-                                        <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-                                            <div className="text-center animate-bounce-slow">
-                                                <Award className="w-16 h-16 text-heritage-gold mb-2 drop-shadow-2xl" />
-                                                <div className="text-heritage-gold font-display font-bold text-xl bg-white/90 backdrop-blur-md px-6 py-2 rounded-2xl shadow-2xl border border-heritage-gold/20">
-                                                    Round {rounds} Complete!
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
+            {/* Mala Preset Selector */}
+            <div className="flex flex-wrap gap-2 mb-8">
+                {malas.map(m => (
+                    <button
+                        key={m.label}
+                        onClick={() => handleMalaSelect(m.value)}
+                        className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200"
+                        style={
+                            (m.value === 0 ? showCustom : selectedMala === m.value)
+                                ? { background: 'var(--accent)', color: '#fff', boxShadow: '0 4px 12px var(--accent-glow)' }
+                                : { background: 'var(--bg-secondary)', color: 'var(--text-secondary)' }
+                        }
+                    >
+                        {m.label}
+                    </button>
+                ))}
+            </div>
 
-                                    <svg className="w-72 h-72 sm:w-96 sm:h-96" viewBox="0 0 240 240">
-                                        <circle cx="120" cy="120" r="110" fill="none" stroke="var(--border)" strokeWidth="2" opacity="0.1" />
-                                        <circle
-                                            cx="120" cy="120" r="110" fill="none"
-                                            stroke="url(#malaGradient)" strokeWidth="8"
-                                            strokeDasharray={beadCircumference}
-                                            strokeDashoffset={beadOffset}
-                                            strokeLinecap="round"
-                                            transform="rotate(-90 120 120)"
-                                            className="transition-all duration-300 ease-out"
-                                        />
-                                        <defs>
-                                            <linearGradient id="malaGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                <stop offset="0%" stopColor="#c9a227" />
-                                                <stop offset="50%" stopColor="#efd47a" />
-                                                <stop offset="100%" stopColor="#c9a227" />
-                                            </linearGradient>
-                                            <filter id="glow">
-                                                <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
-                                                <feMerge>
-                                                    <feMergeNode in="coloredBlur" />
-                                                    <feMergeNode in="SourceGraphic" />
-                                                </feMerge>
-                                            </filter>
-                                        </defs>
+            {/* Custom Target Input */}
+            <AnimatePresence>
+                {showCustom && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="flex gap-3 mb-6 overflow-hidden"
+                    >
+                        <input
+                            type="number"
+                            min="1"
+                            value={customTarget}
+                            onChange={e => setCustomTarget(e.target.value)}
+                            placeholder="Enter count (e.g. 21)"
+                            className="input flex-1"
+                            style={{ borderRadius: 'var(--radius-md)' }}
+                            onKeyDown={e => e.key === 'Enter' && applyCustomTarget()}
+                        />
+                        <button onClick={applyCustomTarget} className="btn btn-primary btn-sm px-5">Set</button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-                                        {/* Current Bead Ghost */}
-                                        {(() => {
-                                            const angle = (beadCount / TOTAL_BEADS) * 360 - 90;
-                                            const rad = (angle * Math.PI) / 180;
-                                            const x = 120 + 110 * Math.cos(rad);
-                                            const y = 120 + 110 * Math.sin(rad);
-                                            return (
-                                                <circle cx={x} cy={y} r="10" fill="#efd47a" filter="url(#glow)" className="animate-pulse" />
-                                            );
-                                        })()}
-                                        {/* Quarter Markers */}
-                                        {[0, 27, 54, 81].map((pos, i) => {
-                                            const angle = (pos / TOTAL_BEADS) * 360 - 90;
-                                            const rad = (angle * Math.PI) / 180;
-                                            const x = 120 + 110 * Math.cos(rad);
-                                            const y = 120 + 110 * Math.sin(rad);
-                                            return (
-                                                <circle key={i} cx={x} cy={y} r="4" fill={beadCount > pos ? '#c9a227' : 'var(--border)'} opacity={beadCount > pos ? 1 : 0.3} className="transition-all duration-500" />
-                                            );
-                                        })}
-                                    </svg>
+            {/* Circular Progress Ring */}
+            <div className="flex flex-col items-center mb-8">
+                <div className="relative" style={{ width: 180, height: 180 }}>
+                    <svg width="180" height="180" style={{ transform: 'rotate(-90deg)' }}>
+                        {/* Background track */}
+                        <circle cx="90" cy="90" r={RADIUS} fill="none" stroke="var(--border-primary)" strokeWidth="8" />
+                        {/* Progress arc */}
+                        <motion.circle
+                            cx="90" cy="90" r={RADIUS}
+                            fill="none"
+                            stroke="var(--accent)"
+                            strokeWidth="8"
+                            strokeLinecap="round"
+                            strokeDasharray={CIRCUMFERENCE}
+                            animate={{ strokeDashoffset: strokeDash }}
+                            transition={{ type: 'spring', stiffness: 80, damping: 20 }}
+                        />
+                    </svg>
 
-                                    <button
-                                        onClick={handleBeadClick}
-                                        className={`absolute inset-0 m-auto w-48 h-48 sm:w-64 sm:h-64 rounded-full
-                                            bg-gradient-to-br from-white/90 to-heritage-gold/5
-                                            border-4 border-heritage-gold/30 backdrop-blur-sm
-                                            flex flex-col items-center justify-center shadow-[0_20px_50px_rgba(201,162,39,0.15)]
-                                            hover:border-heritage-gold/50 active:scale-95 transition-all duration-200
-                                            ${pulsing ? 'scale-[0.97] border-heritage-gold/80 bg-heritage-gold/10' : ''}`}
-                                    >
-                                        <span className="font-display text-7xl sm:text-9xl font-bold text-heritage-gold tabular-nums leading-none mb-2">
-                                            {beadCount}
-                                        </span>
-                                        <div className="flex flex-col items-center gap-1">
-                                            <span className="text-xs font-bold text-[var(--muted)] uppercase tracking-[0.2em]">Bead Counter</span>
-                                            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-heritage-gold/10 text-heritage-gold text-[10px] font-bold uppercase">
-                                                <Flame className="w-3 h-3" /> Round {rounds + 1}
-                                            </div>
-                                        </div>
-                                    </button>
-                                </div>
-
-                                {/* Counter Controls & Info */}
-                                <div className="flex-1 w-full lg:max-w-md">
-                                    <div className="mb-10 text-center lg:text-left">
-                                        <h3 className="font-display text-4xl font-bold text-[var(--fg)] mb-4 flex lg:justify-start justify-center items-center gap-3">
-                                            📿 Japa Mala
-                                        </h3>
-                                        <p className="text-[var(--muted)] text-lg leading-relaxed">
-                                            Focus your intention. Tap the central bead with each sacred chant to complete your spiritual cycle.
-                                        </p>
+                    {/* Center Display */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <AnimatePresence mode="popLayout">
+                            {celebrate ? (
+                                <motion.div key="celebrate" initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ opacity: 0 }} className="text-4xl">
+                                    🙏
+                                </motion.div>
+                            ) : (
+                                <motion.div key={count} initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center">
+                                    <div className="text-4xl font-bold" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
+                                        {count}
                                     </div>
+                                    <div className="text-xs mt-0.5" style={{ color: 'var(--text-tertiary)' }}>/ {target}</div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                </div>
 
-                                    {/* Mantra Cards */}
-                                    <div className="mb-10">
-                                        <label className="text-xs font-bold text-[var(--muted)] uppercase tracking-widest mb-4 block">Selected Mantra</label>
-                                        <div className="grid grid-cols-1 gap-3">
-                                            {MANTRAS.map((m, i) => (
-                                                <button
-                                                    key={i}
-                                                    onClick={() => setSelectedMantra(i)}
-                                                    className={`flex items-center justify-between p-4 rounded-2xl border-2 transition-all duration-300 ${selectedMantra === i
-                                                        ? 'bg-heritage-gold/5 border-heritage-gold shadow-lg shadow-heritage-gold/5'
-                                                        : 'border-[var(--border)] hover:border-heritage-gold/30 hover:bg-heritage-gold/5 opacity-60'
-                                                        }`}
-                                                >
-                                                    <div className="text-left">
-                                                        <div className={`font-bold transition-all ${selectedMantra === i ? 'text-heritage-gold scale-105' : 'text-[var(--fg)]'}`}>{m.name}</div>
-                                                        {selectedMantra === i && <div className="text-xs text-heritage-gold/70 mt-1 italic leading-tight">{m.meaning}</div>}
-                                                    </div>
-                                                    {selectedMantra === i && <ChevronRight className="w-5 h-5 text-heritage-gold" />}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4 mb-10">
-                                        <div className="p-6 rounded-3xl bg-[var(--bg)] border border-[var(--border)] shadow-sm">
-                                            <div className="text-xs font-bold text-[var(--muted)] uppercase tracking-widest mb-2">Total Chants</div>
-                                            <div className="text-3xl font-display font-bold text-[var(--fg)]">{rounds * 108 + beadCount}</div>
-                                        </div>
-                                        <div className="p-6 rounded-3xl bg-[var(--bg)] border border-[var(--border)] shadow-sm">
-                                            <div className="text-xs font-bold text-[var(--muted)] uppercase tracking-widest mb-2">Completion</div>
-                                            <div className="text-3xl font-display font-bold text-heritage-teal">{Math.round((beadProgress + rounds) * 100)}%</div>
-                                        </div>
-                                    </div>
-
-                                    <Button
-                                        variant="secondary"
-                                        className="w-full py-5 text-lg !border-red-500/10 hover:!bg-red-500/5 !text-red-500"
-                                        onClick={() => { setBeadCount(0); setRounds(0); }}
-                                        leftIcon={RotateCcw}
-                                    >
-                                        Reset Spiritual Progress
-                                    </Button>
-                                </div>
-                            </div>
-                        </Card>
-                    </Reveal>
-
-                    {/* Daily Wisdom Stagger */}
-                    <Reveal>
-                        <h3 className="font-display text-4xl font-bold text-[var(--fg)] mb-12 flex items-center gap-4">
-                            <Quote className="text-heritage-gold w-10 h-10" />
-                            Ancient Wisdom for Modern Spirits
-                        </h3>
-                        <Stagger className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {wisdomData.map((w) => (
-                                <Card key={w.id} variant="glass" className="p-8 !rounded-[32px] hover:scale-105 transition-transform duration-500 h-full flex flex-col justify-between border-[var(--border)]">
-                                    <div className="space-y-6">
-                                        <Quote className="w-8 h-8 text-heritage-teal/30" />
-                                        <p className="text-[var(--fg)] text-xl font-medium leading-relaxed italic">"{w.quote}"</p>
-                                    </div>
-                                    <div className="mt-10 pt-6 border-t border-[var(--border)] flex justify-between items-center">
-                                        <span className="text-sm font-bold text-[var(--muted)]">{w.source}</span>
-                                        <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-heritage-teal/10 text-heritage-teal uppercase tracking-widest border border-heritage-teal/10">{w.theme}</span>
-                                    </div>
-                                </Card>
-                            ))}
-                        </Stagger>
-                    </Reveal>
+                {/* Total Malas */}
+                <div className="flex items-center gap-2 mt-4">
+                    {Array.from({ length: Math.min(totalMalas, 10) }).map((_, i) => (
+                        <motion.div
+                            key={i}
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="w-2.5 h-2.5 rounded-full"
+                            style={{ background: 'var(--accent)' }}
+                        />
+                    ))}
+                    {totalMalas > 10 && (
+                        <span className="text-xs font-semibold" style={{ color: 'var(--accent)' }}>+{totalMalas - 10}</span>
+                    )}
+                    {totalMalas > 0 && (
+                        <span className="text-xs ml-1" style={{ color: 'var(--text-tertiary)' }}>
+                            {totalMalas} mala{totalMalas > 1 ? 's' : ''} complete
+                        </span>
+                    )}
                 </div>
             </div>
-        </section>
+
+            {/* Controls */}
+            <div className="flex items-center justify-center gap-4">
+                {/* Decrement */}
+                <motion.button
+                    animate={shake ? { x: [-5, 5, -5, 5, 0] } : {}}
+                    transition={{ duration: 0.3 }}
+                    onClick={decrement}
+                    className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200"
+                    style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)', border: '1.5px solid var(--border-primary)' }}
+                >
+                    <Minus size={18} />
+                </motion.button>
+
+                {/* Main Tap Button */}
+                <motion.button
+                    whileTap={{ scale: 0.93 }}
+                    onClick={increment}
+                    disabled={celebrate}
+                    className="w-24 h-24 rounded-full flex items-center justify-center font-bold text-white text-lg relative overflow-hidden"
+                    style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent-hover))', boxShadow: '0 6px 24px var(--accent-glow)', fontFamily: 'var(--font-display)' }}
+                >
+                    <span className="relative z-10">OM</span>
+                    {/* Ripple on celebrate */}
+                    <AnimatePresence>
+                        {celebrate && (
+                            <motion.div
+                                key="ripple"
+                                className="absolute inset-0 rounded-full"
+                                initial={{ scale: 1, opacity: 0.4 }}
+                                animate={{ scale: 2.5, opacity: 0 }}
+                                exit={{}}
+                                transition={{ duration: 0.8 }}
+                                style={{ background: 'white' }}
+                            />
+                        )}
+                    </AnimatePresence>
+                </motion.button>
+
+                {/* Reset current mala */}
+                <button
+                    onClick={reset}
+                    className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200"
+                    style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)', border: '1.5px solid var(--border-primary)' }}
+                    title="Reset current mala"
+                >
+                    <RotateCcw size={18} />
+                </button>
+            </div>
+
+            {/* Full Reset */}
+            <div className="flex justify-center mt-5">
+                <button onClick={fullReset} className="text-xs transition-colors" style={{ color: 'var(--text-tertiary)' }}>
+                    Reset all ({totalMalas} mala{totalMalas !== 1 ? 's' : ''}, {count} beads)
+                </button>
+            </div>
+
+            {/* Instruction */}
+            <p className="text-center text-xs mt-4" style={{ color: 'var(--text-tertiary)' }}>
+                Tap <strong style={{ color: 'var(--accent)' }}>OM</strong> for each mantra repetition. Bell rings when one mala is complete. 🕉️
+            </p>
+        </motion.div>
+    );
+};
+
+// ──────────── Main Wellness Component ────────────
+const Wellness = () => {
+    const [selectedMood, setSelectedMood] = useState(null);
+    const [journalText, setJournalText] = useState('');
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [showRec, setShowRec] = useState(false);
+    const [activePractice, setActivePractice] = useState(null);
+    const [savingsStatus, setSavingStatus] = useState('idle'); // idle, saving, saved
+    const [reflectionHistory, setReflectionHistory] = useState([]);
+
+    useEffect(() => {
+        moodAPI.getAll().then(data => {
+            if (data) {
+                const history = data.map(item => ({
+                    date: new Date(item.createdAt).toLocaleDateString(),
+                    text: item.notes,
+                    mood: item.mood
+                }));
+                setReflectionHistory(history);
+            }
+        }).catch(err => console.error("Failed to fetch mood history:", err));
+    }, []);
+    const heroRef = useRef(null);
+    const moodRef = useRef(null);
+    const practiceRef = useRef(null);
+    const journalRef = useRef(null);
+    const heroInView = useInView(heroRef, { once: true });
+    const moodInView = useInView(moodRef, { once: true, margin: '-80px' });
+    const practiceInView = useInView(practiceRef, { once: true, margin: '-80px' });
+    const journalInView = useInView(journalRef, { once: true, margin: '-80px' });
+
+    const handleMoodSelect = (i) => {
+        setSelectedMood(i);
+        setIsAnalyzing(true);
+        setShowRec(false);
+        // Simulate AI analysis depth
+        setTimeout(() => {
+            setIsAnalyzing(false);
+            setShowRec(true);
+        }, 1500);
+    };
+
+    return (
+        <>
+            <SEO title="Wellness — Inner Root" description="Japa counter, mood tracking, AI-guided recommendations, and reflection journaling." />
+
+            {/* ── HERO ── */}
+            <section ref={heroRef} className="relative overflow-hidden section-padding" style={{ paddingBottom: 'var(--sp-12)' }}>
+                <div className="sacred-geometry" style={{ opacity: 0.02 }} />
+                <div className="max-w-4xl mx-auto px-6 text-center">
+                    <motion.div initial={{ opacity: 0, y: 30 }} animate={heroInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.7 }}>
+                        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 text-xs font-semibold tracking-widest uppercase"
+                            style={{ background: 'var(--forest-soft)', color: 'var(--forest)' }}>
+                            <Heart size={14} /> Wellness Center
+                        </span>
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-5" style={{ fontFamily: 'var(--font-display)' }}>
+                            Nurture Your <span className="text-gradient">Inner Peace</span>
+                        </h1>
+                        <p className="text-base sm:text-lg max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
+                            Japa counter, mood tracking, AI-guided practices, and daily reflection — all in one sacred space.
+                        </p>
+                    </motion.div>
+                </div>
+            </section>
+
+            {/* ── JAPA COUNTER ── */}
+            <section className="pb-8 px-6">
+                <div className="max-w-3xl mx-auto">
+                    <JapaCounter />
+
+                    {/* Narrative Bridge */}
+                    <motion.div
+                        initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
+                        className="mt-8 p-6 text-center rounded-2xl border border-dashed border-primary"
+                        style={{ background: 'var(--accent-soft)' }}
+                    >
+                        <p className="text-sm font-medium italic" style={{ color: 'var(--text-secondary)' }}>
+                            "After centering yourself with Japa, how is your emotional state? <span className="text-accent underline cursor-pointer" onClick={() => moodRef.current?.scrollIntoView({ behavior: 'smooth' })}>Track your mood below</span> to receive your next personalized practice."
+                        </p>
+                    </motion.div>
+                </div>
+            </section>
+
+            {/* ── MOOD INPUT ── */}
+            <section ref={moodRef} className="pb-16 px-6">
+                <div className="max-w-3xl mx-auto">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }} animate={moodInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6 }}
+                        className="rounded-3xl p-8 sm:p-10"
+                        style={{ background: 'var(--bg-glass-strong)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid var(--border-glass)', boxShadow: 'var(--shadow-lg)' }}
+                    >
+                        <div className="text-center mb-8">
+                            <h2 className="text-2xl sm:text-3xl font-bold mb-2" style={{ fontFamily: 'var(--font-display)' }}>How are you feeling?</h2>
+                            <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>Select your current emotional state</p>
+                        </div>
+
+                        <div className="flex flex-wrap justify-center gap-4 mb-8">
+                            {moods.map((mood, i) => (
+                                <motion.button
+                                    key={mood.label}
+                                    whileTap={{ scale: 0.9 }}
+                                    onClick={() => handleMoodSelect(i)}
+                                    className="flex flex-col items-center gap-2 p-4 rounded-2xl transition-all duration-300"
+                                    style={{
+                                        background: selectedMood === i ? `${mood.color}15` : 'var(--bg-secondary)',
+                                        outline: selectedMood === i ? `2px solid ${mood.color}` : '2px solid transparent',
+                                        minWidth: 80,
+                                    }}
+                                >
+                                    <span className="text-3xl">{mood.emoji}</span>
+                                    <span className="text-xs font-medium" style={{ color: selectedMood === i ? mood.color : 'var(--text-tertiary)' }}>
+                                        {mood.label}
+                                    </span>
+                                </motion.button>
+                            ))}
+                        </div>
+
+                        {isAnalyzing && (
+                            <motion.div
+                                initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                                className="flex flex-col items-center justify-center py-8 gap-3"
+                            >
+                                <motion.div
+                                    animate={{ rotate: 360 }}
+                                    transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                                    className="w-8 h-8 rounded-full border-2 border-primary border-t-accent"
+                                />
+                                <p className="text-xs font-medium italic animate-pulse" style={{ color: 'var(--text-tertiary)' }}>
+                                    AI is analyzing your vibrational state...
+                                </p>
+                            </motion.div>
+                        )}
+
+                        <AnimatePresence>
+                            {showRec && selectedMood !== null && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10, height: 0 }} animate={{ opacity: 1, y: 0, height: 'auto' }}
+                                    exit={{ opacity: 0, y: -10, height: 0 }} transition={{ duration: 0.4 }}
+                                    className="overflow-hidden"
+                                >
+                                    <div className="rounded-2xl p-6 mt-2 relative overflow-hidden" style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-primary)' }}>
+                                        {/* Abstract background glow */}
+                                        <div className="absolute top-0 right-0 w-32 h-32 blur-[60px] opacity-20" style={{ background: moods[selectedMood].color }} />
+
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <Brain size={18} style={{ color: 'var(--accent)' }} />
+                                            <span className="text-xs font-semibold tracking-widest uppercase" style={{ color: 'var(--accent)' }}>AI Guided Discovery</span>
+                                        </div>
+                                        <p className="text-sm leading-relaxed mb-5 italic" style={{ color: 'var(--text-primary)' }}>
+                                            "{recommendations[selectedMood]?.text} This practice will help realign your energy with your natural state of peace."
+                                        </p>
+                                        <div className="flex flex-col sm:flex-row items-center gap-4">
+                                            <button
+                                                onClick={() => {
+                                                    const practiceTitle = recommendations[selectedMood]?.practice;
+                                                    const practiceObj = practices.find(p => p.title === practiceTitle);
+                                                    setActivePractice(practiceObj || practices[0]);
+                                                }}
+                                                className="btn btn-primary w-full sm:w-auto"
+                                            >
+                                                <Sparkles size={14} /> Begin Recommended Practice
+                                            </button>
+                                            <span className="text-[10px] font-bold uppercase tracking-wider opacity-40">
+                                                Based on your {moods[selectedMood].label} mood
+                                            </span>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </motion.div>
+                </div>
+            </section>
+
+            {/* ── GUIDED PRACTICES ── */}
+            <section ref={practiceRef} className="section-padding" style={{ paddingTop: 'var(--sp-8)' }}>
+                <div className="max-w-5xl mx-auto px-6">
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={practiceInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6 }} className="mb-10">
+                        <span className="text-xs font-semibold tracking-widest uppercase mb-3 block" style={{ color: 'var(--accent)' }}>Guided Practices</span>
+                        <h2 className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-display)' }}>Curated for Your Journey</h2>
+                    </motion.div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        {practices.map((p, i) => (
+                            <motion.div
+                                key={p.title}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={practiceInView ? { opacity: 1, y: 0 } : {}}
+                                transition={{ delay: i * 0.1, duration: 0.5 }}
+                                onClick={() => setActivePractice(p)}
+                                className={`group card p-6 cursor-pointer transition-all ${recommendations[selectedMood]?.practice === p.title ? 'ring-2 ring-accent ring-offset-4 ring-offset-bg-primary' : ''}`}
+                            >
+                                <div className="flex items-start gap-4">
+                                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110"
+                                        style={{ background: `${p.color}12`, color: p.color }}>
+                                        <p.icon size={22} strokeWidth={1.5} />
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: `${p.color}12`, color: p.color }}>{p.category}</span>
+                                            <span className="flex items-center gap-1 text-[10px]" style={{ color: 'var(--text-tertiary)' }}><Clock size={10} /> {p.duration}</span>
+                                        </div>
+                                        <h3 className="text-base font-semibold mb-1" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>{p.title}</h3>
+                                        <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{p.desc}</p>
+                                        <div className="mt-3 flex items-center gap-1 text-xs font-medium transition-all duration-300 group-hover:gap-2" style={{ color: p.color }}>
+                                            <span>Begin</span><ArrowRight size={12} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ── REFLECTION JOURNAL ── */}
+            <section ref={journalRef} className="section-padding">
+                <div className="max-w-3xl mx-auto px-6">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }} animate={journalInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6 }}
+                        className="rounded-3xl p-8 sm:p-10"
+                        style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary)', boxShadow: 'var(--shadow-lg)' }}
+                    >
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}>
+                                <PenLine size={22} />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-bold" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>Today's Reflection</h2>
+                                <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>What's on your mind and heart?</p>
+                            </div>
+                        </div>
+
+                        <div className="rounded-xl p-4 mb-5" style={{ background: 'var(--accent-soft)', border: '1px solid var(--accent-glow)' }}>
+                            <p className="text-sm italic leading-relaxed" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-display)', fontSize: 'var(--fs-lg)' }}>
+                                "What am I grateful for today? What challenged me, and what did it teach?"
+                            </p>
+                        </div>
+
+                        <textarea
+                            value={journalText}
+                            onChange={e => setJournalText(e.target.value)}
+                            placeholder="Begin writing your reflection..."
+                            rows={6}
+                            className="input resize-none mb-5"
+                            style={{ borderRadius: 'var(--radius-lg)' }}
+                        />
+
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>{journalText.length} characters</span>
+                            <div className="flex items-center gap-3">
+                                {!journalText.trim() && (
+                                    <span className="text-[10px] italic opacity-50" style={{ color: 'var(--text-tertiary)' }}>
+                                        Write your thoughts to save
+                                    </span>
+                                )}
+                                <button
+                                    className="btn btn-primary btn-sm"
+                                    disabled={!journalText.trim() || savingsStatus === 'saving'}
+                                    title={!journalText.trim() ? "Please write your reflection before saving" : "Click to save your reflection"}
+                                    onClick={() => {
+                                        setSavingStatus('saving');
+                                        const moodEmoji = selectedMood !== null ? moods[selectedMood].emoji : '📝';
+                                        moodAPI.save({
+                                            mood: moodEmoji,
+                                            notes: journalText,
+                                            intensity: 5
+                                        }).then(res => {
+                                            setReflectionHistory([{
+                                                date: 'Today',
+                                                text: journalText,
+                                                mood: moodEmoji
+                                            }, ...reflectionHistory]);
+                                            setJournalText('');
+                                            setSavingStatus('saved');
+                                            setTimeout(() => setSavingStatus('idle'), 3000);
+                                        }).catch(err => {
+                                            console.error("Failed to save mood:", err);
+                                            setSavingStatus('idle');
+                                        });
+                                    }}
+                                >
+                                    {savingsStatus === 'saving' ? 'Saving...' : savingsStatus === 'saved' ? <><Check size={14} /> Saved</> : <><BookOpen size={14} /> Commit to Journal</>}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Reflection History */}
+                        <div className="mt-10 pt-8 border-t border-primary">
+                            <h4 className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--text-tertiary)' }}>Recent History</h4>
+                            <div className="space-y-3">
+                                {reflectionHistory.map((item, idx) => (
+                                    <div key={idx} className="p-3 rounded-lg border border-primary bg-secondary/30 flex gap-3 items-center">
+                                        <div className="text-xl">{item.mood}</div>
+                                        <div className="flex-1">
+                                            <div className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>{item.date}</div>
+                                            <div className="text-[11px] line-clamp-1" style={{ color: 'var(--text-secondary)' }}>{item.text}</div>
+                                        </div>
+                                        <ChevronRight size={14} className="opacity-20" />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </motion.div>
+                </div>
+            </section>
+
+            {/* ── PRACTICE PLAYER MODAL ── */}
+            <AnimatePresence>
+                {activePractice && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-md"
+                            onClick={() => setActivePractice(null)}
+                        />
+                        <motion.div
+                            initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+                            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+                            className="fixed bottom-0 left-0 right-0 z-[70] max-w-2xl mx-auto rounded-t-[2.5rem] p-8 sm:p-12"
+                            style={{ background: 'var(--bg-primary)', borderTop: '1px solid var(--border-primary)' }}
+                        >
+                            <button onClick={() => setActivePractice(null)} className="absolute top-6 right-6 p-2 rounded-full hover:bg-secondary">
+                                <X size={24} />
+                            </button>
+
+                            <div className="text-center mb-10">
+                                <div className="w-20 h-20 rounded-3xl mx-auto flex items-center justify-center mb-6 shadow-xl"
+                                    style={{ background: `${activePractice.color}15`, color: activePractice.color }}>
+                                    <activePractice.icon size={40} />
+                                </div>
+                                <h2 className="text-3xl font-bold mb-2" style={{ fontFamily: 'var(--font-display)' }}>{activePractice.title}</h2>
+                                <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>{activePractice.category} · {activePractice.duration}</p>
+                            </div>
+
+                            {/* Simulated Audio Controls */}
+                            <div className="mb-10 p-6 rounded-2xl bg-secondary/50 border border-primary">
+                                <div className="h-1.5 w-full bg-border-primary rounded-full overflow-hidden mb-4">
+                                    <motion.div
+                                        className="h-full bg-accent"
+                                        initial={{ width: 0 }} animate={{ width: '35%' }}
+                                    />
+                                </div>
+                                <div className="flex items-center justify-between text-[10px] font-bold tracking-widest uppercase mb-8" style={{ color: 'var(--text-tertiary)' }}>
+                                    <span>03:42</span>
+                                    <span>{activePractice.duration}</span>
+                                </div>
+                                <div className="flex items-center justify-center gap-8">
+                                    <button className="p-2 opacity-50 hover:opacity-100"><RotateCcw size={20} /></button>
+                                    <button className="w-16 h-16 rounded-full bg-accent text-white flex items-center justify-center shadow-lg hover:scale-105 transition-transform">
+                                        <div className="w-0 h-0 border-t-[10px] border-t-transparent border-l-[16px] border-l-white border-b-[10px] border-b-transparent ml-1" />
+                                    </button>
+                                    <button className="p-2 opacity-100 text-accent"><Volume2 size={24} /></button>
+                                </div>
+                            </div>
+
+                            <div className="text-center">
+                                <p className="text-sm leading-relaxed mb-6" style={{ color: 'var(--text-secondary)' }}>
+                                    {activePractice.desc}
+                                </p>
+                                <button onClick={() => setActivePractice(null)} className="btn btn-secondary w-full">Close Session</button>
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+        </>
     );
 };
 

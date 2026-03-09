@@ -1,4 +1,11 @@
 {
     "java.compile.nullAnalysis.mode": "automatic",
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "claudeCodeChat.permissions.yoloMode": true,
+    "chat.tools.terminal.autoApprove": {
+        "/^cd \"e:\\\\v2 inner\\\\react-project\" ; npx eslint --config \\.eslintrc\\.cjs \\. --quiet$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
 }

@@ -1,245 +1,128 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { getLibraryItems } from '../services/api';
-import { libraryData as localLibraryData } from '../data/libraryData';
-import { Reveal, Stagger } from '../components/Reveal';
-import Breadcrumbs from '../components/Breadcrumbs';
-import Button from '../components/ui/Button';
-import Card from '../components/ui/Card';
-import Input from '../components/ui/Input';
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, useInView } from 'framer-motion';
 import {
-    Search, BookOpen, Clock, User,
-    FileText, Loader2, ArrowRight, ExternalLink,
-    Book, Bookmark, Sparkles, Info
+    BookOpen, Search, Filter, Clock, Star,
+    ArrowRight, Heart, Tag
 } from 'lucide-react';
+import SEO from '../components/ui/SEO';
+import { libraryAPI } from '../services/api';
+
+const categories = ['All', 'Vedas', 'Yoga', 'Meditation', 'Philosophy', 'History'];
+
+const articles = [
+    { title: 'The Four Vedas: A Beginner\'s Guide', category: 'Vedas', readTime: '8 min', stars: 4.8, desc: 'Explore the foundational scriptures of Hindu philosophy and their relevance today.' },
+    { title: 'Patanjali\'s Yoga Sutras Explained', category: 'Yoga', readTime: '12 min', stars: 4.9, desc: 'A modern interpretation of the 196 sutras that form the backbone of yoga practice.' },
+    { title: 'Vipassana: The Art of Seeing Clearly', category: 'Meditation', readTime: '6 min', stars: 4.7, desc: 'Ancient Buddhist meditation technique for insight and liberation from suffering.' },
+    { title: 'Advaita Vedanta: The Philosophy of Oneness', category: 'Philosophy', readTime: '10 min', stars: 4.6, desc: 'Adi Shankaracharya\'s non-dual philosophy that sees everything as Brahman.' },
+    { title: 'The Silk Road: India\'s Cultural Highways', category: 'History', readTime: '15 min', stars: 4.5, desc: 'How Indian traders, monks, and scholars spread culture across continents.' },
+    { title: 'Pranayama: Science of Breath', category: 'Yoga', readTime: '7 min', stars: 4.8, desc: 'Breathwork techniques from ancient texts that modern science is now validating.' },
+];
 
 const Library = () => {
+    const [dynamicArticles, setDynamicArticles] = useState([]);
+    const [activeCategory, setActiveCategory] = useState('All');
     const [searchQuery, setSearchQuery] = useState('');
-    const [libraryData, setLibraryData] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [isSearching, setIsSearching] = useState(false);
+    const heroRef = useRef(null);
+    const gridRef = useRef(null);
+    const heroInView = useInView(heroRef, { once: true });
+    const gridInView = useInView(gridRef, { once: true, margin: '-80px' });
 
     useEffect(() => {
-        const fetchLibrary = async () => {
-            try {
-                const response = await getLibraryItems();
-                const data = Array.isArray(response.data) && response.data.length > 0
-                    ? response.data
-                    : localLibraryData;
-                setLibraryData(data);
-            } catch (error) {
-                console.error("Failed to fetch library items:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchLibrary();
+        libraryAPI.getAll().then(data => {
+            if (data) setDynamicArticles(data);
+        }).catch(err => console.error("Failed to fetch library items:", err));
     }, []);
 
-    const handleSearch = (query) => {
-        setSearchQuery(query);
-        setIsSearching(true);
-        const timer = setTimeout(() => setIsSearching(false), 500);
-        return () => clearTimeout(timer);
-    };
+    const allArticles = [...dynamicArticles, ...articles.filter(staticArt =>
+        !dynamicArticles.some(dyn => dyn.title === staticArt.title)
+    )];
 
-    const filteredData = (Array.isArray(libraryData) ? libraryData : []).filter(item =>
-        item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.category?.toLowerCase().includes(searchQuery.toLowerCase())
+    const filtered = allArticles.filter(a =>
+        (activeCategory === 'All' || a.category === activeCategory) &&
+        (a.title.toLowerCase().includes(searchQuery.toLowerCase()) || a.desc.toLowerCase().includes(searchQuery.toLowerCase()))
     );
 
-    if (loading) {
-        return (
-            <div className="min-h-screen flex flex-col items-center justify-center gap-6">
-                <Loader2 className="w-12 h-12 text-heritage-gold animate-spin" />
-                <p className="font-display text-xl text-[var(--muted)] animate-pulse">Consulting the archives...</p>
-            </div>
-        );
-    }
-
     return (
-        <section id="page-library" className="page active block opacity-100" aria-label="Digital Repository">
-            <div className="py-12 lg:py-24">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <Breadcrumbs />
+        <>
+            <SEO title="Library — Inner Root" description="Explore articles on Vedas, yoga, meditation, philosophy, and Indian history." />
 
-                    {/* Header */}
-                    <Reveal className="text-center mb-16 mt-8 relative">
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-heritage-gold/5 blur-[100px] pointer-events-none"></div>
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-heritage-gold/10 backdrop-blur-md border border-heritage-gold/20 text-heritage-gold font-bold text-xs uppercase tracking-[0.2em] mb-8">
-                            <Sparkles className="w-3.5 h-3.5" />
-                            <span>The Digital Akasha</span>
-                        </div>
-                        <h1 className="font-display text-5xl sm:text-7xl font-bold text-[var(--fg)] mb-8 tracking-tighter leading-none">
-                            Ancient Wisdom,<br />
-                            <span className="text-heritage-gold">Digitized</span>
+            {/* Hero */}
+            <section ref={heroRef} className="relative overflow-hidden section-padding" style={{ paddingBottom: 'var(--sp-12)' }}>
+                <div className="sacred-geometry" style={{ opacity: 0.02 }} />
+                <div className="max-w-4xl mx-auto px-6 text-center">
+                    <motion.div initial={{ opacity: 0, y: 30 }} animate={heroInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.7 }}>
+                        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 text-xs font-semibold tracking-widest uppercase" style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}>
+                            <BookOpen size={14} /> Library
+                        </span>
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-5" style={{ fontFamily: 'var(--font-display)' }}>
+                            Timeless <span className="text-gradient">Knowledge</span>
                         </h1>
-                        <p className="text-[var(--muted)] max-w-2xl mx-auto text-xl leading-relaxed italic font-medium">
-                            "Knowledge is the only wealth that grows as it is shared, and the only treasure that can't be stolen."
-                            <span className="block text-sm mt-3 font-bold uppercase tracking-widest text-heritage-gold/60">— Bhartṛhari, Nitiśataka</span>
+                        <p className="text-base sm:text-lg max-w-2xl mx-auto mb-8" style={{ color: 'var(--text-secondary)' }}>
+                            Curated articles on Indian heritage, spirituality, and wellness practices.
                         </p>
-                    </Reveal>
+                        <div className="max-w-md mx-auto relative">
+                            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-tertiary)' }} />
+                            <input type="text" placeholder="Search articles..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="search-input" />
+                        </div>
+                    </motion.div>
+                </div>
+            </section>
 
-                    {/* Search Bar */}
-                    <Reveal className="max-w-2xl mx-auto mb-16">
-                        <Card className="p-6 !rounded-[32px] shadow-2xl border-[var(--border)] overflow-visible ring-4 ring-heritage-gold/5">
-                            <Input
-                                placeholder="Search scriptures, texts, articles..."
-                                value={searchQuery}
-                                onChange={(e) => handleSearch(e.target.value)}
-                                icon={Search}
-                                className="!py-4 !text-lg !border-none !bg-transparent"
-                                autoFocus
-                            />
-                        </Card>
-                    </Reveal>
-
-                    {/* Categories Quick Filter */}
-                    <Stagger className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16 px-4">
-                        {[
-                            { id: 'vedas', title: 'Vedas', desc: '4 Core Texts', icon: Book, color: 'text-amber-600', bg: 'bg-amber-600/10' },
-                            { id: 'upanishads', title: 'Upanishads', desc: '108 Upanishads', icon: BookOpen, color: 'text-teal-600', bg: 'bg-teal-600/10' },
-                            { id: 'gita', title: 'The Gita', desc: 'Divine Song', icon: Bookmark, color: 'text-emerald-600', bg: 'bg-emerald-600/10' },
-                            { id: 'philosophy', title: 'Darshanas', desc: '6 Schools', icon: FileText, color: 'text-rose-600', bg: 'bg-rose-600/10' }
-                        ].map(({ icon: Icon, ...cat }) => (
-                            <button
-                                key={cat.id}
-                                className={`group flex flex-col items-center p-8 rounded-[40px] border-2 transition-all duration-500 ${searchQuery.toLowerCase() === cat.title.toLowerCase()
-                                    ? 'bg-heritage-gold border-heritage-gold text-white shadow-2xl -translate-y-2'
-                                    : 'bg-[var(--bg)] border-[var(--border)] hover:border-heritage-gold/30 hover:-translate-y-1'
-                                    }`}
-                                onClick={() => handleSearch(cat.title)}
-                            >
-                                <div className={`w-20 h-20 rounded-3xl ${searchQuery.toLowerCase() === cat.title.toLowerCase() ? 'bg-white/20' : cat.bg} flex items-center justify-center mb-6 transition-all group-hover:scale-110 shadow-inner`}>
-                                    <Icon className={`w-10 h-10 ${searchQuery.toLowerCase() === cat.title.toLowerCase() ? 'text-white' : cat.color}`} />
-                                </div>
-                                <h3 className="font-display text-xl font-bold mb-1 tracking-tight">{cat.title}</h3>
-                                <p className={`text-xs font-bold uppercase tracking-widest ${searchQuery.toLowerCase() === cat.title.toLowerCase() ? 'text-white/70' : 'text-[var(--muted)]'}`}>
-                                    {cat.desc}
-                                </p>
+            {/* Content */}
+            <section ref={gridRef} className="section-padding" style={{ paddingTop: 0 }}>
+                <div className="max-w-5xl mx-auto px-6">
+                    {/* Category Tabs */}
+                    <div className="flex items-center gap-2 mb-10 overflow-x-auto pb-2">
+                        {categories.map(cat => (
+                            <button key={cat} onClick={() => setActiveCategory(cat)} className="tab-btn" style={activeCategory === cat ? { background: 'var(--accent)', color: '#fff', boxShadow: '0 4px 12px var(--accent-glow)' } : {}}>
+                                {cat}
                             </button>
                         ))}
-                    </Stagger>
+                    </div>
 
-                    {/* Library Collection */}
-                    <Reveal>
-                        <div className="flex items-center justify-between mb-8 px-4">
-                            <h2 className="font-display text-3xl font-bold text-[var(--fg)] flex items-center gap-3">
-                                <Sparkles className="text-heritage-gold h-8 w-8" />
-                                Sacred Collection
-                            </h2>
-                            <div className="text-sm font-bold text-[var(--muted)] uppercase tracking-widest">
-                                {filteredData.length} Texts Revealed
-                            </div>
-                        </div>
-
-                        <div className="space-y-8">
-                            {filteredData.length > 0 ? filteredData.map((item) => (
-                                <Card
-                                    key={item.id}
-                                    className="p-0 overflow-hidden !rounded-[40px] group border-[var(--border)] hover:border-heritage-gold/20 shadow-xl hover:shadow-2xl transition-all duration-500"
-                                    animate={false}
-                                >
-                                    <div className="flex flex-col md:flex-row gap-0">
-                                        {/* Book Spine/Cover Overlay */}
-                                        <div className="md:w-64 aspect-[3/4] md:aspect-auto relative overflow-hidden bg-heritage-teal/5 flex-shrink-0">
-                                            <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
-                                            <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent opacity-60"></div>
-                                            <div className="absolute top-6 left-6 z-10">
-                                                <span className="px-3 py-1.5 rounded-xl bg-white/95 backdrop-blur-md text-heritage-brown text-[10px] font-bold uppercase tracking-[0.2em] shadow-2xl border border-white/50">
-                                                    {item.category}
-                                                </span>
-                                            </div>
-                                            <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/60 to-transparent">
-                                                <div className="flex items-center gap-3 text-white text-[10px] font-bold uppercase tracking-widest">
-                                                    <Clock className="w-3.5 h-3.5 text-heritage-gold" />
-                                                    {item.readTime || '5 min'} Read
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Content Area */}
-                                        <div className="flex-1 p-8 md:p-12 flex flex-col justify-between">
-                                            <div>
-                                                <div className="flex justify-between items-start mb-6">
-                                                    <h3 className="font-display text-3xl md:text-4xl font-bold text-[var(--fg)] group-hover:text-heritage-gold transition-colors tracking-tight leading-none">
-                                                        {item.title}
-                                                    </h3>
-                                                    <div className="w-12 h-12 rounded-full border border-[var(--border)] flex items-center justify-center text-[var(--muted)] group-hover:bg-heritage-gold group-hover:text-white group-hover:border-heritage-gold transition-all">
-                                                        <ExternalLink className="w-5 h-5" />
-                                                    </div>
-                                                </div>
-
-                                                <p className="text-lg text-[var(--muted)] mb-6 leading-relaxed max-w-3xl line-clamp-3">
-                                                    {item.description}
-                                                </p>
-
-                                                {/* Excerpt Preview */}
-                                                <div className="mb-8 p-6 bg-heritage-gold/5 rounded-2xl border-l-4 border-heritage-gold/40 italic text-[var(--fg)]/80 text-sm leading-relaxed">
-                                                    <Sparkles className="w-4 h-4 text-heritage-gold mb-2" />
-                                                    "This is a sacred fragment of the eternal wisdom preserved within these verses. Explore the profound depth of human consciousness through these ancient lines..."
-                                                </div>
-
-                                                <div className="grid grid-cols-2 md:grid-cols-3 gap-6 pt-8 border-t border-[var(--border)]">
-                                                    <div className="space-y-1">
-                                                        <div className="text-[10px] font-bold text-[var(--muted)] uppercase tracking-widest">Scribe / Author</div>
-                                                        <div className="font-bold text-[var(--fg)] flex items-center gap-2">
-                                                            <User className="w-4 h-4 text-heritage-teal" />
-                                                            {item.author}
-                                                        </div>
-                                                    </div>
-                                                    <div className="space-y-1">
-                                                        <div className="text-[10px] font-bold text-[var(--muted)] uppercase tracking-widest">Chapters / Sections</div>
-                                                        <div className="font-bold text-[var(--fg)] flex items-center gap-2">
-                                                            <FileText className="w-4 h-4 text-heritage-teal" />
-                                                            {item.chapters}
-                                                        </div>
-                                                    </div>
-                                                    <div className="hidden md:block space-y-1">
-                                                        <div className="text-[10px] font-bold text-[var(--muted)] uppercase tracking-widest">Language</div>
-                                                        <div className="font-bold text-[var(--fg)]">Sanskrit / English</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="mt-10 flex items-center gap-4">
-                                                <Button
-                                                    variant="primary"
-                                                    rightIcon={ArrowRight}
-                                                    className="px-8 py-4 rounded-2xl flex-shrink-0"
-                                                    onClick={() => {
-                                                        if (item.link && item.link !== '#') {
-                                                            window.open(item.link, '_blank');
-                                                        } else {
-                                                            alert(`The full digital edition of "${item.title}" is being meticulously preserved and will be available shortly.`);
-                                                        }
-                                                    }}
-                                                >
-                                                    Open Digital Scripture
-                                                </Button>
-                                                <Button variant="secondary" className="px-5 py-4 rounded-2xl">
-                                                    <Bookmark className="w-5 h-5" />
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Card>
-                            )) : (
-                                <div className="text-center py-20 bg-[var(--bg)] border-2 border-dashed border-[var(--border)] rounded-[40px]">
-                                    <div className="w-20 h-20 bg-white shadow-xl rounded-3xl flex items-center justify-center mx-auto mb-6">
-                                        <Info className="w-10 h-10 text-heritage-gold" />
-                                    </div>
-                                    <h3 className="font-display text-2xl font-bold text-[var(--fg)] mb-2">The files are elusive</h3>
-                                    <p className="text-[var(--muted)] mb-8">Try searching for a different sacred text or category.</p>
-                                    <Button variant="secondary" onClick={() => handleSearch('')}>Restore Collection</Button>
+                    {/* Articles Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                        {filtered.map((article, i) => (
+                            <motion.div
+                                key={article.title}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={gridInView ? { opacity: 1, y: 0 } : {}}
+                                transition={{ delay: i * 0.06, duration: 0.5 }}
+                                className="card p-6 group cursor-pointer flex flex-col"
+                            >
+                                <div className="flex items-center gap-2 mb-3">
+                                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}>
+                                        {article.category}
+                                    </span>
+                                    <span className="flex items-center gap-1 text-[10px]" style={{ color: 'var(--text-tertiary)' }}>
+                                        <Clock size={10} /> {article.readTime}
+                                    </span>
                                 </div>
-                            )}
+                                <h3 className="text-base font-semibold mb-2 flex-1" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
+                                    {article.title}
+                                </h3>
+                                <p className="text-xs leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>{article.desc}</p>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-1 text-xs" style={{ color: 'var(--accent)' }}>
+                                        <Star size={12} fill="currentColor" /> {article.stars}
+                                    </div>
+                                    <span className="flex items-center gap-1 text-xs font-medium transition-all duration-300 group-hover:gap-2" style={{ color: 'var(--accent)' }}>
+                                        Read <ArrowRight size={12} />
+                                    </span>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+
+                    {filtered.length === 0 && (
+                        <div className="text-center py-16" style={{ color: 'var(--text-tertiary)' }}>
+                            <Search size={48} className="mx-auto mb-4 opacity-30" />
+                            <p className="text-lg">No articles found</p>
                         </div>
-                    </Reveal>
+                    )}
                 </div>
-            </div>
-        </section>
+            </section>
+        </>
     );
 };
 

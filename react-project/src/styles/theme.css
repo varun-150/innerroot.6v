@@ -1,0 +1,19 @@
+/* theme.css – light/dark mode overrides
+   All token definitions now live in design-system.css
+   This file provides helper utilities that depend on data-theme */
+
+/* Force light mode on specific components regardless of global theme */
+.force-light {
+    --color-bg: #faf6f0;
+    --color-text: #1c1917;
+    --color-surface: rgba(255, 255, 255, 0.90);
+    --color-border: #e7e0d5;
+}
+
+/* Force dark mode on specific components regardless of global theme */
+.force-dark {
+    --color-bg: #0a0d0c;
+    --color-text: #f2ede6;
+    --color-surface: rgba(22, 30, 26, 0.92);
+    --color-border: #262e2a;
+}

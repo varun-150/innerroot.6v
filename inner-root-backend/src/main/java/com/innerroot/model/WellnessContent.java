@@ -1,6 +1,7 @@
 package com.innerroot.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Entity
@@ -15,11 +16,13 @@ public class WellnessContent {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @NotBlank
     private String title;
 
     private String type; // meditation, yoga, chanting, breathing
 
     @Column(columnDefinition = "TEXT")
+    @Size(max = 2000)
     private String description;
 
     private String duration;

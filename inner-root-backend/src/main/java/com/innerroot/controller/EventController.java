@@ -5,6 +5,7 @@ import com.innerroot.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class EventController {
     }
 
     @PostMapping
-    public ResponseEntity<Event> create(@RequestBody Event event) {
+    public ResponseEntity<Event> create(@Valid @RequestBody Event event) {
         return ResponseEntity.ok(repository.save(event));
     }
 }

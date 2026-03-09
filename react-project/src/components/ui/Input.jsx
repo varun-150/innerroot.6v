@@ -1,52 +1,106 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 
-const Input = ({
-    label,
-    error,
-    id,
-    className = '',
-    containerClassName = '',
-    icon: Icon,
-    as: Component = 'input',
-    ...props
-}) => {
-    const commonClasses = `
-        w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 
-        text-[var(--fg)] placeholder-[var(--muted)]/50
-        focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 focus:border-transparent
-        transition-all duration-300
-        ${Icon ? 'pl-11' : ''}
-        ${error ? 'border-red-500 focus:ring-red-500/50' : ''}
-        ${className}
-    `;
+/**
+ * Input – Accessible text input with icon support
+ *
+ * Usage:
+ *   <Input placeholder="Search…" />
+ *   <Input leftIcon={<Search size={15}/>} />
+ *   <Input size="lg" error="Required" />
+ *   <Input as="textarea" rows={4} />
+ */
+export const Input = forwardRef(function Input(
+    {
+        as: Tag = 'input',
+        size: inputSize = 'md',
+        leftIcon,
+        rightIcon,
+        error,
+        hint,
+        label,
+        id,
+        full = true,
+        className = '',
+        style = {},
+        ...rest
+    },
+    ref
+) {
+    const sizeClass = inputSize === 'sm' ? 'input-sm' : inputSize === 'lg' ? 'input-lg' : '';
+    const hasLeft = Boolean(leftIcon);
+    const hasRight = Boolean(rightIcon);
+    const uid = id || React.useId?.() || undefined;
 
     return (
-        <div className={`space-y-2 ${containerClassName}`}>
+        <div style={{ display: full ? 'block' : 'inline-block', width: full ? '100%' : undefined }}>
             {label && (
                 <label
-                    htmlFor={id}
-                    className="block text-sm font-semibold text-[var(--fg)]"
+                    htmlFor={uid}
+                    style={{
+                        display: 'block',
+                        marginBottom: 'var(--sp-2)',
+                        fontSize: 'var(--text-sm)',
+                        fontWeight: 500,
+                        color: 'var(--color-text-subtle)',
+                    }}
                 >
                     {label}
                 </label>
             )}
-            <div className="relative group">
-                {Icon && (
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <Icon className="h-5 w-5 text-[var(--muted)] group-focus-within:text-[var(--accent)] transition-colors" />
-                    </div>
+
+            <div className="input-group" style={{ width: full ? '100%' : undefined }}>
+                {hasLeft && (
+                    <span className="input-icon" style={{ left: 'var(--sp-3)' }}>
+                        {leftIcon}
+                    </span>
                 )}
-                <Component
-                    id={id}
-                    className={commonClasses}
-                    {...props}
+
+                <Tag
+                    id={uid}
+                    ref={ref}
+                    className={[
+                        'input',
+                        sizeClass,
+                        error ? 'error' : '',
+                        className,
+                    ].filter(Boolean).join(' ')}
+                    style={{
+                        paddingLeft: hasLeft ? '2.5rem' : undefined,
+                        paddingRight: hasRight ? '2.5rem' : undefined,
+                        width: full ? '100%' : undefined,
+                        resize: Tag === 'textarea' ? 'vertical' : undefined,
+                        ...style,
+                    }}
+                    aria-invalid={error ? 'true' : undefined}
+                    aria-describedby={error || hint ? `${uid}-msg` : undefined}
+                    {...rest}
                 />
+
+                {hasRight && (
+                    <span
+                        className="input-icon"
+                        style={{ left: 'auto', right: 'var(--sp-3)' }}
+                    >
+                        {rightIcon}
+                    </span>
+                )}
             </div>
-            {error && (
-                <p className="text-xs text-red-500 mt-1 animate-fadeIn">{error}</p>
+
+            {(error || hint) && (
+                <p
+                    id={`${uid}-msg`}
+                    style={{
+                        marginTop: 'var(--sp-1)',
+                        fontSize: 'var(--text-xs)',
+                        color: error ? 'var(--color-error)' : 'var(--color-text-faint)',
+                    }}
+                    role={error ? 'alert' : undefined}
+                >
+                    {error || hint}
+                </p>
             )}
         </div>
     );
-};
+});
 
 export default Input;

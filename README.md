@@ -25,6 +25,9 @@ A digital gateway to India's cultural richness:
 * **Virtual Tours**
   Interactive exploration of historical landmarks, temples, heritage sites, and sacred spaces.
 
+* **Interactive Heritage Map**
+  A fully zoomable and pannable digital atlas of India with markers representing major heritage, monuments, and spiritual locations using React Leaflet.
+
 * **Cultural Knowledge Base**
   Information on traditions, festivals, arts, scriptures, philosophy, and regional heritage.
 
@@ -46,6 +49,9 @@ Focused on emotional balance and mindful living:
 * **Mood Tracking & Journaling**
   Track emotional patterns, reflections, and mental wellness progress.
 
+* **AI Recommendation Engine**
+  Smart suggestions based on your mood (e.g., "Feeling stressed → Suggests specific meditation, a calming temple, and a relevant quote").
+
 ---
 
 ### 🤝 Community & Interaction
@@ -60,6 +66,17 @@ Building meaningful connections:
 
 * **Personalized Dashboard**
   Monitor progress, saved content, activity history, and wellness journey.
+
+---
+
+### ⚙️ Admin Dashboard
+
+Comprehensive management interface to oversee the platform:
+
+* **Manage Heritage Locations:** Add, edit, or remove interactive map markers and cultural data.
+* **User Management:** Monitor user roles, access, and activities.
+* **Event Management:** Create and track workshops, webinars, and community programs.
+* **Post Moderation:** Oversee discussion forums to maintain a safe community space.
 
 ---
 
@@ -98,6 +115,7 @@ Building meaningful connections:
 | **Framer Motion**             | UI animations              |
 | **React Router 7**            | Navigation                 |
 | **Lucide React Icons**        | UI icons                   |
+| **React Leaflet / Leaflet**   | Interactive Maps           |
 | **D3.js / React Simple Maps** | Interactive visualizations |
 
 ---

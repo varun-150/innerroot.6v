@@ -1,0 +1,477 @@
+/* ============================================================
+   INNER ROOT — Animations & Motion System
+   60fps · transform/opacity only · respects prefers-reduced-motion
+   ============================================================ */
+
+/* ── HERO GRADIENT ───────────────────────────────────────── */
+.hero-gradient-bg {
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-gradient-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gradient-hero);
+    background-size: 250% 250%;
+    animation: heroGradient 14s ease-in-out infinite;
+}
+
+@keyframes heroGradient {
+    0% {
+        background-position: 0% 0%;
+    }
+
+    25% {
+        background-position: 100% 0%;
+    }
+
+    50% {
+        background-position: 100% 100%;
+    }
+
+    75% {
+        background-position: 0% 100%;
+    }
+
+    100% {
+        background-position: 0% 0%;
+    }
+}
+
+/* ── TEXT GRADIENT ANIMATION ─────────────────────────────── */
+@keyframes gradientShift {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+/* ── SACRED GEOMETRY ─────────────────────────────────────── */
+.sacred-geometry {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='200' cy='200' r='180' fill='none' stroke='%23d97706' stroke-width='0.5'/%3E%3Ccircle cx='200' cy='200' r='140' fill='none' stroke='%23d97706' stroke-width='0.4'/%3E%3Ccircle cx='200' cy='200' r='100' fill='none' stroke='%23d97706' stroke-width='0.4'/%3E%3Ccircle cx='200' cy='200' r='60' fill='none' stroke='%23d97706' stroke-width='0.3'/%3E%3Cpath d='M200 20 L200 380 M20 200 L380 200' stroke='%23d97706' stroke-width='0.3'/%3E%3Cpath d='M60 60 L340 340 M340 60 L60 340' stroke='%23d97706' stroke-width='0.2'/%3E%3Cpolygon points='200,40 340,280 60,280' fill='none' stroke='%23d97706' stroke-width='0.4'/%3E%3Cpolygon points='200,360 340,120 60,120' fill='none' stroke='%23d97706' stroke-width='0.4'/%3E%3Ccircle cx='200' cy='200' r='25' fill='none' stroke='%23d97706' stroke-width='0.6'/%3E%3C/svg%3E");
+    background-size: 500px 500px;
+    background-position: center;
+    animation: sacredRotate 90s linear infinite;
+}
+
+[data-theme="dark"] .sacred-geometry {
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='200' cy='200' r='180' fill='none' stroke='%23f5be4e' stroke-width='0.5'/%3E%3Ccircle cx='200' cy='200' r='140' fill='none' stroke='%23f5be4e' stroke-width='0.4'/%3E%3Ccircle cx='200' cy='200' r='100' fill='none' stroke='%23f5be4e' stroke-width='0.4'/%3E%3Ccircle cx='200' cy='200' r='60' fill='none' stroke='%23f5be4e' stroke-width='0.3'/%3E%3Cpath d='M200 20 L200 380 M20 200 L380 200' stroke='%23f5be4e' stroke-width='0.3'/%3E%3Cpath d='M60 60 L340 340 M340 60 L60 340' stroke='%23f5be4e' stroke-width='0.2'/%3E%3Cpolygon points='200,40 340,280 60,280' fill='none' stroke='%23f5be4e' stroke-width='0.4'/%3E%3Cpolygon points='200,360 340,120 60,120' fill='none' stroke='%23f5be4e' stroke-width='0.4'/%3E%3Ccircle cx='200' cy='200' r='25' fill='none' stroke='%23f5be4e' stroke-width='0.6'/%3E%3C/svg%3E");
+}
+
+@keyframes sacredRotate {
+    from {
+        transform: rotate(0deg) scale(1);
+    }
+
+    50% {
+        transform: rotate(180deg) scale(1.05);
+    }
+
+    to {
+        transform: rotate(360deg) scale(1);
+    }
+}
+
+/* ── MANDALA BACKGROUND ──────────────────────────────────── */
+.mandala-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.018;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='90' fill='none' stroke='%23d97706' stroke-width='0.5'/%3E%3Ccircle cx='100' cy='100' r='70' fill='none' stroke='%23d97706' stroke-width='0.4'/%3E%3Ccircle cx='100' cy='100' r='50' fill='none' stroke='%23d97706' stroke-width='0.4'/%3E%3Ccircle cx='100' cy='100' r='30' fill='none' stroke='%23d97706' stroke-width='0.3'/%3E%3Cpath d='M100 10 L100 190 M10 100 L190 100 M30 30 L170 170 M170 30 L30 170' stroke='%23d97706' stroke-width='0.2'/%3E%3C/svg%3E");
+    background-size: 350px 350px;
+    animation: rotateMandala 120s linear infinite;
+}
+
+@keyframes rotateMandala {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ── FLOATING PARTICLES ──────────────────────────────────── */
+.particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: var(--color-accent);
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0;
+    animation: floatParticle 10s ease-in-out infinite;
+}
+
+@keyframes floatParticle {
+
+    0%,
+    100% {
+        opacity: 0;
+        transform: translateY(0) scale(0);
+    }
+
+    15% {
+        opacity: 0.4;
+        transform: translateY(-30px) scale(1);
+    }
+
+    85% {
+        opacity: 0.1;
+        transform: translateY(-120px) scale(0.3);
+    }
+}
+
+/* ── PAGE TRANSITION ─────────────────────────────────────── */
+.page {
+    opacity: 0;
+    animation: pageFadeIn 0.45s var(--ease-out) forwards;
+}
+
+.page.active {
+    display: block;
+}
+
+@keyframes pageFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── SCROLL REVEAL ───────────────────────────────────────── */
+.reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.65s var(--ease-out), transform 0.65s var(--ease-out);
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.reveal-left {
+    opacity: 0;
+    transform: translateX(-28px);
+    transition: opacity 0.65s var(--ease-out), transform 0.65s var(--ease-out);
+}
+
+.reveal-left.active {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.reveal-right {
+    opacity: 0;
+    transform: translateX(28px);
+    transition: opacity 0.65s var(--ease-out), transform 0.65s var(--ease-out);
+}
+
+.reveal-right.active {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.reveal-scale {
+    opacity: 0;
+    transform: scale(0.94);
+    transition: opacity 0.65s var(--ease-out), transform 0.65s var(--ease-out);
+}
+
+.reveal-scale.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* ── STAGGER CHILDREN ────────────────────────────────────── */
+.stagger-children>* {
+    opacity: 0;
+    transform: translateY(18px);
+}
+
+.stagger-children.active>* {
+    animation: staggerIn 0.55s var(--ease-out) forwards;
+}
+
+.stagger-children.active>*:nth-child(1) {
+    animation-delay: 0.04s;
+}
+
+.stagger-children.active>*:nth-child(2) {
+    animation-delay: 0.08s;
+}
+
+.stagger-children.active>*:nth-child(3) {
+    animation-delay: 0.12s;
+}
+
+.stagger-children.active>*:nth-child(4) {
+    animation-delay: 0.16s;
+}
+
+.stagger-children.active>*:nth-child(5) {
+    animation-delay: 0.20s;
+}
+
+.stagger-children.active>*:nth-child(6) {
+    animation-delay: 0.24s;
+}
+
+.stagger-children.active>*:nth-child(7) {
+    animation-delay: 0.28s;
+}
+
+.stagger-children.active>*:nth-child(8) {
+    animation-delay: 0.32s;
+}
+
+.stagger-children.active>*:nth-child(9) {
+    animation-delay: 0.36s;
+}
+
+.stagger-children.active>*:nth-child(10) {
+    animation-delay: 0.40s;
+}
+
+@keyframes staggerIn {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── UTILITY ANIMATIONS ──────────────────────────────────── */
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.animate-float {
+    animation: float 4s ease-in-out infinite;
+}
+
+@keyframes pulseSlow {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: scale(0.97);
+    }
+}
+
+.animate-pulse-slow {
+    animation: pulseSlow 4s ease-in-out infinite;
+}
+
+@keyframes spinSlow {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin-slow {
+    animation: spinSlow 8s linear infinite;
+}
+
+@keyframes breathe {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+
+    50% {
+        transform: scale(1.04);
+        opacity: 0.5;
+    }
+}
+
+.animate-breathe {
+    animation: breathe 6s ease-in-out infinite;
+}
+
+@keyframes bounce-gentle {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+.animate-bounce-gentle {
+    animation: bounce-gentle 2s ease-in-out infinite;
+}
+
+@keyframes ping {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+
+    75%,
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+.animate-ping {
+    animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn var(--duration-normal) var(--ease-out) forwards;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-slide-up {
+    animation: slideUp var(--duration-normal) var(--ease-spring) forwards;
+}
+
+/* Shimmer alias (legacy compat) */
+@keyframes shimmer {
+    0% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.animate-shimmer {
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.15) 50%, transparent 100%);
+    background-size: 800px 100%;
+    animation: shimmer 2.5s infinite linear;
+}
+
+/* ── PARALLAX WRAPPER ────────────────────────────────────── */
+.parallax-section {
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+.parallax-layer {
+    will-change: transform;
+}
+
+/* ── LOADING SPINNER ─────────────────────────────────────── */
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--color-border);
+    border-top-color: var(--color-accent);
+    border-radius: 50%;
+    animation: spinSlow 0.7s linear infinite;
+    display: inline-block;
+}
+
+.spinner-lg {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+}
+
+/* ── REDUCED MOTION ──────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+
+    .reveal,
+    .reveal-left,
+    .reveal-right,
+    .reveal-scale,
+    .stagger-children>*,
+    .stagger-children.active>* {
+        opacity: 1 !important;
+        transform: none !important;
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .mandala-bg,
+    .sacred-geometry,
+    .animate-float,
+    .animate-pulse-slow,
+    .animate-spin-slow,
+    .animate-breathe,
+    .animate-bounce-gentle,
+    .animate-ping,
+    .hero-gradient-bg::before {
+        animation: none !important;
+    }
+
+    .particle {
+        display: none;
+    }
+}

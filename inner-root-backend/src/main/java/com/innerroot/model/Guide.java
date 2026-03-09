@@ -1,6 +1,7 @@
 package com.innerroot.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Entity
@@ -15,10 +16,12 @@ public class Guide {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @NotBlank
     private String name;
 
     private String specialty;
 
+    @NotBlank
     private String status; // e.g., "online", "away"
 
     private String imageUrl; // Optional, for future use

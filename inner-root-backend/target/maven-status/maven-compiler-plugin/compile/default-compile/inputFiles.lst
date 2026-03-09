@@ -1,7 +1,11 @@
 E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\config\CorsConfig.java
+E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\config\DataInitializer.java
 E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\config\DataSeeder.java
+E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\config\InputSanitizationAdvice.java
 E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\config\SecurityConfig.java
+E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\config\WebSocketConfig.java
 E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\controller\AuthController.java
+E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\controller\ChatGatewayController.java
 E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\controller\CommunityController.java
 E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\controller\CultureController.java
 E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\controller\EventController.java
@@ -13,6 +17,9 @@ E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\controller\MoodContro
 E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\controller\WellnessController.java
 E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\controller\WisdomController.java
 E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\dto\AuthResponse.java
+E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\dto\ChatMessage.java
+E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\dto\ChatResponse.java
+E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\dto\CommunityPostRequest.java
 E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\dto\GoogleAuthRequest.java
 E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\dto\LoginRequest.java
 E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\dto\SignupRequest.java
@@ -40,5 +47,10 @@ E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\repository\WisdomQuot
 E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\security\CustomUserDetailsService.java
 E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\security\JwtAuthFilter.java
 E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\security\JwtTokenProvider.java
+E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\security\RateLimitingFilter.java
 E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\service\AuthService.java
+E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\service\chat\AIProcessingService.java
+E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\service\chat\AutomationEngineService.java
+E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\service\chat\IntentDetectionService.java
+E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\service\chat\KnowledgeRetrievalService.java
 E:\v2 inner\inner-root-backend\src\main\java\com\innerroot\service\GoogleOAuthService.java

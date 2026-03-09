@@ -1,212 +1,163 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { geoMercator, geoPath } from 'd3-geo';
-import { motion } from 'framer-motion';
-import { Tooltip } from 'react-tooltip';
-import 'react-tooltip/dist/react-tooltip.css';
-// Removed static import
+import React, { useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import { Link } from 'react-router-dom';
 
-// Using local GeoJSON file downloaded to public/data/india.json
-const INDIA_GEO_JSON = "/data/india.json";
+// Fix for default marker icons in React Leaflet with Vite
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
-const HeritageMap = ({ tours = [] }) => {
-    const [geography, setGeography] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const containerRef = useRef(null);
-    const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
-    const [hoveredState, setHoveredState] = useState(null);
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconUrl: markerIcon,
+    iconRetinaUrl: markerIcon2x,
+    shadowUrl: markerShadow,
+});
 
-    // Handle resize
+// Example heritage locations data
+const heritageLocations = [
+    {
+        id: 1,
+        name: 'Varanasi',
+        lat: 25.3176,
+        lng: 82.9739,
+        description: 'Spiritual capital of India, known for its ghats and temples along the Ganges.',
+        image: 'https://images.unsplash.com/photo-1560384734-b91c0e39aee4?auto=format&fit=crop&q=80&w=400',
+        type: 'Spiritual'
+    },
+    {
+        id: 2,
+        name: 'Kedarnath Temple',
+        lat: 30.7352,
+        lng: 79.0669,
+        description: 'Ancient Himalayan pilgrimage site dedicated to Lord Shiva.',
+        image: 'https://images.unsplash.com/photo-1626084050215-6f81e3381fa1?auto=format&fit=crop&q=80&w=400',
+        type: 'Temple'
+    },
+    {
+        id: 3,
+        name: 'Rameshwaram Temple',
+        lat: 9.2881,
+        lng: 79.3174,
+        description: 'One of the Char Dhams, famous for its long corridor and sacred teerthams.',
+        image: 'https://images.unsplash.com/photo-1627885740411-bcbf813426e2?auto=format&fit=crop&q=80&w=400',
+        type: 'Temple'
+    },
+    {
+        id: 4,
+        name: 'Hampi',
+        lat: 15.3350,
+        lng: 76.4600,
+        description: 'UNESCO World Heritage Site with mesmerizing ruins of the Vijayanagara Empire.',
+        image: 'https://images.unsplash.com/photo-1600008581786-9acab420aab1?auto=format&fit=crop&q=80&w=400',
+        type: 'Historical'
+    },
+    {
+        id: 5,
+        name: 'Konark Sun Temple',
+        lat: 19.8876,
+        lng: 86.0945,
+        description: 'Architectural marvel shaped like a giant chariot, dedicated to the Sun God.',
+        image: 'https://images.unsplash.com/photo-1596409848520-22709e8647e3?auto=format&fit=crop&q=80&w=400',
+        type: 'Monument'
+    },
+    {
+        id: 6,
+        name: 'Ajanta & Ellora Caves',
+        lat: 20.5519,
+        lng: 75.7033,
+        description: 'Ancient rock-cut caves featuring exquisite Buddhist and Hindu art.',
+        image: 'https://images.unsplash.com/photo-1610056156360-318e47f2ef87?auto=format&fit=crop&q=80&w=400',
+        type: 'Historical'
+    },
+    {
+        id: 7,
+        name: 'Bodh Gaya',
+        lat: 24.6961,
+        lng: 84.9869,
+        description: 'The sacred place where Gautama Buddha attained enlightenment.',
+        image: 'https://images.unsplash.com/photo-1588691503920-00ad7fa91666?auto=format&fit=crop&q=80&w=400',
+        type: 'Spiritual'
+    }
+];
+
+// Custom map zoom controller
+const MapController = ({ selectedLocation }) => {
+    const map = useMap();
     useEffect(() => {
-        const handleResize = () => {
-            if (containerRef.current) {
-                const { width } = containerRef.current.getBoundingClientRect();
-                setDimensions({ width, height: width * 0.8 }); // Maintain aspect ratio
-            }
-        };
-
-        window.addEventListener('resize', handleResize);
-        handleResize(); // Initial call
-
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-    // Fetch Map Data
-    useEffect(() => {
-        fetch(INDIA_GEO_JSON)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Failed to load map data: ${response.status} ${response.statusText}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Determine if GeoJSON (direct features) or TopoJSON
-                let features;
-                if (data.type === 'FeatureCollection') {
-                    features = data.features;
-                } else if (data.type === 'Topology') {
-                    // Fallback for TopoJSON (though we expect GeoJSON)
-                    // features = feature(data, Object.keys(data.objects)[0]).features;
-                    throw new Error("Unexpected TopoJSON format. Expected GeoJSON.");
-                } else {
-                    throw new Error("Unknown map data format");
-                }
-
-                setGeography(features);
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error("Map Load Error:", err);
-                setError(err.message);
-                setLoading(false);
+        if (selectedLocation) {
+            map.flyTo([selectedLocation.lat, selectedLocation.lng], 12, {
+                duration: 1.5
             });
-    }, []);
+        }
+    }, [selectedLocation, map]);
+    return null;
+};
 
-    // Memoize the projection and path generator
-    const { pathGenerator, projection } = useMemo(() => {
-        if (!geography || !dimensions.width) return { pathGenerator: null, projection: null };
-
-        // Manual projection for India - centered and scaled to MAXIMIZE visibility
-        const proj = geoMercator()
-            .center([80, 23]) // Center on central India
-            .scale(dimensions.width * 1.6) // Boost scale to fit box (approx 1300-1500 for standard screens)
-            .translate([dimensions.width / 2, dimensions.height / 2]);
-
-        const pathGen = geoPath().projection(proj);
-
-        return { pathGenerator: pathGen, projection: proj };
-    }, [geography, dimensions]);
-
-    if (loading) {
-        return (
-            <div className="w-full h-[600px] flex items-center justify-center bg-black/20 rounded-xl border border-white/10 backdrop-blur-sm">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-heritage-gold"></div>
-                <span className="ml-3 text-white/70">Loading Map...</span>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="w-full h-[600px] flex flex-col items-center justify-center bg-black/20 rounded-xl border border-white/10 backdrop-blur-sm p-6 text-center">
-                <div className="text-4xl mb-4">🗺️</div>
-                <h3 className="text-xl font-bold text-white mb-2">Unable to load map data</h3>
-                <p className="text-white/50 mb-4">{error}</p>
-                <div className="text-sm text-white/30">Check your internet connection or GitHub access.</div>
-            </div>
-        );
-    }
+const HeritageMap = ({ onLocationSelect, selectedLocation, isMobile }) => {
+    // Center of India
+    const defaultCenter = [22.3511, 78.6677];
+    const defaultZoom = isMobile ? 4 : 5;
 
     return (
-        <div
-            ref={containerRef}
-            className="w-full h-[500px] md:h-[600px] bg-black/20 rounded-xl overflow-hidden relative border border-white/10 backdrop-blur-sm shadow-2xl"
-        >
-            <svg width={dimensions.width} height={dimensions.height} viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}>
-                <defs>
-                    <linearGradient id="mapGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#2D3748" />
-                        <stop offset="100%" stopColor="#1A202C" />
-                    </linearGradient>
-                </defs>
+        <div className="h-full w-full rounded-xl overflow-hidden shadow-2xl border border-white/10 relative z-0">
+            <MapContainer
+                center={defaultCenter}
+                zoom={defaultZoom}
+                className="h-full w-full outline-none"
+                scrollWheelZoom={true}
+            >
+                <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    className="map-tiles grayscale opacity-90 sepia-[0.3] hue-rotate-[-30deg] invert-[0.9]"
+                />
 
-                {/* Map Features (States) */}
-                <g className="map-features">
-                    {geography && geography.length > 0 && pathGenerator ? (
-                        geography.map((feature, i) => (
-                            <motion.path
-                                key={`path-${i}`}
-                                d={pathGenerator(feature)}
-                                initial={{ opacity: 0, pathLength: 0 }}
-                                animate={{ opacity: 1, pathLength: 1 }}
-                                transition={{ duration: 1, delay: i * 0.005 }}
-                                fill={hoveredState === i ? "#4A5568" : "rgba(255,255,255,0.05)"} // Slight fill for presence
-                                stroke={hoveredState === i ? "#F6E05E" : "#E2E8F0"}
-                                strokeWidth={hoveredState === i ? "1.5" : "0.75"}
-                                onMouseEnter={() => setHoveredState(i)}
-                                onMouseLeave={() => setHoveredState(null)}
-                                style={{ cursor: "pointer", filter: hoveredState === i ? "drop-shadow(0px 0px 8px rgba(246, 224, 94, 0.5))" : "none" }}
-                            />
-                        ))
-                    ) : (
-                        <text x="50%" y="50%" textAnchor="middle" fill="white">
-                            {!geography ? "Loading geography..." : !pathGenerator ? "Preparing projection..." : "No map features found"}
-                        </text>
-                    )}
-                </g>
-
-                {/* Tour Markers */}
-                {projection && tours.map((tour) => {
-                    const coords = tour.coordinates;
-                    if (!coords || coords.length !== 2) return null;
-
-                    const [x, y] = projection(coords);
-                    if (isNaN(x) || isNaN(y)) return null;
-
-                    return (
-                        <g key={tour.id} transform={`translate(${x}, ${y})`}>
-                            <motion.g
-                                initial={{ scale: 0, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                transition={{
-                                    type: "spring",
-                                    stiffness: 260,
-                                    damping: 20,
-                                    delay: 1 + Math.random() * 0.5
-                                }}
-                                whileHover={{ scale: 1.5 }}
-                            >
-                                {/* Glow Effect */}
-                                <circle r={12} fill="rgb(217 119 6 / 0.2)" className="animate-pulse" />
-                                {/* Pin */}
-                                <circle
-                                    r={5}
-                                    fill="#D97706"
-                                    stroke="#fff"
-                                    strokeWidth={1.5}
-                                    data-tooltip-id="map-tooltip"
-                                    data-tooltip-content={`${tour.name || tour.title} - ${tour.location}`}
-                                    className="cursor-pointer focus:outline-none hover:stroke-heritage-gold"
-                                    onClick={() => {
-                                        const card = document.getElementById(`tour-card-${tour.id}`);
-                                        if (card) {
-                                            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                            card.classList.add('ring-4', 'ring-heritage-gold', 'ring-offset-2');
-                                            setTimeout(() => card.classList.remove('ring-4', 'ring-ring-heritage-gold', 'ring-offset-2'), 2000);
-                                        }
-                                    }}
-                                />
-                            </motion.g>
-                        </g>
-                    );
-                })}
-            </svg>
-
-            {/* Tooltip */}
-            <Tooltip
-                id="map-tooltip"
-                style={{
-                    backgroundColor: "#1A202C",
-                    color: "#fff",
-                    padding: "8px 12px",
-                    borderRadius: "8px",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    zIndex: 50,
-                    fontSize: "0.875rem",
-                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)"
-                }}
-            />
-
-            <div className="absolute bottom-4 right-4 bg-black/80 p-4 rounded-xl backdrop-blur-md border border-white/10 max-w-xs shadow-xl">
-                <h4 className="text-heritage-gold font-display font-bold mb-1 flex items-center gap-2">
-                    <span className="text-xl">🗺️</span> Explore India’s Heritage
-                </h4>
-                <p className="text-xs text-gray-300 leading-relaxed">
-                    Tap the markers to explore monuments, culture, and timeless stories across the map.
-                </p>
-            </div>
+                {heritageLocations.map((location) => (
+                    <Marker
+                        key={location.id}
+                        position={[location.lat, location.lng]}
+                        eventHandlers={{
+                            click: () => {
+                                if (onLocationSelect) onLocationSelect(location);
+                            },
+                        }}
+                    >
+                        <Popup className="heritage-popup custom-popup">
+                            <div className="w-56 overflow-hidden rounded-lg bg-slate-900 border border-amber-500/30 text-slate-200">
+                                <div className="h-28 overflow-hidden relative">
+                                    <img
+                                        src={location.image}
+                                        alt={location.name}
+                                        className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute top-2 right-2 px-2 py-0.5 bg-amber-600/90 text-white text-xs rounded-full font-medium">
+                                        {location.type}
+                                    </div>
+                                </div>
+                                <div className="p-3">
+                                    <h3 className="font-serif text-lg font-bold text-amber-500 mb-1">{location.name}</h3>
+                                    <p className="text-sm text-slate-300 mb-3 line-clamp-2 leading-tight">
+                                        {location.description}
+                                    </p>
+                                    <Link
+                                        to={`/explore?location=${location.id}`}
+                                        className="block w-full text-center py-1.5 px-3 bg-amber-600 hover:bg-amber-500 text-white text-sm rounded transition-colors duration-300 font-medium"
+                                    >
+                                        Explore Details
+                                    </Link>
+                                </div>
+                            </div>
+                        </Popup>
+                    </Marker>
+                ))}
+                <MapController selectedLocation={selectedLocation} />
+            </MapContainer>
         </div>
     );
 };
 
+export { heritageLocations };
 export default HeritageMap;

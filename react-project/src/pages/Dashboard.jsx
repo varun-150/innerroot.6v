@@ -1,396 +1,665 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import divineSparkImg from '../assets/divine-spark.png';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { moodAPI } from '../services/api';
-import { Reveal, Stagger } from '../components/Reveal';
-import Button from '../components/ui/Button';
-import Card from '../components/ui/Card';
+import React, { useState, useRef, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
 import {
-    Flame, Trophy, Star, BookOpen, Sparkles, Heart,
-    ChevronRight, Award, Zap, Target, Calendar,
-    TrendingUp, CheckCircle2, Lock, ArrowRight,
-    Search, Compass, Play
+    LayoutDashboard, Compass, Heart, Users, BookOpen,
+    Bell, Settings, LogOut, ChevronDown, Calendar,
+    TrendingUp, Brain, Flame, Target, ArrowRight,
+    Sun, Moon, Filter, MapPin, Sparkles,
+    Activity, BarChart3, ChevronLeft, ChevronRight, Database,
+    Clock, Star, User, Camera, Mail, Shield, Trash2
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import SEO from '../components/ui/SEO';
+import { moodAPI } from '../services/api';
 
-const interestCategories = [
+// ===== Sidebar Nav Items =====
+const sidebarItems = [
+    { icon: LayoutDashboard, label: 'Overview', id: 'overview' },
+    { icon: Compass, label: 'Heritage', id: 'heritage' },
+    { icon: Heart, label: 'Wellness', id: 'wellness' },
+    { icon: Users, label: 'Community', id: 'community' },
+    { icon: BookOpen, label: 'Library', id: 'library' },
+    { icon: User, label: 'Profile', id: 'profile' },
+    { icon: Settings, label: 'Settings', id: 'settings' },
+];
+
+/* ─── Helper ──────────────────────────────────────────────── */
+const getInitials = (name) => {
+    if (!name) return 'U';
+    return name.trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
+};
+
+// ===== KPI Data =====
+const kpiData = [
     {
-        id: 'yoga',
-        label: 'Yoga & Meditation',
-        emoji: '🧘',
-        color: 'text-emerald-600',
-        bgGlow: 'bg-emerald-500/10',
-        description: 'Asanas, mindfulness',
+        label: 'Emotional Stability',
+        value: 82,
+        change: '+5%',
+        icon: Brain,
+        color: '#d97706',
+        gradient: 'linear-gradient(135deg, #fef7ec, #fde8c8)',
+        darkGradient: 'linear-gradient(135deg, rgba(217,119,6,0.12), rgba(217,119,6,0.05))',
     },
     {
-        id: 'heritage',
-        label: 'Heritage & Culture',
-        emoji: '🏛️',
-        color: 'text-amber-600',
-        bgGlow: 'bg-amber-500/10',
-        description: 'Temples, traditions',
+        label: 'Meditation Streak',
+        value: 14,
+        unit: 'days',
+        change: '+2',
+        icon: Flame,
+        color: '#22c55e',
+        gradient: 'linear-gradient(135deg, #f0fdf4, #dcfce7)',
+        darkGradient: 'linear-gradient(135deg, rgba(34,197,94,0.12), rgba(34,197,94,0.05))',
     },
     {
-        id: 'texts',
-        label: 'Sacred Texts',
-        emoji: '📜',
-        color: 'text-indigo-600',
-        bgGlow: 'bg-indigo-500/10',
-        description: 'Vedas, Gita, scriptures',
+        label: 'Reflections Done',
+        value: 87,
+        unit: '%',
+        change: '+12%',
+        icon: Target,
+        color: '#7c3aed',
+        gradient: 'linear-gradient(135deg, #f5f3ff, #ede9fe)',
+        darkGradient: 'linear-gradient(135deg, rgba(124,58,237,0.12), rgba(124,58,237,0.05))',
     },
     {
-        id: 'wellness',
-        label: 'Holistic Wellness',
-        emoji: '🌿',
-        color: 'text-rose-600',
-        bgGlow: 'bg-rose-500/10',
-        description: 'Ayurveda, healing',
+        label: 'Cultural Journeys',
+        value: 24,
+        change: '+3',
+        icon: MapPin,
+        color: '#c9a227',
+        gradient: 'linear-gradient(135deg, #fefce8, #fef9c3)',
+        darkGradient: 'linear-gradient(135deg, rgba(201,162,39,0.12), rgba(201,162,39,0.05))',
     },
 ];
 
-const recommendationsMap = {
-    yoga: [
-        { title: 'Surya Namaskar', desc: 'Master the 12 sun salutation poses', icon: '☀️', link: '/wellness', tag: 'Beginner' },
-        { title: 'Pranayama Master', desc: 'Ancient techniques for clarity', icon: '🌬️', link: '/wellness', tag: 'Popular' },
-    ],
-    heritage: [
-        { title: 'Virtual Taj Mahal', desc: 'Explore the wonder of the world', icon: '🕌', link: '/tours', tag: 'Featured' },
-        { title: 'Festivals of India', desc: 'Diwali, Holi, and more', icon: '🎆', link: '/explore', tag: 'Culture' },
-    ],
-    texts: [
-        { title: 'Bhagavad Gita', desc: '700 verses of divine wisdom', icon: '📖', link: '/library', tag: 'Essential' },
-        { title: 'Ancient Vedas', desc: 'Oldest Vedic Sanskrit texts', icon: '📜', link: '/library', tag: 'Deep Dive' },
-    ],
-    wellness: [
-        { title: 'Ayurvedic Diet', desc: 'Eat according to your dosha', icon: '🍵', link: '/wellness', tag: 'Health' },
-        { title: 'Om Chanting', desc: 'Primordial sound meditation', icon: '🔔', link: '/wellness', tag: 'New' },
-    ],
-};
-
-const allBadges = [
-    { id: 'first_login', name: 'First Step', emoji: '👣', desc: 'Logged in for the first time', unlocked: true },
-    { id: 'explorer', name: 'Explorer', emoji: '🧭', desc: 'Visited 3 sections', unlocked: true },
-    { id: 'streak_3', name: '3-Day Streak', emoji: '🔥', desc: '3-day streak', unlocked: true },
-    { id: 'streak_7', name: 'Week Warrior', emoji: '⚡', desc: '7-day streak', unlocked: false },
-    { id: 'bookworm', name: 'Bookworm', emoji: '📚', desc: 'Read 5 texts', unlocked: false },
-    { id: 'culture_buff', name: 'Culture Buff', emoji: '🎭', desc: 'Explored culture', unlocked: true },
+// ===== Mood Trend (last 7 days) =====
+const moodData = [
+    { day: 'Mon', value: 65, label: 'Calm' },
+    { day: 'Tue', value: 72, label: 'Centered' },
+    { day: 'Wed', value: 58, label: 'Anxious' },
+    { day: 'Thu', value: 80, label: 'Peaceful' },
+    { day: 'Fri', value: 75, label: 'Focused' },
+    { day: 'Sat', value: 88, label: 'Joyful' },
+    { day: 'Sun', value: 85, label: 'Grateful' },
 ];
 
-const generateStreakData = () => {
-    const days = [];
-    const today = new Date();
-    for (let i = 29; i >= 0; i--) {
-        const d = new Date(today);
-        d.setDate(d.getDate() - i);
-        const completed = i < 3 || (i >= 5 && i <= 8) || (i >= 12 && i <= 16) || (i >= 20 && i <= 23);
-        days.push({
-            date: d,
-            dayNum: d.getDate(),
-            completed,
-        });
-    }
-    return days;
-};
+// ===== Weekly Activity =====
+const weeklyActivity = [
+    { day: 'Mon', meditation: 20, reflection: 15, heritage: 10 },
+    { day: 'Tue', meditation: 30, reflection: 10, heritage: 25 },
+    { day: 'Wed', meditation: 15, reflection: 20, heritage: 5 },
+    { day: 'Thu', meditation: 25, reflection: 25, heritage: 20 },
+    { day: 'Fri', meditation: 35, reflection: 10, heritage: 15 },
+    { day: 'Sat', meditation: 40, reflection: 30, heritage: 35 },
+    { day: 'Sun', meditation: 30, reflection: 25, heritage: 30 },
+];
 
-const Dashboard = () => {
-    const { user, isAuthenticated } = useAuth();
-    const [selectedInterests, setSelectedInterests] = useState(() => {
-        const saved = localStorage.getItem('innerRootInterests');
-        return saved ? JSON.parse(saved) : ['yoga'];
-    });
-    const [streakDays] = useState(generateStreakData);
-    const [moodHistory, setMoodHistory] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+// ===== Mini Line Chart =====
+const MiniLineChart = ({ data, color }) => {
+    const maxVal = Math.max(...data.map(d => d.value));
+    const minVal = Math.min(...data.map(d => d.value));
+    const range = maxVal - minVal || 1;
+    const width = 100;
+    const height = 50;
+    const padding = 4;
+    // Generate a safe ID from color (strip non-alphanumeric chars)
+    const gradId = 'grad' + color.replace(/[^a-zA-Z0-9]/g, '');
 
-    useEffect(() => {
-        if (isAuthenticated) {
-            fetchDashboardData();
-        } else {
-            setIsLoading(false);
-        }
-    }, [isAuthenticated]);
+    const points = data.map((d, i) => ({
+        x: padding + (i / (data.length - 1)) * (width - padding * 2),
+        y: padding + (1 - (d.value - minVal) / range) * (height - padding * 2),
+    }));
 
-    const fetchDashboardData = async () => {
-        try {
-            const data = await moodAPI.getAll();
-            setMoodHistory(data);
-        } catch (err) {
-            console.error('Failed to fetch dashboard data:', err);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const pathD = points.map((p, i) => {
+        if (i === 0) return `M ${p.x} ${p.y}`;
+        const prev = points[i - 1];
+        const cpX = (prev.x + p.x) / 2;
+        return `C ${cpX} ${prev.y} ${cpX} ${p.y} ${p.x} ${p.y}`;
+    }).join(' ');
 
-    const currentStreakCount = useMemo(() => {
-        if (!moodHistory.length) return 3; // Fallback for demo if no history
-        return Math.min(moodHistory.length, 7);
-    }, [moodHistory]);
-
-    const toggleInterest = (id) => {
-        setSelectedInterests(prev => {
-            const next = prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id];
-            if (next.length === 0) return prev;
-            localStorage.setItem('innerRootInterests', JSON.stringify(next));
-            return next;
-        });
-    };
-
-    const recommendations = selectedInterests
-        .flatMap(interest => recommendationsMap[interest] || [])
-        .slice(0, 8);
-
-    const learningProgress = [
-        { category: 'Festivals', progress: 80, completed: 4, total: 5, color: 'bg-heritage-gold' },
-        { category: 'Arts & Dance', progress: 60, completed: 3, total: 5, color: 'bg-heritage-teal' },
-        { category: 'Traditions', progress: 40, completed: 2, total: 5, color: 'bg-rose-500' },
-        { category: 'Scriptures', progress: 100, completed: 5, total: 5, color: 'bg-emerald-500' },
-    ];
-
-    const currentStreak = 3;
-    const bestStreak = 8;
-    const totalSessions = 42;
-    const unlockedBadgesCount = allBadges.filter(b => b.unlocked).length;
+    const areaD = pathD + ` L ${points[points.length - 1].x} ${height} L ${points[0].x} ${height} Z`;
 
     return (
-        <div className="min-h-screen py-12 lg:py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent to-[var(--bg)]/10">
-            <div className="max-w-7xl mx-auto">
+        <svg viewBox={`0 0 ${width} ${height}`} className="w-full" style={{ height: '100%' }}>
+            <defs>
+                <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={color} stopOpacity="0.2" />
+                    <stop offset="100%" stopColor={color} stopOpacity="0" />
+                </linearGradient>
+            </defs>
+            <path d={areaD} fill={`url(#${gradId})`} />
+            <path d={pathD} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" />
+            <circle cx={points[points.length - 1].x} cy={points[points.length - 1].y} r="3" fill={color} />
+        </svg>
+    );
+};
 
-                {/* Header Section */}
-                <Reveal className="text-center mb-16">
-                    <span className="inline-block px-4 py-1 rounded-full bg-heritage-gold/20 text-heritage-gold font-bold text-xs uppercase tracking-widest mb-6 border border-heritage-gold/20">Citizen of Inner Root</span>
-                    <h1 className="font-display text-4xl md:text-6xl font-bold text-[var(--fg)] mb-6 tracking-tight">
-                        Namaste, {user?.name ? user.name.split(' ')[0] : 'Seeker'} ✨
-                    </h1>
-                    <p className="text-[var(--muted)] max-w-2xl mx-auto text-xl leading-relaxed italic">
-                        "The journey of a thousand miles begins with a single step towards clarity."
-                    </p>
-                </Reveal>
+// ===== Bar Chart =====
+const BarChart = ({ data }) => {
+    const maxTotal = Math.max(...data.map(d => d.meditation + d.reflection + d.heritage));
+    return (
+        <div className="flex items-end gap-3 h-44">
+            {data.map((d, i) => {
+                const total = d.meditation + d.reflection + d.heritage;
+                const pct = (total / maxTotal) * 100;
+                return (
+                    <div key={d.day} className="flex-1 flex flex-col items-center gap-2">
+                        <div className="w-full relative rounded-t-md overflow-hidden" style={{ height: `${pct}%`, minHeight: 8 }}>
+                            <div className="absolute bottom-0 w-full" style={{ height: `${(d.meditation / total) * 100}%`, background: 'var(--accent)', borderRadius: '4px 4px 0 0' }} />
+                            <div className="absolute w-full" style={{ bottom: `${(d.meditation / total) * 100}%`, height: `${(d.reflection / total) * 100}%`, background: 'var(--forest)', opacity: 0.7 }} />
+                            <div className="absolute w-full" style={{ bottom: `${((d.meditation + d.reflection) / total) * 100}%`, height: `${(d.heritage / total) * 100}%`, background: '#7c3aed', opacity: 0.5 }} />
+                        </div>
+                        <span className="text-[10px] font-medium" style={{ color: 'var(--text-tertiary)' }}>{d.day}</span>
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
 
-                {/* Quick Stats Grid */}
-                <Stagger className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16 px-4">
-                    {[
-                        { icon: Flame, value: currentStreakCount, label: 'Day Streak', color: 'text-orange-500', bg: 'bg-orange-500/10' },
-                        { icon: Trophy, value: bestStreak, label: 'Best Streak', color: 'text-heritage-gold', bg: 'bg-heritage-gold/10' },
-                        { icon: Target, value: totalSessions, label: 'Sessions', color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-                        { icon: Award, value: `${unlockedBadgesCount}/${allBadges.length}`, label: 'Badges Earned', color: 'text-indigo-500', bg: 'bg-indigo-500/10' },
-                    ].map(({ icon: Icon, ...stat }, i) => (
-                        <Card key={i} className={`!p-8 text-center !rounded-[32px] border-[var(--border)] shadow-xl hover:-translate-y-2 transition-transform h-full flex flex-col items-center justify-center`}>
-                            <div className={`w-14 h-14 ${stat.bg} ${stat.color} rounded-2xl flex items-center justify-center mb-6 shadow-inner`}>
-                                <Icon className="w-8 h-8" />
+// ===== Dashboard Component =====
+const Dashboard = () => {
+    const navigate = useNavigate();
+    const { user, logout } = useAuth();
+    const [reflectionCount, setReflectionCount] = useState(0);
+    const [activeSection, setActiveSection] = useState('overview');
+    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [dateRange, setDateRange] = useState('7days');
+    const [isDark, setIsDark] = useState(false);
+    const ref = useRef(null);
+    const inView = useInView(ref, { once: true });
+
+    const displayName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Seeker';
+    const [profileName, setProfileName] = useState(displayName);
+    const [profileEmail, setProfileEmail] = useState(user?.email || '');
+    const [profileSaved, setProfileSaved] = useState(false);
+
+    useEffect(() => {
+        if (user) {
+            setProfileName(user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Seeker');
+            setProfileEmail(user.email || '');
+        }
+    }, [user]);
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
+
+    const handleSaveProfile = (e) => {
+        e.preventDefault();
+        setProfileSaved(true);
+        setTimeout(() => setProfileSaved(false), 2500);
+    };
+
+    /* displayInitials helper */
+    const displayInitials = getInitials(displayName);
+
+    useEffect(() => {
+        moodAPI.getAll().then(data => {
+            if (data) setReflectionCount(data.length);
+        }).catch(err => console.error('Failed to fetch reflection count:', err));
+
+        setIsDark(document.body.dataset.theme === 'dark');
+        const observer = new MutationObserver(() => {
+            setIsDark(document.body.dataset.theme === 'dark');
+        });
+        observer.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+        return () => observer.disconnect();
+    }, []);
+
+    return (
+        <>
+            <SEO title="Dashboard — Inner Root" description="Your personal wellness and heritage dashboard." />
+
+            <div className="flex min-h-screen" style={{ background: 'var(--bg-primary)', paddingTop: 0, marginTop: '-1rem' }}>
+                {/* ===== LEFT SIDEBAR ===== */}
+                <aside
+                    className={`hidden lg:flex flex-col fixed left-0 top-0 bottom-0 z-30 transition-all duration-300 ${sidebarOpen ? 'w-[260px]' : 'w-[72px]'
+                        }`}
+                    style={{
+                        background: 'var(--bg-secondary)',
+                        borderRight: '1px solid var(--border-primary)',
+                    }}
+                >
+                    {/* Sidebar Header */}
+                    <div className="flex items-center gap-3 px-5 h-16 border-b" style={{ borderColor: 'var(--border-primary)' }}>
+                        <div
+                            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                            style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent-hover))' }}
+                        >
+                            <span className="text-white font-bold text-sm" style={{ fontFamily: 'var(--font-display)' }}>IR</span>
+                        </div>
+                        {sidebarOpen && (
+                            <span className="text-base font-semibold truncate" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
+                                Inner Root
+                            </span>
+                        )}
+                    </div>
+
+                    {/* Sidebar Nav */}
+                    <nav className="flex-1 py-4 px-3 overflow-y-auto">
+                        <div className="space-y-1">
+                            {sidebarItems.map((item) => (
+                                <button
+                                    key={item.id}
+                                    onClick={() => setActiveSection(item.id)}
+                                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${sidebarOpen ? '' : 'justify-center'
+                                        }`}
+                                    style={{
+                                        color: activeSection === item.id ? 'var(--accent)' : 'var(--text-secondary)',
+                                        background: activeSection === item.id ? 'var(--accent-soft)' : 'transparent',
+                                    }}
+                                    title={item.label}
+                                >
+                                    <item.icon size={20} strokeWidth={activeSection === item.id ? 2 : 1.5} />
+                                    {sidebarOpen && <span>{item.label}</span>}
+                                </button>
+                            ))}
+                        </div>
+                    </nav>
+
+                    {/* Sidebar Toggle */}
+                    <div className="px-3 py-4 border-t" style={{ borderColor: 'var(--border-primary)' }}>
+                        <button
+                            onClick={() => setSidebarOpen(!sidebarOpen)}
+                            className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-medium transition-all duration-200"
+                            style={{ color: 'var(--text-tertiary)', background: 'var(--accent-soft)' }}
+                        >
+                            {sidebarOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+                            {sidebarOpen && 'Collapse'}
+                        </button>
+                    </div>
+                </aside>
+
+                {/* ===== MAIN CONTENT ===== */}
+                <div
+                    className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'lg:ml-[260px]' : 'lg:ml-[72px]'}`}
+                >
+                    {/* Top Bar */}
+                    <div
+                        className="sticky top-16 lg:top-0 z-20 flex items-center justify-between px-6 lg:px-8 h-16"
+                        style={{
+                            background: 'var(--bg-glass-strong)',
+                            backdropFilter: 'blur(20px)',
+                            WebkitBackdropFilter: 'blur(20px)',
+                            borderBottom: '1px solid var(--border-secondary)',
+                        }}
+                    >
+                        <div className="flex items-center gap-4">
+                            <div>
+                                <h1 className="text-lg font-semibold" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
+                                    Welcome Back ✨
+                                </h1>
+                                <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                                    Your inner journey continues
+                                </p>
                             </div>
-                            <div className="text-4xl font-bold text-[var(--fg)] mb-1 tabular-nums">{stat.value}</div>
-                            <div className="text-[10px] font-bold text-[var(--muted)] uppercase tracking-widest">{stat.label}</div>
-                        </Card>
-                    ))}
-                </Stagger>
+                        </div>
 
-                <div className="grid lg:grid-cols-3 gap-10 px-4">
+                        <div className="flex items-center gap-3">
+                            <Link
+                                to="/tools/sql-seed-generator"
+                                className="hidden lg:inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-colors"
+                                style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
+                            >
+                                <Database size={14} />
+                                <span>SQL Seed Tool</span>
+                            </Link>
 
-                    {/* Left Column: Interests and Recommendations */}
-                    <div className="lg:col-span-2 space-y-12">
+                            {/* Date Range Filter */}
+                            <select
+                                value={dateRange}
+                                onChange={(e) => setDateRange(e.target.value)}
+                                className="hidden sm:block text-xs px-3 py-2 rounded-lg border-none appearance-none cursor-pointer"
+                                style={{
+                                    background: 'var(--accent-soft)',
+                                    color: 'var(--text-secondary)',
+                                    fontFamily: 'var(--font-body)',
+                                }}
+                            >
+                                <option value="7days">Last 7 Days</option>
+                                <option value="30days">Last 30 Days</option>
+                                <option value="90days">Last 90 Days</option>
+                            </select>
 
-                        {/* Personalized Interests */}
-                        <section>
-                            <div className="flex items-center gap-3 mb-8">
-                                <Compass className="w-6 h-6 text-heritage-gold" />
-                                <h2 className="font-display text-3xl font-bold text-[var(--fg)] tracking-tight">Personalize Your Path</h2>
-                            </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {interestCategories.map((cat) => {
-                                    const isActive = selectedInterests.includes(cat.id);
-                                    return (
-                                        <button
-                                            key={cat.id}
-                                            onClick={() => toggleInterest(cat.id)}
-                                            className={`group relative flex items-center p-6 rounded-[32px] border-2 transition-all duration-500 text-left overflow-hidden ${isActive
-                                                ? 'bg-heritage-gold border-heritage-gold text-white shadow-2xl scale-[1.02]'
-                                                : 'bg-white border-[var(--border)] hover:border-heritage-gold/30'
-                                                }`}
-                                        >
-                                            <div className={`w-16 h-16 rounded-2xl ${isActive ? 'bg-white/20' : 'bg-heritage-teal/5'} flex items-center justify-center text-4xl mr-6 transition-transform group-hover:scale-110`}>
-                                                {cat.emoji}
-                                            </div>
-                                            <div className="flex-1">
-                                                <h3 className={`font-bold text-lg ${isActive ? 'text-white' : 'text-[var(--fg)]'}`}>{cat.label}</h3>
-                                                <p className={`text-sm ${isActive ? 'text-white/80' : 'text-[var(--muted)]'}`}>{cat.description}</p>
-                                            </div>
-                                            {isActive && (
-                                                <div className="absolute right-6">
-                                                    <CheckCircle2 className="w-6 h-6 text-white" />
-                                                </div>
-                                            )}
+                            {/* Notifications */}
+                            <button
+                                className="relative w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+                                style={{ color: 'var(--text-secondary)', background: 'var(--accent-soft)' }}
+                            >
+                                <Bell size={18} />
+                                <span className="absolute top-2 right-2 w-2 h-2 rounded-full" style={{ background: 'var(--accent)' }} />
+                            </button>
+
+                            {/* Profile avatar — click to open Profile section */}
+                            <button
+                                onClick={() => setActiveSection('profile')}
+                                title={`${displayName} — View Profile`}
+                                style={{
+                                    width: 40, height: 40,
+                                    borderRadius: '50%',
+                                    background: 'linear-gradient(135deg, var(--accent), var(--accent-hover))',
+                                    color: '#fff',
+                                    fontWeight: 700,
+                                    fontSize: '0.8125rem',
+                                    border: '2px solid transparent',
+                                    cursor: 'pointer',
+                                    transition: 'box-shadow 0.2s, border-color 0.2s',
+                                    flexShrink: 0,
+                                }}
+                                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 0 0 3px var(--accent-glow)'; e.currentTarget.style.borderColor = 'var(--accent)'; }}
+                                onMouseLeave={e => { e.currentTarget.style.boxShadow = ''; e.currentTarget.style.borderColor = 'transparent'; }}
+                            >
+                                {user?.profilePicture
+                                    ? <img src={user.profilePicture} alt={displayName} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                                    : displayInitials
+                                }
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Dashboard Content */}
+                    <div ref={ref} className="p-6 lg:p-8 space-y-8">
+
+                        {/* ══ PROFILE SECTION ══ */}
+                        {activeSection === 'profile' && (
+                            <motion.div
+                                key="profile-section"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                                className="space-y-6"
+                            >
+                                <div>
+                                    <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.5rem,3vw,2rem)', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>My Profile</h2>
+                                    <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)' }}>Manage your account information and preferences</p>
+                                </div>
+
+                                {/* Avatar + name card */}
+                                <div className="rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6"
+                                    style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary)', boxShadow: 'var(--shadow-sm)' }}>
+                                    <div style={{ position: 'relative', flexShrink: 0 }}>
+                                        <div style={{
+                                            width: 88, height: 88, borderRadius: '50%',
+                                            background: 'linear-gradient(135deg, var(--accent), var(--accent-hover))',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            fontSize: '2rem', fontWeight: 700, color: '#fff',
+                                            boxShadow: '0 4px 20px var(--accent-glow)',
+                                            overflow: 'hidden',
+                                        }}>
+                                            {user?.profilePicture
+                                                ? <img src={user.profilePicture} alt={displayName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                : displayInitials
+                                            }
+                                        </div>
+                                        <button style={{
+                                            position: 'absolute', bottom: 0, right: 0,
+                                            width: 28, height: 28, borderRadius: '50%',
+                                            background: 'var(--accent)', color: '#fff', border: '2px solid var(--bg-card)',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                                        }} title="Change photo">
+                                            <Camera size={12} />
                                         </button>
-                                    );
-                                })}
-                            </div>
-                        </section>
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.375rem', fontWeight: 700, color: 'var(--text-primary)' }}>{displayName}</div>
+                                        <div style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', marginTop: '0.25rem' }}>{user?.email || 'Not signed in'}</div>
+                                        <div style={{ marginTop: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.375rem', padding: '0.25em 0.75em', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: '9999px', fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                                            {user?.role || 'Seeker'}
+                                        </div>
+                                    </div>
+                                </div>
 
-                        {/* Personalized Recommendations */}
-                        <section>
-                            <div className="flex items-center gap-3 mb-8">
-                                <Sparkles className="w-6 h-6 text-heritage-gold" />
-                                <h2 className="font-display text-3xl font-bold text-[var(--fg)] tracking-tight">Chosen For You</h2>
-                            </div>
-                            <div className="grid sm:grid-cols-2 gap-6">
-                                {recommendations.map((rec, i) => (
-                                    <Card key={i} className="p-8 group hover:border-heritage-gold/30 hover:shadow-2xl transition-all duration-500 !rounded-[40px] flex flex-col justify-between border-[var(--border)]">
+                                {/* Edit form */}
+                                <form onSubmit={handleSaveProfile} className="rounded-2xl p-6 sm:p-8 space-y-5"
+                                    style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary)', boxShadow: 'var(--shadow-sm)' }}>
+                                    <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>Account Details</h3>
+
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(220px,100%),1fr))', gap: '1rem' }}>
                                         <div>
-                                            <div className="flex justify-between items-start mb-6">
-                                                <span className="text-5xl group-hover:scale-125 transition-transform duration-500">{rec.icon}</span>
-                                                <span className="text-[10px] font-bold uppercase tracking-widest px-3 py-1 bg-heritage-gold/10 text-heritage-gold rounded-full">
-                                                    {rec.tag}
+                                            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-tertiary)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Display Name</label>
+                                            <div style={{ position: 'relative' }}>
+                                                <User size={14} style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-tertiary)' }} />
+                                                <input
+                                                    value={profileName}
+                                                    onChange={e => setProfileName(e.target.value)}
+                                                    className="input"
+                                                    style={{ paddingLeft: '2.5rem', width: '100%' }}
+                                                    placeholder="Your full name"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-tertiary)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Email Address</label>
+                                            <div style={{ position: 'relative' }}>
+                                                <Mail size={14} style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-tertiary)' }} />
+                                                <input
+                                                    type="email"
+                                                    value={profileEmail}
+                                                    onChange={e => setProfileEmail(e.target.value)}
+                                                    className="input"
+                                                    style={{ paddingLeft: '2.5rem', width: '100%' }}
+                                                    placeholder="you@example.com"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', paddingTop: '0.5rem', flexWrap: 'wrap' }}>
+                                        <button type="submit" className="btn btn-primary btn-sm">
+                                            {profileSaved ? '✓ Saved!' : 'Save Changes'}
+                                        </button>
+                                        {profileSaved && (
+                                            <span style={{ fontSize: '0.8125rem', color: 'var(--success)' }}>Profile updated successfully.</span>
+                                        )}
+                                    </div>
+                                </form>
+
+                                {/* Security & Danger zone */}
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(280px,100%),1fr))', gap: '1rem' }}>
+                                    {/* Change password */}
+                                    <div className="rounded-2xl p-6" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary)' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.875rem' }}>
+                                            <Shield size={16} style={{ color: 'var(--accent)' }} />
+                                            <span style={{ fontWeight: 600, fontSize: '0.9375rem', color: 'var(--text-primary)' }}>Security</span>
+                                        </div>
+                                        <p style={{ fontSize: '0.8125rem', color: 'var(--text-tertiary)', marginBottom: '1rem', lineHeight: 1.6 }}>
+                                            Manage your password and two-factor authentication settings.
+                                        </p>
+                                        <button className="btn btn-secondary btn-sm">Change Password</button>
+                                    </div>
+
+                                    {/* Danger zone / Logout */}
+                                    <div className="rounded-2xl p-6" style={{ background: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.18)' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.875rem' }}>
+                                            <LogOut size={16} style={{ color: '#ef4444' }} />
+                                            <span style={{ fontWeight: 600, fontSize: '0.9375rem', color: '#ef4444' }}>Sign Out</span>
+                                        </div>
+                                        <p style={{ fontSize: '0.8125rem', color: 'var(--text-tertiary)', marginBottom: '1rem', lineHeight: 1.6 }}>
+                                            You'll be returned to the sign-in page. Your data is preserved.
+                                        </p>
+                                        <button
+                                            onClick={handleLogout}
+                                            className="btn btn-sm"
+                                            style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.25)' }}
+                                        >
+                                            <LogOut size={14} /> Sign Out Now
+                                        </button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {/* ══ ALL OTHER SECTIONS ══ */}
+                        {activeSection !== 'profile' && (
+                            <>
+                                {/* === KPI Cards === */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+                                    {kpiData.map((kpi, i) => (
+                                        <motion.div
+                                            key={kpi.label}
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={inView ? { opacity: 1, y: 0 } : {}}
+                                            transition={{ delay: i * 0.08, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                                            className="group rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1"
+                                            style={{
+                                                background: isDark ? kpi.darkGradient : kpi.gradient,
+                                                border: '1px solid var(--border-primary)',
+                                                boxShadow: 'var(--shadow-sm)',
+                                            }}
+                                        >
+                                            <div className="flex items-start justify-between mb-4">
+                                                <div
+                                                    className="w-11 h-11 rounded-xl flex items-center justify-center"
+                                                    style={{ background: `${kpi.color}15`, color: kpi.color }}
+                                                >
+                                                    <kpi.icon size={22} strokeWidth={1.5} />
+                                                </div>
+                                                <span
+                                                    className="text-xs font-semibold px-2.5 py-1 rounded-full"
+                                                    style={{ color: kpi.color, background: `${kpi.color}15` }}
+                                                >
+                                                    {kpi.change}
                                                 </span>
                                             </div>
-                                            <h3 className="font-display text-2xl font-bold text-[var(--fg)] mb-3 group-hover:text-heritage-gold transition-colors">{rec.title}</h3>
-                                            <p className="text-[var(--muted)] leading-relaxed mb-8">{rec.desc}</p>
-                                        </div>
-                                        <Button
-                                            as={Link}
-                                            to={rec.link}
-                                            variant="secondary"
-                                            className="w-full !rounded-2xl"
-                                            rightIcon={ArrowRight}
-                                        >
-                                            Explore Session
-                                        </Button>
-                                    </Card>
-                                ))}
-                            </div>
-                        </section>
-                    </div>
-
-                    {/* Right Column: Streak, Progress and Badges */}
-                    <div className="space-y-12">
-
-                        {/* Streak Tracker */}
-                        <Card className="p-8 !rounded-[40px] border-[var(--border)] bg-heritage-teal/5 ring-8 ring-heritage-teal/5">
-                            <div className="flex items-center gap-3 mb-8">
-                                <Flame className="w-6 h-6 text-orange-500" />
-                                <h2 className="font-display text-2xl font-bold text-[var(--fg)]">Sacred Streak</h2>
-                            </div>
-
-                            <div className="grid grid-cols-7 gap-2 mb-8">
-                                {streakDays.slice(-28).map((day, i) => (
-                                    <div
-                                        key={i}
-                                        className={`aspect-square rounded-xl flex items-center justify-center text-[10px] font-bold transition-all duration-300 ${day.completed
-                                            ? 'bg-heritage-gold text-white shadow-lg shadow-heritage-gold/20 scale-105'
-                                            : 'bg-white border border-[var(--border)] text-[var(--muted)]'
-                                            }`}
-                                        title={`Day ${day.dayNum}`}
-                                    >
-                                        {day.dayNum}
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="space-y-4">
-                                <div className="flex justify-between items-center text-sm p-4 rounded-2xl bg-white border border-[var(--border)] shadow-sm">
-                                    <span className="text-[var(--muted)] font-bold uppercase tracking-widest text-xs">Current Streak</span>
-                                    <span className="font-bold text-orange-500 text-lg">{currentStreak} Days</span>
+                                            <div className="text-3xl font-bold mb-1" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
+                                                {kpi.label === 'Reflections Done' ? reflectionCount : kpi.value}{kpi.unit || ''}
+                                            </div>
+                                            <div className="text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>
+                                                {kpi.label}
+                                            </div>
+                                        </motion.div>
+                                    ))}
                                 </div>
-                                <div className="flex justify-between items-center text-sm p-4 rounded-2xl bg-white border border-[var(--border)] shadow-sm">
-                                    <span className="text-[var(--muted)] font-bold uppercase tracking-widest text-xs">Best Effort</span>
-                                    <span className="font-bold text-heritage-gold text-lg">{bestStreak} Days</span>
-                                </div>
-                            </div>
-                        </Card>
 
-                        {/* Achievement Progress */}
-                        <Card className="p-8 !rounded-[40px] border-[var(--border)] shadow-xl">
-                            <div className="flex items-center gap-3 mb-8">
-                                <BookOpen className="w-6 h-6 text-heritage-teal" />
-                                <h2 className="font-display text-2xl font-bold text-[var(--fg)]">Learning Path</h2>
-                            </div>
-                            <div className="space-y-8">
-                                {learningProgress.map((item, i) => (
-                                    <div key={i} className="space-y-3">
-                                        <div className="flex justify-between items-end">
-                                            <span className="text-sm font-bold text-[var(--fg)]">{item.category}</span>
-                                            <span className="text-[10px] font-bold text-[var(--muted)] uppercase tracking-widest">{item.completed}/{item.total} Level</span>
-                                        </div>
-                                        <div className="h-2 w-full bg-heritage-teal/5 rounded-full overflow-hidden border border-[var(--border)]">
-                                            <div
-                                                className={`h-full ${item.color} rounded-full transition-all duration-1000 shadow-sm`}
-                                                style={{ width: `${item.progress}%` }}
-                                            />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </Card>
-
-                        {/* Badges Collection */}
-                        <Card className="p-8 !rounded-[40px] border-[var(--border)] shadow-xl">
-                            <div className="flex items-center gap-3 mb-8">
-                                <Star className="w-6 h-6 text-heritage-gold" />
-                                <h2 className="font-display text-2xl font-bold text-[var(--fg)]">Sacred Seals</h2>
-                            </div>
-                            <div className="grid grid-cols-3 gap-4">
-                                {allBadges.map((badge) => (
-                                    <div
-                                        key={badge.id}
-                                        className={`flex flex-col items-center justify-center aspect-square rounded-2xl border transition-all duration-500 ${badge.unlocked
-                                            ? 'bg-heritage-gold/5 border-heritage-gold/20 shadow-sm'
-                                            : 'bg-black/5 border-transparent opacity-30 grayscale'
-                                            }`}
-                                        title={badge.desc}
+                                {/* === Charts Row === */}
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    {/* Mood Trend Chart */}
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={inView ? { opacity: 1, y: 0 } : {}}
+                                        transition={{ delay: 0.3, duration: 0.5 }}
+                                        className="card p-6"
                                     >
-                                        <span className={`text-3xl mb-1 ${badge.unlocked ? 'animate-pulse-slow' : ''}`}>{badge.emoji}</span>
-                                        <span className="text-[8px] font-bold uppercase tracking-tighter text-center px-1">{badge.name}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </Card>
+                                        <div className="flex items-center justify-between mb-6">
+                                            <div>
+                                                <h3 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>Mood Trend</h3>
+                                                <p className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>This week's emotional journey</p>
+                                            </div>
+                                            <div className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-full" style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}>
+                                                <TrendingUp size={14} />
+                                                <span>+12%</span>
+                                            </div>
+                                        </div>
+                                        <div className="h-40 mb-4">
+                                            <MiniLineChart data={moodData} color="var(--accent)" />
+                                        </div>
+                                        <div className="flex justify-between px-1">
+                                            {moodData.map((d) => (
+                                                <div key={d.day} className="text-center">
+                                                    <div className="text-[10px] font-medium" style={{ color: 'var(--text-tertiary)' }}>{d.day}</div>
+                                                    <div className="text-[10px] mt-0.5" style={{ color: 'var(--text-secondary)' }}>{d.label}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </motion.div>
+
+                                    {/* Weekly Activity Chart */}
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={inView ? { opacity: 1, y: 0 } : {}}
+                                        transition={{ delay: 0.4, duration: 0.5 }}
+                                        className="card p-6"
+                                    >
+                                        <div className="flex items-center justify-between mb-6">
+                                            <div>
+                                                <h3 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>Weekly Activity</h3>
+                                                <p className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>Meditation, reflections & heritage</p>
+                                            </div>
+                                            <div className="flex items-center gap-3 text-[10px]">
+                                                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm" style={{ background: 'var(--accent)' }} /> Meditation</span>
+                                                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm" style={{ background: 'var(--forest)', opacity: 0.7 }} /> Reflection</span>
+                                                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm" style={{ background: '#7c3aed', opacity: 0.5 }} /> Heritage</span>
+                                            </div>
+                                        </div>
+                                        <BarChart data={weeklyActivity} />
+                                    </motion.div>
+                                </div>
+
+                                {/* === Bottom Cards === */}
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    {/* Suggested Ritual */}
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={inView ? { opacity: 1, y: 0 } : {}}
+                                        transition={{ delay: 0.5, duration: 0.5 }}
+                                        className="relative overflow-hidden rounded-2xl p-6 sm:p-8"
+                                        style={{
+                                            background: 'linear-gradient(135deg, var(--accent), var(--accent-hover))',
+                                            boxShadow: '0 12px 40px var(--accent-glow)',
+                                        }}
+                                    >
+                                        <div className="absolute top-0 right-0 w-40 h-40 rounded-full opacity-10" style={{ background: '#fff', transform: 'translate(30%, -30%)' }} />
+                                        <div className="relative z-10">
+                                            <div className="flex items-center gap-2 mb-3">
+                                                <Sparkles size={18} className="text-white/80" />
+                                                <span className="text-xs font-semibold text-white/70 tracking-widest uppercase">Today's Ritual</span>
+                                            </div>
+                                            <h3 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
+                                                Surya Namaskar
+                                            </h3>
+                                            <p className="text-sm text-white/80 mb-5 leading-relaxed">
+                                                Start your day with 12 rounds of Sun Salutation. Honor the solar energy that sustains all life — a practice rooted in Vedic tradition.
+                                            </p>
+                                            <button className="btn btn-sm" style={{ background: 'rgba(255,255,255,0.2)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)' }}>
+                                                Begin Practice
+                                                <ArrowRight size={14} />
+                                            </button>
+                                        </div>
+                                    </motion.div>
+
+                                    {/* Upcoming Community Event */}
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={inView ? { opacity: 1, y: 0 } : {}}
+                                        transition={{ delay: 0.6, duration: 0.5 }}
+                                        className="card p-6 sm:p-8"
+                                    >
+                                        <div className="flex items-center gap-2 mb-5">
+                                            <Calendar size={18} style={{ color: 'var(--accent)' }} />
+                                            <span className="text-xs font-semibold tracking-widest uppercase" style={{ color: 'var(--accent)' }}>
+                                                Upcoming Event
+                                            </span>
+                                        </div>
+                                        <h3 className="text-xl font-bold mb-2" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
+                                            Full Moon Meditation Circle
+                                        </h3>
+                                        <p className="text-sm mb-5 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                                            Join our community for a guided Purnima meditation session with chanting and reflection.
+                                        </p>
+                                        <div className="flex flex-wrap gap-4 mb-5">
+                                            <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                                                <Clock size={14} />
+                                                <span>March 14, 2026 · 7:00 PM</span>
+                                            </div>
+                                            <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                                                <Users size={14} />
+                                                <span>128 attending</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <Link to="/community" className="btn btn-primary btn-sm">RSVP Now</Link>
+                                            <Link to="/community" className="btn btn-ghost btn-sm" style={{ color: 'var(--text-secondary)' }}>View All Events</Link>
+                                        </div>
+                                    </motion.div>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
-
-                {/* Final CTA Portal */}
-                <Reveal className="mt-20 px-4">
-                    <Card className="relative p-12 lg:p-20 !rounded-[64px] border-none overflow-hidden text-center bg-black group">
-                        <div className="absolute inset-0 opacity-40">
-                            <img src={divineSparkImg} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[20s] linear" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/20" />
-                        </div>
-
-                        <div className="relative z-10 flex flex-col items-center">
-                            <div className="w-24 h-24 rounded-full bg-heritage-gold/20 backdrop-blur-md flex items-center justify-center mb-10 shadow-2xl border border-heritage-gold/30">
-                                <Play className="w-10 h-10 ml-1 text-heritage-gold fill-heritage-gold" />
-                            </div>
-                            <h2 className="font-display text-4xl lg:text-7xl font-bold text-white mb-8 tracking-tighter">
-                                The Temple of Mind Awaits
-                            </h2>
-                            <p className="text-white/60 max-w-2xl mx-auto text-xl mb-12 italic leading-relaxed">
-                                Join our live meditation circles today at 6:00 PM IST.
-                                Connect with the collective energy of thousands of seekers.
-                            </p>
-                            <div className="flex flex-col sm:flex-row gap-6">
-                                <Button
-                                    as={Link}
-                                    to="/wellness"
-                                    size="lg"
-                                    className="!px-12 !py-6 !rounded-[24px] !bg-heritage-gold !border-heritage-gold text-white font-bold tracking-widest uppercase text-xs"
-                                    leftIcon={Flame}
-                                >
-                                    Join Daily Sadhana
-                                </Button>
-                                <Button
-                                    variant="secondary"
-                                    size="lg"
-                                    className="!px-12 !py-6 !rounded-[24px] !bg-white/10 !border-white/20 !text-white hover:!bg-white/20 font-bold tracking-widest uppercase text-xs"
-                                >
-                                    View Sangha Schedule
-                                </Button>
-                            </div>
-                        </div>
-
-                        {/* Decorative Glow */}
-                        <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-heritage-gold/10 rounded-full blur-[150px] pointer-events-none" />
-                        <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-heritage-teal/10 rounded-full blur-[150px] pointer-events-none" />
-                    </Card>
-                </Reveal>
-            </div>
-        </div >
+            </div >
+        </>
     );
 };
 

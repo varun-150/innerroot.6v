@@ -1,7 +1,7 @@
 import React from 'react';
-import { Reveal, Stagger } from '../components/Reveal';
-import SEO from '../components/SEO';
-import Breadcrumbs from '../components/Breadcrumbs';
+import { Reveal, Stagger } from '../components/ui/Reveal';
+import SEO from '../components/ui/SEO';
+import Breadcrumbs from '../components/layout/Breadcrumbs';
 import {
     Check, Star, Users, Briefcase, Globe, GraduationCap,
     Heart, Shield, Zap, Gift, Crown, Rocket

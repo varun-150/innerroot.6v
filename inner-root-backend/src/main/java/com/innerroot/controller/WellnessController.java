@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class WellnessController {
     }
 
     @PostMapping
-    public ResponseEntity<WellnessContent> create(@RequestBody WellnessContent content) {
+    public ResponseEntity<WellnessContent> create(@Valid @RequestBody WellnessContent content) {
         return ResponseEntity.status(HttpStatus.CREATED).body(repository.save(content));
     }
 

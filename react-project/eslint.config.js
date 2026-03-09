@@ -1,29 +1,37 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import { defineConfig, globalIgnores } from 'eslint/config'
+// Flat ESLint configuration for the workspace
+// ensures compatibility with ESLint v9+ default behaviour.
 
-export default defineConfig([
-  globalIgnores(['dist']),
+import reactPlugin from 'eslint-plugin-react';
+import hooksPlugin from 'eslint-plugin-react-hooks';
+
+export default [
   {
-    files: ['**/*.{js,jsx}'],
-    extends: [
-      js.configs.recommended,
-      reactHooks.configs.flat.recommended,
-      reactRefresh.configs.vite,
-    ],
+    ignores: ['node_modules/**', 'dist/**'],
     languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
+      globals: {
+        window: 'readonly',
+        document: 'readonly',
+        navigator: 'readonly',
+        process: 'readonly',
+      },
       parserOptions: {
         ecmaVersion: 'latest',
-        ecmaFeatures: { jsx: true },
         sourceType: 'module',
+        ecmaFeatures: { jsx: true },
       },
     },
+  },
+  {
+    plugins: {
+      react: reactPlugin,
+      'react-hooks': hooksPlugin,
+    },
+    settings: {
+      react: { version: 'detect' },
+    },
     rules: {
+      'react/react-in-jsx-scope': 'off',
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
     },
   },
-])
+];

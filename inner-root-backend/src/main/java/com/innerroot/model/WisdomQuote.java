@@ -1,6 +1,7 @@
 package com.innerroot.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Entity
@@ -16,6 +17,7 @@ public class WisdomQuote {
     private String id;
 
     @Column(columnDefinition = "TEXT")
+    @NotBlank
     private String quote;
 
     private String source;

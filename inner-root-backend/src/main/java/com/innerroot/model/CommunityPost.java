@@ -1,6 +1,7 @@
 package com.innerroot.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -18,10 +19,14 @@ public class CommunityPost {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @NotBlank
     private String title;
 
     @Column(columnDefinition = "TEXT")
-    private String content;
+    @NotBlank
+    @Size(max = 2000)
+    @Builder.Default
+    private String content = "Click to read more about this discussion.";
 
     private String author;
 

@@ -4,24 +4,31 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predev": "node ./scripts/checkEnv.js",
+    "prebuild": "node ./scripts/checkEnv.js",
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
+    "lint": "eslint --ignore-pattern dist/** .",
     "preview": "vite preview"
   },
   "dependencies": {
     "@react-oauth/google": "^0.13.4",
+    "@stomp/stompjs": "^7.3.0",
+    "@supabase/supabase-js": "^2.98.0",
     "axios": "^1.13.5",
     "d3-geo": "^3.1.1",
     "d3-scale": "^4.0.2",
     "framer-motion": "^12.34.1",
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.564.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-helmet-async": "^2.0.5",
-    "react-router-dom": "^7.13.0",
+    "react-helmet-async": "^3.0.0",
+    "react-leaflet": "^5.0.0",
+    "react-router-dom": "^6.30.3",
     "react-simple-maps": "^3.0.0",
     "react-tooltip": "^5.30.0",
+    "sockjs-client": "^1.6.1",
     "topojson-client": "^3.1.0"
   },
   "devDependencies": {
@@ -31,6 +38,7 @@
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.16",
     "eslint": "^9.39.1",
+    "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "globals": "^15.0.0",
@@ -40,6 +48,10 @@
   },
   "overrides": {
     "d3-color": "^3.1.0",
-    "esbuild": "^0.25.0"
+    "esbuild": "^0.25.0",
+    "react-simple-maps": {
+      "react": "$react",
+      "react-dom": "$react-dom"
+    }
   }
 }

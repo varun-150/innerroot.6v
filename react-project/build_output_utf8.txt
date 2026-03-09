@@ -1,0 +1,73 @@
+﻿
+> react-project@0.0.0 prebuild
+> node ./scripts/checkEnv.js
+
+node.exe : Warning: 
+missing required 
+environment variables: 
+VITE_API_URL, 
+VITE_GOOGLE_CLIENT_ID
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" "C:
+\Users\akuri\AppData\Roami
+ng\ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (W  
+  arning: missin...OOGL   
+ E_CLIENT_ID:String) [    
+], RemoteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+The frontend will use 
+development defaults, but 
+you should:
+  1. copy .env.example to 
+.env.local
+  2. fill in the real API 
+URL / Google client ID
+For now we supply sane 
+defaults below so the dev 
+server can start.
+
+> react-project@0.0.0 build
+> vite build
+
+[36mvite v5.4.21 [32mbuilding for production...[36m[39m
+transforming...
+[32mΓ£ô[39m 1140 modules transformed.
+[31mx[39m Build failed 
+in 2.46s
+[31merror during build:
+[31mCould not resolve 
+"../hooks/useWebSocket" 
+from "src/pages/Community.
+jsx"[31m
+file: [36mE:/v2 inner/rea
+ct-project/src/pages/Commu
+nity.jsx[31m
+    at getRollupError (fil
+e:///E:/v2%20inner/react-p
+roject/node_modules/rollup
+/dist/es/shared/parseAst.j
+s:402:41)
+    at error (file:///E:/v
+2%20inner/react-project/no
+de_modules/rollup/dist/es/
+shared/parseAst.js:398:42)
+    at ModuleLoader.handle
+InvalidResolvedId (file://
+/E:/v2%20inner/react-proje
+ct/node_modules/rollup/dis
+t/es/shared/node-entry.js:
+21710:24)
+    at file:///E:/v2%20inn
+er/react-project/node_modu
+les/rollup/dist/es/shared/
+node-entry.js:21670:26[39
+m

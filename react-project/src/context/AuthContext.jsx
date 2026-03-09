@@ -31,7 +31,8 @@ export const AuthProvider = ({ children }) => {
             const userData = await authAPI.getMe();
             setUser(userData);
         } catch (err) {
-            console.error('Failed to fetch user:', err);
+            // Backend may be offline — fail silently so the app still renders
+            console.warn('Auth check failed (backend may be offline):', err?.message);
             localStorage.removeItem('innerRootToken');
         } finally {
             setLoading(false);
