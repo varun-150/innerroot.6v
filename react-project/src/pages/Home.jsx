@@ -789,6 +789,37 @@ const Home = () => {
             </section>
 
             {/* ══════════════════════════════════════════════════════════
+                MEMBERSHIP PREVIEW
+            ══════════════════════════════════════════════════════════ */}
+            <section style={{ padding: '0 clamp(1rem,5vw,4rem) clamp(5rem,9vw,9rem)' }}>
+                <div style={{ maxWidth: 'var(--container-8k)', margin: '0 auto' }}>
+                    <div className="card-8k p-12 text-center relative overflow-hidden">
+                        <div className="orb orb-1 !opacity-5" />
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                        >
+                            <span className="section-label mb-6 justify-center">Inner Root Membership</span>
+                            <h2 className="display-2 mb-6">Deepen Your Journey</h2>
+                            <p className="lead max-w-2xl mx-auto mb-10">
+                                Support the preservation of Indian heritage while unlocking exclusive AI features,
+                                expert workshops, and high-resolution maps.
+                            </p>
+                            <div className="flex flex-wrap gap-4 justify-center">
+                                <Link to="/subscription" className="btn btn-primary bg-accent">
+                                    View Membership Plans
+                                </Link>
+                                <Link to="/about" className="btn btn-secondary">
+                                    Our Mission
+                                </Link>
+                            </div>
+                        </motion.div>
+                    </div>
+                </div>
+            </section>
+
+            {/* ══════════════════════════════════════════════════════════
                 FAQ
             ══════════════════════════════════════════════════════════ */}
             <section style={{ padding: '0 clamp(1rem,5vw,4rem) clamp(5rem,9vw,9rem)' }}>

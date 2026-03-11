@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from './context/AuthContext';
 import { WebSocketProvider } from './context/WebSocketContext';
+import { HelmetProvider } from 'react-helmet-async';
 import { useTheme } from './hooks/useTheme';
 import { routes } from './config/routes';
 
@@ -52,15 +54,21 @@ const AppContent = () => {
   );
 };
 
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <WebSocketProvider>
-          <AppContent />
-        </WebSocketProvider>
-      </AuthProvider>
-    </Router>
+    <HelmetProvider>
+      <Router>
+        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+          <AuthProvider>
+            <WebSocketProvider>
+              <AppContent />
+            </WebSocketProvider>
+          </AuthProvider>
+        </GoogleOAuthProvider>
+      </Router>
+    </HelmetProvider>
   );
 }
 

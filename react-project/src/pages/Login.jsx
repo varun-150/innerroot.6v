@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogIn, Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, ShieldCheck, ArrowLeft, RefreshCcw } from 'lucide-react';
 import SEO from '../components/ui/SEO';
+import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
 
 import logo from '../assets/logo.webp';
@@ -58,6 +59,30 @@ const Login = () => {
         }
     };
 
+    /* Google login logic with useGoogleLogin Hook */
+    const handleGoogleLoginSuccess = async (tokenResponse) => {
+        setGoogleLoading(true);
+        setError('');
+        try {
+            const accessToken = tokenResponse.access_token;
+            await googleAuth(accessToken);
+            navigate('/dashboard');
+        } catch (err) {
+            console.error('Google verification error:', err);
+            setError(err.message || 'Verification with our server failed.');
+        } finally {
+            setGoogleLoading(false);
+        }
+    };
+
+    const handleGoogleLogin = useGoogleLogin({
+        onSuccess: handleGoogleLoginSuccess,
+        onError: (error) => {
+            console.error('Google Login Error:', error);
+            setError('Google sign-in was unsuccessful.');
+        }
+    });
+
     /* Email/password login */
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
@@ -99,19 +124,6 @@ const Login = () => {
         setOtp(['', '', '', '', '', '']);
         otpRefs.current[0].focus();
         // Trigger resend API
-    };
-
-    /* Google login */
-    const handleGoogleAuth = async () => {
-        setGoogleLoading(true);
-        setError('');
-        try {
-            await googleAuth();
-        } catch (err) {
-            setError(err.message || 'Google sign-in failed.');
-        } finally {
-            setGoogleLoading(false);
-        }
     };
 
     return (
@@ -156,7 +168,7 @@ const Login = () => {
 
                                     {/* Google Button */}
                                     <button
-                                        onClick={handleGoogleAuth}
+                                        onClick={() => handleGoogleLogin()}
                                         disabled={googleLoading || loading}
                                         className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 mb-5"
                                         style={{
@@ -171,7 +183,7 @@ const Login = () => {
                                             <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin"
                                                 style={{ borderColor: 'var(--accent)', borderTopColor: 'transparent' }} />
                                         ) : <GoogleIcon />}
-                                        {googleLoading ? 'Signing in...' : 'Continue with Google'}
+                                        {googleLoading ? 'Connecting...' : 'Continue with Google'}
                                     </button>
 
                                     {/* Divider */}

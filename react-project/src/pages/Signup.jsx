@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UserPlus, Mail, Lock, User, Eye, EyeOff, CheckCircle2, AlertCircle, ShieldCheck, ArrowLeft, RefreshCcw } from 'lucide-react';
 import SEO from '../components/ui/SEO';
+import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
 
 import logo from '../assets/logo.webp';
@@ -104,19 +105,29 @@ const Signup = () => {
         }
     };
 
-    /* Google sign-up */
-    // Using Supabase direct OAuth instead of Google Login provider component here
-    const handleGoogleAuth = async () => {
+    /* Google sign-up logic with useGoogleLogin Hook */
+    const handleGoogleLoginSuccess = async (tokenResponse) => {
         setGoogleLoading(true);
         setError('');
         try {
-            await googleAuth();
+            const accessToken = tokenResponse.access_token;
+            await googleAuth(accessToken);
+            navigate('/dashboard');
         } catch (err) {
-            setError(err.message || 'Google sign-in failed.');
+            console.error('Google verification error:', err);
+            setError(err.message || 'Verification with our server failed.');
         } finally {
             setGoogleLoading(false);
         }
     };
+
+    const handleGoogleLogin = useGoogleLogin({
+        onSuccess: handleGoogleLoginSuccess,
+        onError: (error) => {
+            console.error('Google Login Error:', error);
+            setError('Google sign-in was unsuccessful.');
+        }
+    });
 
     return (
         <>
@@ -156,7 +167,7 @@ const Signup = () => {
 
                                     {/* Google Button */}
                                     <button
-                                        onClick={handleGoogleAuth}
+                                        onClick={() => handleGoogleLogin()}
                                         disabled={googleLoading || loading}
                                         className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 mb-5"
                                         style={{ background: 'var(--bg-secondary)', border: '1.5px solid var(--border-primary)', color: 'var(--text-primary)' }}

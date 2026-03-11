@@ -18,7 +18,20 @@ export default {
                     tealLight: '#5ba3a3',
                     brown: '#5c4033',
                     brownLight: '#8b6914'
-                }
+                },
+                accent: {
+                    DEFAULT: 'var(--color-accent)',
+                    hover: 'var(--color-accent-hover)',
+                    soft: 'var(--color-accent-soft)',
+                    glow: 'var(--color-accent-glow)',
+                },
+                primary: 'var(--color-bg)',
+                secondary: 'var(--color-bg-subtle)',
+                forest: {
+                    DEFAULT: 'var(--color-forest)',
+                    soft: 'var(--color-forest-soft)',
+                },
+                glass: 'var(--color-overlay)',
             },
             fontFamily: {
                 display: ['Cormorant Garamond', 'serif'],

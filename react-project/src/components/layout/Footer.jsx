@@ -193,7 +193,7 @@ const Footer = () => (
                     {[
                         { label: 'Privacy Policy', to: '/privacy' },
                         { label: 'Terms of Use', to: '/terms' },
-                        { label: 'Pricing', to: '/monetization' },
+                        { label: 'Membership', to: '/subscription' },
                     ].map(({ label, to }) => (
                         <Link
                             key={label}

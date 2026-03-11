@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, X, Send, Sparkles, User, Bot, Loader2 } from 'lucide-react';
 import { useWebSocketClient } from '../../context/WebSocketContext';
@@ -117,10 +118,15 @@ const ChatBot = () => {
                             <div>
                                 <h3 className="font-bold text-sm" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>Heritage Companion</h3>
                                 <div className="flex items-center gap-1.5">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                                    <span className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>Online | Backend Automation Engine</span>
+                                    <div className={`w-1.5 h-1.5 rounded-full ${connected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+                                    <span className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>
+                                        {connected ? 'Online | AI Core Active' : 'Offline | Reconnecting...'}
+                                    </span>
                                 </div>
                             </div>
+                            <Link to="/subscription" className="ml-auto text-[10px] px-2 py-1 rounded-md bg-accent/10 text-accent font-bold hover:bg-accent/20 transition-colors">
+                                Go Pro
+                            </Link>
                         </div>
 
                         {/* Messages */}

@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import {
     Menu, X, Sun, Moon,
     MapPin, Heart, Users, BookOpen,
-    LogIn, LayoutDashboard, Compass
+    LogIn, LayoutDashboard, Compass, Sparkles
 } from 'lucide-react';
 
 import logo from '../../assets/logo.webp';
@@ -18,6 +18,7 @@ const navItems = [
     { path: '/wellness', label: 'Wellness', icon: Heart },
     { path: '/community', label: 'Community', icon: Users },
     { path: '/library', label: 'Library', icon: BookOpen },
+    { path: '/subscription', label: 'Plans', icon: Sparkles },
 ];
 
 const Header = ({ theme, onToggleTheme, isMobileMenuOpen, onToggleMobileMenu }) => {
