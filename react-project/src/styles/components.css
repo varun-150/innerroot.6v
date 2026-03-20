@@ -34,6 +34,14 @@
     box-shadow: var(--shadow-card-hover), var(--shadow-glow);
 }
 
+.shadow-glow-accent {
+    box-shadow: var(--shadow-glow-accent);
+}
+
+.shadow-2xl {
+    box-shadow: var(--shadow-2xl);
+}
+
 /* ── CARD ────────────────────────────────────────────────── */
 .card {
     background: var(--color-surface);

@@ -27,13 +27,13 @@ public class MoodEntry {
     private String mood; // happy, sad, anxious, calm
 
     @Size(max = 500)
-    private String note;
+    private String notes;
 
     @Min(1)
     @Max(10)
     private Integer intensity; // 1-10
 
     @CreationTimestamp
-    @Column(updatable = false)
-    private LocalDateTime timestamp;
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 }

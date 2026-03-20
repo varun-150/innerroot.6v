@@ -2,6 +2,7 @@ package com.innerroot.controller;
 
 import com.innerroot.model.WellnessContent;
 import com.innerroot.repository.WellnessContentRepository;
+import com.innerroot.service.wellness.WellnessRecommendationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/wellness")
@@ -16,6 +18,12 @@ import java.util.List;
 public class WellnessController {
 
     private final WellnessContentRepository repository;
+    private final WellnessRecommendationService recommendationService;
+
+    @GetMapping("/recommend")
+    public ResponseEntity<Map<String, String>> getRecommendation(@RequestParam String mood, @RequestParam(defaultValue = "5") String intensity) {
+        return ResponseEntity.ok(recommendationService.getRecommendation(mood, intensity));
+    }
 
     @GetMapping
     public ResponseEntity<List<WellnessContent>> getAll(@RequestParam(required = false) String type) {

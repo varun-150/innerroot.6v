@@ -95,20 +95,23 @@ const Footer = () => (
                         <div>
                             <span style={{
                                 display: 'block',
-                                fontSize: 'clamp(1rem,1.5vw,1.25rem)',
+                                fontSize: '1.25rem',
                                 fontFamily: 'var(--font-display)',
-                                fontWeight: 600,
+                                fontWeight: 900,
                                 color: 'var(--color-text)',
-                                lineHeight: 1.2,
+                                lineHeight: 1,
+                                letterSpacing: '-0.02em',
+                                textTransform: 'uppercase'
                             }}>Inner Root</span>
                             <span style={{
                                 display: 'block',
-                                fontSize: '0.625rem',
-                                letterSpacing: '0.12em',
+                                fontSize: '8px',
+                                letterSpacing: '0.4em',
                                 textTransform: 'uppercase',
-                                color: 'var(--color-text-faint)',
-                                marginTop: '0.15rem',
-                            }}>Heritage · Wellness · AI</span>
+                                color: 'var(--gold-500)',
+                                marginTop: '0.4rem',
+                                fontWeight: 800
+                            }}>The Aura of Heritage</span>
                         </div>
                     </Link>
 
@@ -120,7 +123,7 @@ const Footer = () => (
                         maxWidth: 340,
                     }}>
                         India's first platform blending 5,000 years of Vedic wisdom with
-                        modern AI — explore cultural heritage and nurture your inner wellbeing.
+                        modern AI - explore cultural heritage and nurture your inner wellbeing.
                     </p>
 
                     <a
@@ -143,11 +146,12 @@ const Footer = () => (
                     <div key={title}>
                         <h4 style={{
                             fontSize: '0.625rem',
-                            fontWeight: 700,
-                            letterSpacing: '0.12em',
+                            fontWeight: 900,
+                            letterSpacing: '0.2em',
                             textTransform: 'uppercase',
                             color: 'var(--color-text-faint)',
-                            marginBottom: 'clamp(0.875rem,1.5vw,1.25rem)',
+                            marginBottom: '1.5rem',
+                            fontFamily: 'var(--font-heading)'
                         }}>
                             {title}
                         </h4>
@@ -212,3 +216,4 @@ const Footer = () => (
 );
 
 export default Footer;
+

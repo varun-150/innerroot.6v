@@ -18,22 +18,22 @@ const teamMembers = [
     {
         name: 'AKURI VENKATA SURYA VARUN',
         role: 'Founder & Lead Developer',
+        bio: 'Visionary architect blending Indian heritage with next-gen technology.',
         initials: 'AV',
-        bio: 'Visionary engineer blending ancient Vedic wisdom with cutting-edge AI architecture and immersive UX.',
         social: { linkedin: '#', twitter: '#', github: '#' }
     },
     {
         name: 'GANGI REDDY GARI HEM SATHVIK REDDY',
         role: 'Co-Founder',
+        bio: 'Strategic lead focused on cultural preservation and community impact.',
         initials: 'GR',
-        bio: 'Heritage enthusiast dedicated to digitizing India\'s lost architectural history and sacred geometry.',
         social: { linkedin: '#', twitter: '#' }
     },
     {
-        name: 'MD. RUHAN',
+        name: 'MD. ROOHAN',
         role: 'Backend Engineer',
+        bio: 'Systems specialist ensuring robust and scalable infrastructure.',
         initials: 'MR',
-        bio: 'Specialist in high-performance spiritual data systems and secure, scalable cloud infrastructure.',
         social: { github: '#', linkedin: '#' }
     },
 ];

@@ -43,7 +43,13 @@ export const authAPI = {
     login: (email, password) => api.post('/auth/login', { email, password }).then(res => res.data),
     register: (name, email, password, onboardingData) => api.post('/auth/register', { name, email, password, ...onboardingData }).then(res => res.data),
     getMe: () => api.get('/auth/me').then(res => res.data),
+    updateProfile: (profileData) => api.put('/users/profile', profileData).then(res => res.data),
     googleAuth: (accessToken) => api.post('/auth/google', { accessToken }).then(res => res.data),
+};
+
+export const japaAPI = {
+    save: (japaData) => api.post('/japa', japaData).then(res => res.data),
+    getHistory: () => api.get('/japa').then(res => res.data),
 };
 
 export const communityAPI = {
@@ -76,6 +82,16 @@ export const eventAPI = {
 export const moodAPI = {
     getAll: () => api.get('/mood').then(res => res.data),
     save: (moodData) => api.post('/mood', moodData).then(res => res.data),
+};
+
+export const wellnessAPI = {
+    getAll: (type) => api.get('/wellness', { params: { type } }).then(res => res.data),
+    getById: (id) => api.get(`/wellness/${id}`).then(res => res.data),
+    getRecommendation: (mood, intensity) => api.get('/wellness/recommend', { params: { mood, intensity } }).then(res => res.data),
+};
+
+export const contactAPI = {
+    submit: (data) => api.post('/contact', data).then(res => res.data),
 };
 
 export default api;

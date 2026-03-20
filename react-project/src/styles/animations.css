@@ -60,15 +60,20 @@
     pointer-events: none;
     z-index: 1;
     opacity: 0.04;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='200' cy='200' r='180' fill='none' stroke='%23d97706' stroke-width='0.5'/%3E%3Ccircle cx='200' cy='200' r='140' fill='none' stroke='%23d97706' stroke-width='0.4'/%3E%3Ccircle cx='200' cy='200' r='100' fill='none' stroke='%23d97706' stroke-width='0.4'/%3E%3Ccircle cx='200' cy='200' r='60' fill='none' stroke='%23d97706' stroke-width='0.3'/%3E%3Cpath d='M200 20 L200 380 M20 200 L380 200' stroke='%23d97706' stroke-width='0.3'/%3E%3Cpath d='M60 60 L340 340 M340 60 L60 340' stroke='%23d97706' stroke-width='0.2'/%3E%3Cpolygon points='200,40 340,280 60,280' fill='none' stroke='%23d97706' stroke-width='0.4'/%3E%3Cpolygon points='200,360 340,120 60,120' fill='none' stroke='%23d97706' stroke-width='0.4'/%3E%3Ccircle cx='200' cy='200' r='25' fill='none' stroke='%23d97706' stroke-width='0.6'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='200' cy='200' r='180' fill='none' stroke='%23C09020' stroke-width='0.5'/%3E%3Ccircle cx='200' cy='200' r='140' fill='none' stroke='%23C09020' stroke-width='0.4'/%3E%3Ccircle cx='200' cy='200' r='100' fill='none' stroke='%23C09020' stroke-width='0.4'/%3E%3Ccircle cx='200' cy='200' r='60' fill='none' stroke='%23C09020' stroke-width='0.3'/%3E%3Cpath d='M200 20 L200 380 M20 200 L380 200' stroke='%23C09020' stroke-width='0.3'/%3E%3Cpath d='M60 60 L340 340 M340 60 L60 340' stroke='%23C09020' stroke-width='0.2'/%3E%3Cpolygon points='200,40 340,280 60,280' fill='none' stroke='%23C09020' stroke-width='0.4'/%3E%3Cpolygon points='200,360 340,120 60,120' fill='none' stroke='%23C09020' stroke-width='0.4'/%3E%3Ccircle cx='200' cy='200' r='25' fill='none' stroke='%23C09020' stroke-width='0.6'/%3E%3C/svg%3E");
     background-size: 500px 500px;
     background-position: center;
     animation: sacredRotate 90s linear infinite;
 }
 
+[data-theme="light"] .sacred-geometry {
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='200' cy='200' r='180' fill='none' stroke='%23A07015' stroke-width='0.5'/%3E%3Ccircle cx='200' cy='200' r='140' fill='none' stroke='%23A07015' stroke-width='0.4'/%3E%3Ccircle cx='200' cy='200' r='100' fill='none' stroke='%23A07015' stroke-width='0.4'/%3E%3Ccircle cx='200' cy='200' r='60' fill='none' stroke='%23A07015' stroke-width='0.3'/%3E%3Cpath d='M200 20 L200 380 M20 200 L380 200' stroke='%23A07015' stroke-width='0.3'/%3E%3Cpath d='M60 60 L340 340 M340 60 L60 340' stroke='%23A07015' stroke-width='0.2'/%3E%3Cpolygon points='200,40 340,280 60,280' fill='none' stroke='%23A07015' stroke-width='0.4'/%3E%3Cpolygon points='200,360 340,120 60,120' fill='none' stroke='%23A07015' stroke-width='0.4'/%3E%3Ccircle cx='200' cy='200' r='25' fill='none' stroke='%23A07015' stroke-width='0.6'/%3E%3C/svg%3E");
+}
+
 [data-theme="dark"] .sacred-geometry {
     opacity: 0.025;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='200' cy='200' r='180' fill='none' stroke='%23f5be4e' stroke-width='0.5'/%3E%3Ccircle cx='200' cy='200' r='140' fill='none' stroke='%23f5be4e' stroke-width='0.4'/%3E%3Ccircle cx='200' cy='200' r='100' fill='none' stroke='%23f5be4e' stroke-width='0.4'/%3E%3Ccircle cx='200' cy='200' r='60' fill='none' stroke='%23f5be4e' stroke-width='0.3'/%3E%3Cpath d='M200 20 L200 380 M20 200 L380 200' stroke='%23f5be4e' stroke-width='0.3'/%3E%3Cpath d='M60 60 L340 340 M340 60 L60 340' stroke='%23f5be4e' stroke-width='0.2'/%3E%3Cpolygon points='200,40 340,280 60,280' fill='none' stroke='%23f5be4e' stroke-width='0.4'/%3E%3Cpolygon points='200,360 340,120 60,120' fill='none' stroke='%23f5be4e' stroke-width='0.4'/%3E%3Ccircle cx='200' cy='200' r='25' fill='none' stroke='%23f5be4e' stroke-width='0.6'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='200' cy='200' r='180' fill='none' stroke='%23F5D154' stroke-width='0.5'/%3E%3Ccircle cx='200' cy='200' r='140' fill='none' stroke='%23F5D154' stroke-width='0.4'/%3E%3Ccircle cx='200' cy='200' r='100' fill='none' stroke='%23F5D154' stroke-width='0.4'/%3E%3Ccircle cx='200' cy='200' r='60' fill='none' stroke='%23F5D154' stroke-width='0.3'/%3E%3Cpath d='M200 20 L200 380 M20 200 L380 200' stroke='%23F5D154' stroke-width='0.3'/%3E%3Cpath d='M60 60 L340 340 M340 60 L60 340' stroke='%23F5D154' stroke-width='0.2'/%3E%3Cpolygon points='200,40 340,280 60,280' fill='none' stroke='%23F5D154' stroke-width='0.4'/%3E%3Cpolygon points='200,360 340,120 60,120' fill='none' stroke='%23F5D154' stroke-width='0.4'/%3E%3Ccircle cx='200' cy='200' r='25' fill='none' stroke='%23F5D154' stroke-width='0.6'/%3E%3C/svg%3E");
 }
 
 @keyframes sacredRotate {
@@ -94,8 +99,8 @@
     height: 100%;
     pointer-events: none;
     z-index: 0;
-    opacity: 0.018;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='90' fill='none' stroke='%23d97706' stroke-width='0.5'/%3E%3Ccircle cx='100' cy='100' r='70' fill='none' stroke='%23d97706' stroke-width='0.4'/%3E%3Ccircle cx='100' cy='100' r='50' fill='none' stroke='%23d97706' stroke-width='0.4'/%3E%3Ccircle cx='100' cy='100' r='30' fill='none' stroke='%23d97706' stroke-width='0.3'/%3E%3Cpath d='M100 10 L100 190 M10 100 L190 100 M30 30 L170 170 M170 30 L30 170' stroke='%23d97706' stroke-width='0.2'/%3E%3C/svg%3E");
+    opacity: 0.015;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='90' fill='none' stroke='%23D4AF37' stroke-width='0.5'/%3E%3Ccircle cx='100' cy='100' r='70' fill='none' stroke='%23D4AF37' stroke-width='0.4'/%3E%3Ccircle cx='100' cy='100' r='50' fill='none' stroke='%23D4AF37' stroke-width='0.4'/%3E%3Ccircle cx='100' cy='100' r='30' fill='none' stroke='%23D4AF37' stroke-width='0.3'/%3E%3Cpath d='M100 10 L100 190 M10 100 L190 100 M30 30 L170 170 M170 30 L30 170' stroke='%23D4AF37' stroke-width='0.2'/%3E%3C/svg%3E");
     background-size: 350px 350px;
     animation: rotateMandala 120s linear infinite;
 }
@@ -110,7 +115,6 @@
     }
 }
 
-/* ── FLOATING PARTICLES ──────────────────────────────────── */
 .particle {
     position: absolute;
     width: 3px;

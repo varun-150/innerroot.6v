@@ -26,31 +26,37 @@ const circles = [
 
 const FeedItem = ({ title, author, createdAt, content, likes, id, i }) => (
     <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: i * 0.1, duration: 0.5 }}
-        className="p-6 rounded-3xl border border-primary bg-card hover:shadow-xl transition-all duration-300"
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        transition={{ delay: i * 0.1 }}
+        className="p-8 rounded-[2rem] border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-all duration-500 group relative overflow-hidden"
     >
-        <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center font-bold text-accent">
+        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-100 transition-opacity">
+            <Sparkles size={24} className="text-accent" />
+        </div>
+        
+        <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center font-display font-black text-accent text-xl">
                 {(author || 'A')[0]}
             </div>
             <div>
-                <div className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{author || 'Anonymous'}</div>
-                <div className="text-[10px] opacity-40 uppercase tracking-widest">{new Date(createdAt || Date.now()).toLocaleDateString()}</div>
+                <div className="text-sm font-heading font-black uppercase tracking-widest text-white">{author || 'Anonymous'}</div>
+                <div className="text-[10px] text-white/40 uppercase font-bold tracking-[0.2em]">{new Date(createdAt || Date.now()).toLocaleDateString()}</div>
             </div>
         </div>
-        {title && <h4 className="font-bold mb-2">{title}</h4>}
-        <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>{content}</p>
-        <div className="flex items-center gap-4 pt-4 border-t border-primary">
-            <button onClick={() => communityAPI.likePost(id).catch(console.error)} className="flex items-center gap-1.5 text-xs hover:text-accent transition-colors">
-                <Heart size={14} className="opacity-40" /> {likes || 0}
+        
+        {title && <h4 className="text-xl font-display font-black mb-4 tracking-tight uppercase group-hover:text-accent transition-colors">{title}</h4>}
+        <p className="text-sm leading-relaxed text-white/50 mb-8 font-sans">{content}</p>
+        
+        <div className="flex items-center gap-6 pt-6 border-t border-white/5">
+            <button onClick={() => communityAPI.likePost(id).catch(console.error)} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-accent transition-all">
+                <Heart size={14} className={likes > 0 ? "fill-accent text-accent" : ""} /> {likes || 0} RESONANCE
             </button>
-            <button className="flex items-center gap-1.5 text-xs hover:text-accent transition-colors">
-                <MessageCircle size={14} className="opacity-40" /> 0
+            <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-accent transition-all">
+                <MessageCircle size={14} /> 0 CHRONICLES
             </button>
             <div className="flex-1" />
-            <button className="text-[10px] font-bold uppercase tracking-widest opacity-30 hover:opacity-100 transition-opacity">Share</button>
+            <button className="text-[10px] font-black uppercase tracking-[0.3em] text-accent/40 hover:text-accent transition-all">SHARE RADIANCE</button>
         </div>
     </motion.div>
 );
@@ -141,49 +147,51 @@ const Community = () => {
             <SEO title="Community — Inner Root" description="Join circles, events, and mindfulness sessions with our growing inner root community." />
 
             {/* Hero */}
-            <section ref={heroRef} className="relative overflow-hidden section-padding" style={{ paddingBottom: 'var(--sp-12)' }}>
-                <div className="sacred-geometry" style={{ opacity: 0.02 }} />
-                <div className="max-w-4xl mx-auto px-6 text-center">
-                    <motion.div initial={{ opacity: 0, y: 30 }} animate={heroInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.7 }}>
-                        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 text-xs font-semibold tracking-widest uppercase" style={{ background: 'rgba(124,58,237,0.08)', color: '#7c3aed' }}>
-                            <Users size={14} /> Community Hub
+                <div className="max-w-7xl mx-auto px-6 pt-10 relative z-10 text-center">
+                    <motion.div initial={{ opacity: 0, y: 30 }} animate={heroInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}>
+                        <span className="text-accent font-black uppercase text-[10px] tracking-[0.6em] mb-12 block">
+                            Circle of Seekers
                         </span>
-                        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-5" style={{ fontFamily: 'var(--font-display)' }}>
-                            Join the <span className="text-gradient">Circle of Seekers</span>
+                        
+                        <h1 className="text-6xl md:text-[8rem] font-display font-black leading-[0.8] mb-16 tracking-tighter">
+                            COMMUNITY <br/> OF LIGHT
                         </h1>
-                        <p className="text-base sm:text-lg max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
-                            Connect with a global community dedicated to heritage, mindfulness, and conscious living.
+                        
+                        <p className="text-base sm:text-lg max-w-2xl mx-auto opacity-40 font-heading uppercase tracking-widest leading-loose">
+                            Connect with a global collective dedicated to heritage, mindfulness, and the alchemy of conscious living.
                         </p>
                     </motion.div>
                 </div>
-            </section>
 
             {/* Tabs */}
             <section ref={contentRef} className="section-padding" style={{ paddingTop: 0 }}>
                 <div className="max-w-5xl mx-auto px-6">
                     {/* Search & Tab Selection Combined */}
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
-                        <div className="flex items-center p-1 rounded-2xl bg-secondary border border-primary w-full md:w-auto">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-20 bg-[#0a0a0a]/80 backdrop-blur-2xl p-4 rounded-[2.5rem] border border-white/5">
+                        <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 no-scrollbar">
                             {['events', 'circles', 'feed'].map(tab => (
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
-                                    className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${activeTab === tab ? 'bg-accent text-white shadow-lg shadow-accent-glow' : 'text-tertiary hover:text-primary'}`}
+                                    className={`px-8 py-5 rounded-2xl whitespace-nowrap font-heading font-black uppercase text-[10px] tracking-widest transition-all ${
+                                        activeTab === tab 
+                                        ? 'bg-accent text-obsidian-pure shadow-[0_10px_30px_rgba(217,119,6,0.3)]' 
+                                        : 'bg-white/5 text-white/40 hover:bg-white/10'
+                                    }`}
                                 >
-                                    {tab === 'events' ? <Calendar size={16} /> : tab === 'circles' ? <Users size={16} /> : <MessageCircle size={16} />}
-                                    <span className="capitalize">{tab}</span>
+                                    {tab}
                                 </button>
                             ))}
                         </div>
 
-                        <div className="relative w-full md:w-80">
-                            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 opacity-30" />
+                        <div className="relative w-full md:w-96">
+                            <Search size={20} className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20" />
                             <input
                                 type="text"
                                 placeholder={`Search ${activeTab}...`}
                                 value={searchQuery}
                                 onChange={e => setSearchQuery(e.target.value)}
-                                className="w-full bg-secondary border border-primary rounded-xl pl-12 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent transition-all"
+                                className="w-full bg-white/5 border border-white/5 rounded-2xl pl-16 pr-6 py-5 text-sm focus:outline-none focus:border-accent/40 font-heading text-white placeholder:text-white/20"
                             />
                         </div>
                     </div>
@@ -198,48 +206,57 @@ const Community = () => {
                         >
                             {/* Events Tab */}
                             {activeTab === 'events' && (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                                     {filteredEvents.map((event, i) => (
                                         <motion.div
                                             key={event.title}
                                             initial={{ opacity: 0, y: 20 }}
                                             animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: i * 0.08, duration: 0.5 }}
-                                            className="group rounded-3xl p-6 border border-primary bg-card hover:border-accent transition-all duration-300"
+                                            transition={{ delay: i * 0.08, duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                                            className="group relative rounded-[2.5rem] p-8 border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] hover:border-accent/20 transition-all duration-500 overflow-hidden"
                                         >
-                                            <div className="flex justify-between items-start mb-4">
-                                                <span className="text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full" style={{ background: `${event.color}12`, color: event.color }}>
+                                            <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-all duration-700 translate-x-4 group-hover:translate-x-0">
+                                                <Sparkles size={24} className="text-accent" />
+                                            </div>
+
+                                            <div className="flex justify-between items-start mb-8">
+                                                <span className="text-[10px] font-black tracking-[0.2em] uppercase px-4 py-2 rounded-full bg-accent/10 border border-accent/20 text-accent">
                                                     {event.category}
                                                 </span>
-                                                <div className="w-8 h-8 rounded-full border border-primary flex items-center justify-center opacity-40 group-hover:opacity-100 transition-opacity">
-                                                    {rsvpd[event.title] === 'confirmed' ? <Check size={14} className="text-success" /> : <Plus size={14} />}
+                                                <div className={`w-10 h-10 rounded-full border border-white/10 flex items-center justify-center transition-all duration-500 ${rsvpd[event.title] === 'confirmed' ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400' : 'group-hover:border-accent/40 text-white/20 group-hover:text-accent'}`}>
+                                                    {rsvpd[event.title] === 'confirmed' ? <Check size={18} /> : <Plus size={18} />}
                                                 </div>
                                             </div>
-                                            <h3 className="text-xl font-bold mb-3" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
+
+                                            <h3 className="text-3xl font-display font-black mb-4 tracking-tight uppercase group-hover:text-accent transition-colors">
                                                 {event.title}
                                             </h3>
 
-                                            <div className="flex flex-col gap-2 mb-5">
-                                                <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
-                                                    <Calendar size={12} className="opacity-40" /> {event.date} · {event.time}
+                                            <div className="flex flex-col gap-3 mb-8">
+                                                <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
+                                                    <Calendar size={14} className="text-accent/40" /> {event.date} · {event.time}
                                                 </div>
-                                                <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
-                                                    <MapPin size={12} className="opacity-40" /> Online via Inner Root Circle
+                                                <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
+                                                    <MapPin size={14} className="text-accent/40" /> Online · Sentient Core
                                                 </div>
                                             </div>
 
-                                            <div className="p-4 rounded-2xl bg-secondary mb-5">
-                                                <div className="text-[10px] font-bold uppercase tracking-tighter opacity-40 mb-1">Facilitated by</div>
-                                                <div className="text-sm font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>{event.facilitator}</div>
-                                                <div className="text-[11px] leading-relaxed" style={{ color: 'var(--text-tertiary)' }}>{event.bio}</div>
+                                            <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/5 mb-8">
+                                                <div className="text-[10px] font-black uppercase tracking-[0.3em] text-accent/40 mb-2">Facilitator</div>
+                                                <div className="text-sm font-heading font-black uppercase tracking-widest text-white mb-2">{event.facilitator}</div>
+                                                <div className="text-[11px] leading-relaxed text-white/30">{event.bio}</div>
                                             </div>
 
                                             <button
                                                 onClick={() => handleRSVP(event.title)}
                                                 disabled={rsvpd[event.title] === 'confirmed' || rsvpd[event.title] === 'joining'}
-                                                className={`btn w-full btn-sm flex items-center justify-center gap-2 ${rsvpd[event.title] === 'confirmed' ? 'btn-secondary text-success border-success/30' : 'btn-primary'}`}
+                                                className={`w-full py-5 rounded-2xl font-black uppercase text-[10px] tracking-[0.3em] transition-all ${
+                                                    rsvpd[event.title] === 'confirmed' 
+                                                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+                                                    : 'bg-accent text-obsidian-pure hover:scale-[1.02] active:scale-[0.98]'
+                                                }`}
                                             >
-                                                {rsvpd[event.title] === 'joining' ? 'Joining...' : rsvpd[event.title] === 'confirmed' ? <><Check size={14} /> RSVP Confirmed</> : <>Join Event <ArrowRight size={14} /></>}
+                                                {rsvpd[event.title] === 'joining' ? 'Aligning Resonance...' : rsvpd[event.title] === 'confirmed' ? 'Resonance Confirmed' : 'Sync with Circle'}
                                             </button>
                                         </motion.div>
                                     ))}
@@ -248,44 +265,48 @@ const Community = () => {
 
                             {/* Circles Tab */}
                             {activeTab === 'circles' && (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                                     {filteredCircles.map((circle, i) => (
                                         <motion.div
                                             key={circle.name}
                                             initial={{ opacity: 0, y: 20 }}
                                             animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: i * 0.08, duration: 0.5 }}
-                                            className="group rounded-3xl p-6 border border-primary bg-card hover:border-accent transition-all duration-300"
+                                            transition={{ delay: i * 0.08, duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                                            className="group relative rounded-[2.5rem] p-8 border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] hover:border-accent/20 transition-all duration-500"
                                         >
-                                            <div className="flex items-start gap-5 mb-5">
-                                                <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110" style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}>
-                                                    <circle.icon size={28} />
+                                            <div className="flex items-start gap-6 mb-8">
+                                                <div className="w-16 h-16 rounded-[1.5rem] flex items-center justify-center flex-shrink-0 transition-all duration-500 group-hover:scale-110 bg-accent/10 border border-accent/20 text-accent">
+                                                    <circle.icon size={32} />
                                                 </div>
                                                 <div className="flex-1">
-                                                    <h3 className="text-lg font-bold mb-1" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
+                                                    <h3 className="text-2xl font-display font-black mb-2 tracking-tight uppercase group-hover:text-accent transition-colors">
                                                         {circle.name}
                                                     </h3>
-                                                    <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{circle.desc}</p>
+                                                    <p className="text-xs leading-relaxed text-white/40 font-sans">{circle.desc}</p>
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center justify-between mb-6 px-1">
+                                            <div className="flex items-center justify-between mb-8 px-2">
                                                 <div className="flex flex-col">
-                                                    <span className="text-[10px] font-bold uppercase opacity-40 mb-0.5">Circle Lead</span>
-                                                    <span className="text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>{circle.facilitator}</span>
+                                                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-accent/40 mb-1">Circle Lead</span>
+                                                    <span className="text-xs font-heading font-black uppercase text-white tracking-widest">{circle.facilitator}</span>
                                                 </div>
                                                 <div className="text-right">
-                                                    <span className="text-[10px] font-bold uppercase opacity-40 mb-0.5">Active</span>
-                                                    <div className="text-xs font-semibold" style={{ color: 'var(--accent)' }}>{circle.members} Seekers</div>
+                                                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-accent/40 mb-1">Active</span>
+                                                    <div className="text-xs font-heading font-black uppercase text-accent tracking-widest">{circle.members} Seekers</div>
                                                 </div>
                                             </div>
 
                                             <button
                                                 onClick={() => handleRSVP(circle.name)}
                                                 disabled={rsvpd[circle.name] === 'confirmed' || rsvpd[circle.name] === 'joining'}
-                                                className={`btn w-full btn-sm flex items-center justify-center gap-2 ${rsvpd[circle.name] === 'confirmed' ? 'btn-secondary text-success border-success/30' : 'btn-primary'}`}
+                                                className={`w-full py-5 rounded-2xl font-black uppercase text-[10px] tracking-[0.3em] transition-all ${
+                                                    rsvpd[circle.name] === 'confirmed' 
+                                                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+                                                    : 'bg-accent text-obsidian-pure hover:scale-[1.02] active:scale-[0.98]'
+                                                }`}
                                             >
-                                                {rsvpd[circle.name] === 'joining' ? 'Joining...' : rsvpd[circle.name] === 'confirmed' ? <><Check size={14} /> Circle Joined</> : <>Join Circle <Plus size={14} /></>}
+                                                {rsvpd[circle.name] === 'joining' ? 'Initiating...' : rsvpd[circle.name] === 'confirmed' ? 'Initiated' : 'Request Initiation'}
                                             </button>
                                         </motion.div>
                                     ))}

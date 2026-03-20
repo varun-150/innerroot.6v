@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 import {
     LayoutDashboard, Compass, Heart, Users, BookOpen,
     Bell, Settings, LogOut, ChevronDown, Calendar,
@@ -11,7 +13,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import SEO from '../components/ui/SEO';
-import { moodAPI } from '../services/api';
+import { authAPI, moodAPI } from '../services/api';
 
 // ===== Sidebar Nav Items =====
 const sidebarItems = [
@@ -186,10 +188,18 @@ const Dashboard = () => {
         navigate('/login');
     };
 
-    const handleSaveProfile = (e) => {
+    const handleSaveProfile = async (e) => {
         e.preventDefault();
-        setProfileSaved(true);
-        setTimeout(() => setProfileSaved(false), 2500);
+        try {
+            await authAPI.updateProfile({
+                name: profileName,
+                // Add any other fields you want to update
+            });
+            setProfileSaved(true);
+            setTimeout(() => setProfileSaved(false), 2500);
+        } catch (err) {
+            console.error('Failed to update profile:', err);
+        }
     };
 
     /* displayInitials helper */
@@ -208,17 +218,46 @@ const Dashboard = () => {
         return () => observer.disconnect();
     }, []);
 
+    // ── GSAP Staggered Entrance ──
+    const dashboardRef = useRef(null);
+    useGSAP(() => {
+        if (inView) {
+            gsap.from(".kpi-card", {
+                y: 60,
+                opacity: 0,
+                duration: 1.2,
+                stagger: 0.15,
+                ease: "expo.out",
+                rotateX: -15,
+                perspective: 1000
+            });
+            gsap.from(".chart-card", {
+                y: 40,
+                opacity: 0,
+                duration: 1.5,
+                delay: 0.4,
+                stagger: 0.2,
+                ease: "power4.out"
+            });
+        }
+    }, { scope: dashboardRef, dependencies: [inView] });
+
     return (
         <>
             <SEO title="Dashboard — Inner Root" description="Your personal wellness and heritage dashboard." />
 
-            <div className="flex min-h-screen" style={{ background: 'var(--bg-primary)', paddingTop: 0, marginTop: '-1rem' }}>
+            <div className="flex min-h-screen relative overflow-hidden" style={{ background: 'var(--bg-primary)', paddingTop: 0, marginTop: '-1rem' }}>
+                {/* Background Decor */}
+                <div className="absolute inset-0 pointer-events-none opacity-30 overflow-hidden">
+                    <div className="orb orb-1 !w-[600px] !h-[600px] top-[-10%] left-[-10%]" />
+                    <div className="orb orb-2 !w-[500px] !h-[500px] bottom-[-5%] right-[-5%]" />
+                </div>
+
                 {/* ===== LEFT SIDEBAR ===== */}
                 <aside
-                    className={`hidden lg:flex flex-col fixed left-0 top-0 bottom-0 z-30 transition-all duration-300 ${sidebarOpen ? 'w-[260px]' : 'w-[72px]'
+                    className={`hidden lg:flex flex-col fixed left-0 top-0 bottom-0 z-30 transition-all duration-300 glass-morphism ${sidebarOpen ? 'w-[260px]' : 'w-[72px]'
                         }`}
                     style={{
-                        background: 'var(--bg-secondary)',
                         borderRight: '1px solid var(--border-primary)',
                     }}
                 >
@@ -274,26 +313,38 @@ const Dashboard = () => {
 
                 {/* ===== MAIN CONTENT ===== */}
                 <div
-                    className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'lg:ml-[260px]' : 'lg:ml-[72px]'}`}
+                    className={`flex-1 transition-all duration-300 relative z-10 ${sidebarOpen ? 'lg:ml-[260px]' : 'lg:ml-[72px]'}`}
                 >
                     {/* Top Bar */}
                     <div
-                        className="sticky top-16 lg:top-0 z-20 flex items-center justify-between px-6 lg:px-8 h-16"
+                        className="sticky top-16 lg:top-0 z-20 flex items-center justify-between px-6 lg:px-8 h-18 glass-morphism"
                         style={{
-                            background: 'var(--bg-glass-strong)',
-                            backdropFilter: 'blur(20px)',
-                            WebkitBackdropFilter: 'blur(20px)',
                             borderBottom: '1px solid var(--border-secondary)',
                         }}
                     >
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center justify-between mb-16">
                             <div>
-                                <h1 className="text-lg font-semibold" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
-                                    Welcome Back ✨
+                                <motion.span
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    className="text-accent font-black uppercase text-[10px] tracking-[0.4em] mb-4 block"
+                                >
+                                    Executive Overview
+                                </motion.span>
+                                <h1 className="text-4xl md:text-6xl font-display font-black tracking-tighter uppercase">
+                                    YOUR <span className="text-accent underline decoration-accent/20 underline-offset-8">SANCTUARY</span>
                                 </h1>
-                                <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
-                                    Your inner journey continues
-                                </p>
+                            </div>
+
+                            <div className="flex items-center gap-6">
+                                <div className="hidden md:flex flex-col items-end">
+                                    <span className="text-[10px] uppercase font-bold text-white/40 tracking-widest">Aura Resonance</span>
+                                    <span className="text-xl font-display font-black text-accent">89.4%</span>
+                                </div>
+                                <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center text-white/40 hover:text-accent transition-all cursor-pointer relative">
+                                    <Bell size={24} />
+                                    <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-accent animate-ping" />
+                                </div>
                             </div>
                         </div>
 
@@ -360,7 +411,7 @@ const Dashboard = () => {
                     </div>
 
                     {/* Dashboard Content */}
-                    <div ref={ref} className="p-6 lg:p-8 space-y-8">
+                    <div ref={dashboardRef} className="p-6 lg:p-8 space-y-8 perspective-1000">
 
                         {/* ══ PROFILE SECTION ══ */}
                         {activeSection === 'profile' && (
@@ -495,96 +546,83 @@ const Dashboard = () => {
                         {activeSection !== 'profile' && (
                             <>
                                 {/* === KPI Cards === */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 preserve-3d">
                                     {kpiData.map((kpi, i) => (
-                                        <motion.div
+                                        <div
                                             key={kpi.label}
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={inView ? { opacity: 1, y: 0 } : {}}
-                                            transition={{ delay: i * 0.08, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                                            className="group rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1"
+                                            className="kpi-card hover-3d group rounded-2xl p-5 transition-all duration-300 card-8k shimmer-border"
                                             style={{
                                                 background: isDark ? kpi.darkGradient : kpi.gradient,
-                                                border: '1px solid var(--border-primary)',
-                                                boxShadow: 'var(--shadow-sm)',
                                             }}
                                         >
                                             <div className="flex items-start justify-between mb-4">
                                                 <div
-                                                    className="w-11 h-11 rounded-xl flex items-center justify-center"
+                                                    className="w-11 h-11 rounded-xl flex items-center justify-center shadow-sm"
                                                     style={{ background: `${kpi.color}15`, color: kpi.color }}
                                                 >
                                                     <kpi.icon size={22} strokeWidth={1.5} />
                                                 </div>
                                                 <span
-                                                    className="text-xs font-semibold px-2.5 py-1 rounded-full"
-                                                    style={{ color: kpi.color, background: `${kpi.color}15` }}
+                                                    className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider"
+                                                    style={{ color: kpi.color, background: `${kpi.color}15`, border: `1px solid ${kpi.color}30` }}
                                                 >
                                                     {kpi.change}
                                                 </span>
                                             </div>
-                                            <div className="text-3xl font-bold mb-1" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
+                                            <div className="text-4xl font-bold mb-1 tracking-tighter" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
                                                 {kpi.label === 'Reflections Done' ? reflectionCount : kpi.value}{kpi.unit || ''}
                                             </div>
-                                            <div className="text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>
+                                            <div className="text-[10px] font-bold uppercase tracking-widest opacity-60" style={{ color: 'var(--text-primary)' }}>
                                                 {kpi.label}
                                             </div>
-                                        </motion.div>
+                                        </div>
                                     ))}
                                 </div>
 
                                 {/* === Charts Row === */}
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 preserve-3d">
                                     {/* Mood Trend Chart */}
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={inView ? { opacity: 1, y: 0 } : {}}
-                                        transition={{ delay: 0.3, duration: 0.5 }}
-                                        className="card p-6"
-                                    >
+                                    <div className="chart-card card-8k shimmer-border p-6 hover-3d bg-surface">
                                         <div className="flex items-center justify-between mb-6">
                                             <div>
-                                                <h3 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>Mood Trend</h3>
-                                                <p className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>This week's emotional journey</p>
+                                                <h3 className="text-base font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>Mood Trend</h3>
+                                                <p className="text-[10px] uppercase tracking-widest mt-1" style={{ color: 'var(--text-tertiary)' }}>Weekly emotional journey</p>
                                             </div>
-                                            <div className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-full" style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}>
-                                                <TrendingUp size={14} />
+                                            <div className="flex items-center gap-1 text-[10px] font-bold px-3 py-1 rounded-full" style={{ background: 'var(--accent-soft)', color: 'var(--accent)', border: '1px solid var(--accent-faint)' }}>
+                                                <TrendingUp size={12} />
                                                 <span>+12%</span>
                                             </div>
                                         </div>
-                                        <div className="h-40 mb-4">
+                                        <div className="h-40 mb-4 opacity-80 hover:opacity-100 transition-opacity">
                                             <MiniLineChart data={moodData} color="var(--accent)" />
                                         </div>
                                         <div className="flex justify-between px-1">
                                             {moodData.map((d) => (
-                                                <div key={d.day} className="text-center">
-                                                    <div className="text-[10px] font-medium" style={{ color: 'var(--text-tertiary)' }}>{d.day}</div>
-                                                    <div className="text-[10px] mt-0.5" style={{ color: 'var(--text-secondary)' }}>{d.label}</div>
+                                                <div key={d.day} className="text-center group/day">
+                                                    <div className="text-[10px] font-bold transition-colors group-hover/day:text-accent" style={{ color: 'var(--text-tertiary)' }}>{d.day}</div>
+                                                    <div className="text-[9px] mt-0.5 opacity-60" style={{ color: 'var(--text-secondary)' }}>{d.label}</div>
                                                 </div>
                                             ))}
                                         </div>
-                                    </motion.div>
+                                    </div>
 
                                     {/* Weekly Activity Chart */}
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={inView ? { opacity: 1, y: 0 } : {}}
-                                        transition={{ delay: 0.4, duration: 0.5 }}
-                                        className="card p-6"
-                                    >
+                                    <div className="chart-card card-8k shimmer-border p-6 hover-3d bg-surface">
                                         <div className="flex items-center justify-between mb-6">
                                             <div>
-                                                <h3 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>Weekly Activity</h3>
-                                                <p className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>Meditation, reflections & heritage</p>
+                                                <h3 className="text-base font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>Weekly Activity</h3>
+                                                <p className="text-[10px] uppercase tracking-widest mt-1" style={{ color: 'var(--text-tertiary)' }}>Meditation & Heritage</p>
                                             </div>
-                                            <div className="flex items-center gap-3 text-[10px]">
-                                                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm" style={{ background: 'var(--accent)' }} /> Meditation</span>
-                                                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm" style={{ background: 'var(--forest)', opacity: 0.7 }} /> Reflection</span>
-                                                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm" style={{ background: '#7c3aed', opacity: 0.5 }} /> Heritage</span>
+                                            <div className="flex items-center gap-3 text-[9px] font-bold uppercase tracking-tighter opacity-70">
+                                                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent)' }} /> Zen</span>
+                                                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--forest)', opacity: 0.7 }} /> Soul</span>
+                                                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full" style={{ background: '#7c3aed', opacity: 0.5 }} /> Root</span>
                                             </div>
                                         </div>
-                                        <BarChart data={weeklyActivity} />
-                                    </motion.div>
+                                        <div className="opacity-80 hover:opacity-100 transition-opacity">
+                                            <BarChart data={weeklyActivity} />
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {/* === Bottom Cards === */}

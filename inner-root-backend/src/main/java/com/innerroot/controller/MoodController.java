@@ -33,7 +33,7 @@ public class MoodController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        return ResponseEntity.ok(moodRepository.findByUserOrderByTimestampDesc(user));
+        return ResponseEntity.ok(moodRepository.findByUserOrderByCreatedAtDesc(user));
     }
 
     @PostMapping

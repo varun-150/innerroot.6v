@@ -41,7 +41,7 @@ const Privacy = () => {
 
                         <section className="space-y-4">
                             <h3 className="text-2xl font-display font-bold text-[var(--fg)]">4. Contact Us</h3>
-                            <p>If you have questions or concerns about this policy, please reach out to our team at <a href="mailto:support@innerroot.in" className="text-heritage-gold hover:underline">support@innerroot.in</a></p>
+                            <p>If you have questions or concerns about this policy, please reach out to our team at <a href="mailto:akurivarun@gmail.com" className="text-heritage-gold hover:underline">support@innerroot.in</a></p>
                         </section>
                     </div>
                 </Reveal>

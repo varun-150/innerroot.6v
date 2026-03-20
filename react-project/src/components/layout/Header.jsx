@@ -3,22 +3,21 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import {
-    Menu, X, Sun, Moon,
+    Menu, X,
     MapPin, Heart, Users, BookOpen,
-    LogIn, LayoutDashboard, Compass, Sparkles
+    LogIn, LayoutDashboard, Compass, Sparkles, Info
 } from 'lucide-react';
 
 import logo from '../../assets/logo.webp';
 
-// Core nav — Home removed (logo serves that) to avoid overcrowding
-// 5 items is the upper limit for comfortable desktop navigation
 const navItems = [
     { path: '/explore', label: 'Explore', icon: Compass },
-    { path: '/heritage-map', label: 'Heritage Map', icon: MapPin },
-    { path: '/wellness', label: 'Wellness', icon: Heart },
-    { path: '/community', label: 'Community', icon: Users },
-    { path: '/library', label: 'Library', icon: BookOpen },
-    { path: '/subscription', label: 'Plans', icon: Sparkles },
+    { path: '/heritage-map', label: 'Explore Map', icon: MapPin },
+    { path: '/wellness', label: 'Spiritual Wellness', icon: Heart },
+    { path: '/community', label: 'Sattva Community', icon: Users },
+    { path: '/library', label: 'Ancient Library', icon: BookOpen },
+    { path: '/subscription', label: 'Sushupti Plans', icon: Sparkles },
+    { path: '/about', label: 'About Us', icon: Info },
 ];
 
 const Header = ({ theme, onToggleTheme, isMobileMenuOpen, onToggleMobileMenu }) => {
@@ -32,8 +31,8 @@ const Header = ({ theme, onToggleTheme, isMobileMenuOpen, onToggleMobileMenu }) 
     useEffect(() => {
         const handleScroll = () => {
             const curr = window.scrollY;
-            setScrolled(curr > 20);
-            setHidden(curr > lastScroll && curr > 100);
+            setScrolled(curr > 50);
+            setHidden(curr > lastScroll && curr > 150);
             setLastScroll(curr);
         };
         window.addEventListener('scroll', handleScroll, { passive: true });
@@ -45,243 +44,141 @@ const Header = ({ theme, onToggleTheme, isMobileMenuOpen, onToggleMobileMenu }) 
     return (
         <>
             <motion.header
-                initial={{ y: -100 }}
-                animate={{ y: hidden ? -100 : 0 }}
-                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'py-2' : 'py-4'}`}
+                initial={{ y: -100, opacity: 0 }}
+                animate={{ y: hidden ? -100 : 0, opacity: 1 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                className={`fixed top-4 left-4 right-4 z-50 transition-all duration-700 rounded-[2rem] overflow-hidden`}
                 style={{
-                    background: scrolled ? 'var(--bg-glass-strong)' : 'transparent',
-                    backdropFilter: scrolled ? 'blur(24px) saturate(180%)' : 'none',
-                    WebkitBackdropFilter: scrolled ? 'blur(24px) saturate(180%)' : 'none',
-                    borderBottom: scrolled ? '1px solid var(--border-secondary)' : '1px solid transparent',
+                    background: scrolled ? 'rgba(10, 10, 10, 0.6)' : 'transparent',
+                    backdropFilter: scrolled ? 'blur(32px) saturate(200%)' : 'none',
+                    WebkitBackdropFilter: scrolled ? 'blur(32px) saturate(200%)' : 'none',
+                    border: scrolled ? '1px solid rgba(184, 115, 51, 0.2)' : '1px solid transparent',
+                    boxShadow: scrolled ? 'var(--shadow-8k)' : 'none',
                 }}
             >
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-12 lg:h-14">
+                <div className="max-w-7xl mx-auto px-6 py-4">
+                    <div className="flex items-center justify-between">
 
-                        {/* Logo — "Inner Root" spelled out so branding is clear */}
-                        <Link to="/" className="flex items-center gap-3 group" aria-label="Inner Root — home">
-                            <div className="relative w-10 h-10 flex items-center justify-center">
-                                <div className="absolute inset-[-4px] rounded-xl animate-spin-slow"
-                                    style={{ background: 'conic-gradient(from 0deg, var(--accent), var(--forest), var(--accent))', opacity: 0.12 }} />
+                        <Link to="/" className="flex items-center gap-4 group" aria-label="Inner Root — home">
+                            <div className="relative w-14 h-14 flex items-center justify-center p-2 rounded-2xl transition-all duration-700 group-hover:scale-110">
+                                <motion.div 
+                                    className="absolute inset-0 rounded-2xl border border-accent/30"
+                                    animate={{ rotate: [0, 90, 180, 270, 360] }}
+                                    transition={{ repeat: Infinity, duration: 15, ease: "linear" }}
+                                />
+                                <div className="absolute inset-2 rounded-full bg-accent/5 blur-xl group-hover:bg-accent/20 transition-all duration-700" />
                                 <img
                                     src={logo}
                                     alt="Inner Root Logo"
-                                    className="w-full h-full object-contain relative z-10 rounded-lg shadow-sm"
+                                    className="w-full h-full object-contain relative z-10 filter drop-shadow-[0_0_10px_rgba(212,175,55,0.3)]"
                                 />
                             </div>
-                            <div className="hidden sm:block">
-                                <span className="text-base font-semibold tracking-tight leading-none block"
-                                    style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
-                                    Inner Root
+                            <div className="flex flex-col">
+                                <span className="text-2xl font-black tracking-tighter uppercase leading-none font-heading"
+                                    style={{ color: 'var(--color-text)' }}>
+                                    INNER ROOT
                                 </span>
-                                <span className="text-[9px] tracking-widest uppercase leading-none block mt-0.5"
-                                    style={{ color: 'var(--text-tertiary)' }}>
-                                    Heritage · Wellness · AI
+                                <span className="text-[9px] tracking-[0.5em] font-bold uppercase mt-1.5"
+                                    style={{ color: 'var(--gold-500)', opacity: 0.8 }}>
+                                    The Aura of Heritage
                                 </span>
                             </div>
                         </Link>
 
-                        {/* Desktop Nav — 5 items max, clearly labelled */}
-                        <nav className="hidden lg:flex items-center gap-1" role="navigation" aria-label="Main navigation">
+                        {/* Desktop Nav - Spaced & Sophisticated */}
+                        <nav className="hidden lg:flex items-center gap-2" role="navigation">
                             {navItems.map(item => (
                                 <Link
                                     key={item.path}
                                     to={item.path}
-                                    className="relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300"
+                                    className="px-5 py-2.5 text-[13px] font-bold uppercase tracking-widest transition-all duration-500 relative group"
                                     style={{
-                                        color: isActive(item.path) ? 'var(--accent)' : 'var(--text-secondary)',
-                                        background: isActive(item.path) ? 'var(--accent-soft)' : 'transparent',
+                                        color: isActive(item.path) ? 'var(--color-text-accent)' : 'var(--color-text-subtle)',
                                     }}
-                                    onMouseEnter={e => { if (!isActive(item.path)) e.currentTarget.style.background = 'var(--accent-soft)'; }}
-                                    onMouseLeave={e => { if (!isActive(item.path)) e.currentTarget.style.background = 'transparent'; }}
                                 >
-                                    {item.label}
+                                    <span className="relative z-10">{item.label}</span>
                                     {isActive(item.path) && (
                                         <motion.div
-                                            layoutId="nav-indicator"
-                                            className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
-                                            style={{ background: 'var(--accent)' }}
+                                            layoutId="nav-glow"
+                                            className="absolute inset-0 bg-accent-soft rounded-full -z-10"
                                             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                                         />
                                     )}
+                                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-accent transition-all duration-300 group-hover:w-8" />
                                 </Link>
                             ))}
                         </nav>
 
-                        {/* Right actions */}
-                        <div className="flex items-center gap-2">
-                            {/* Theme Toggle — labeled for accessibility */}
-                            <motion.button
-                                whileTap={{ scale: 0.9 }}
-                                onClick={onToggleTheme}
-                                className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300"
-                                style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
-                                aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-                                title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-                            >
-                                <AnimatePresence mode="wait">
-                                    {theme === 'light' ? (
-                                        <motion.div key="moon" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                                            <Moon size={16} />
-                                        </motion.div>
-                                    ) : (
-                                        <motion.div key="sun" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                                            <Sun size={16} />
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </motion.button>
+                        {/* Actions */}
+                        <div className="flex items-center gap-4">
+                             {/* Theme toggle removed for permanent dark mode */}
 
                             {!isAuthenticated ? (
-                                <>
-                                    {/* Sign In — secondary ghost style (converts visitors) */}
-                                    <Link
-                                        to="/login"
-                                        className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200"
-                                        style={{ color: 'var(--text-secondary)', border: '1.5px solid var(--border-primary)' }}
-                                        onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)'; }}
-                                        onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-primary)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
-                                    >
-                                        <LogIn size={14} /> Sign In
-                                    </Link>
-
-                                    {/* Start Free — primary CTA for conversion */}
-                                    <Link
-                                        to="/signup"
-                                        className="hidden sm:inline-flex btn btn-primary btn-sm"
-                                    >
-                                        Start Free
-                                    </Link>
-                                </>
+                                <Link
+                                    to="/signup"
+                                    className="px-8 py-3 rounded-2xl text-[12px] font-black uppercase tracking-widest transition-all duration-500 shadow-glow-copper"
+                                    style={{ 
+                                        background: 'var(--gradient-copper-ray)',
+                                        color: 'white',
+                                    }}
+                                >
+                                    INITIATE
+                                </Link>
                             ) : (
-                                <>
-                                    <Link
-                                        to="/dashboard"
-                                        className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200"
-                                        style={{ color: 'var(--text-primary)', background: 'var(--accent-soft)' }}
-                                    >
-                                        <LayoutDashboard size={14} /> Dashboard
-                                    </Link>
-                                    <motion.button
-                                        whileTap={{ scale: 0.95 }}
-                                        onClick={() => { logout(); navigate('/'); }}
-                                        className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200"
-                                        style={{ color: 'var(--text-secondary)', border: '1.5px solid var(--border-primary)' }}
-                                    >
-                                        Sign Out
-                                    </motion.button>
-                                </>
+                                <Link
+                                    to="/dashboard"
+                                    className="w-11 h-11 rounded-2xl flex items-center justify-center border border-accent/20 bg-accent-soft text-accent"
+                                >
+                                    <LayoutDashboard size={18} />
+                                </Link>
                             )}
-
-                            {/* Mobile Menu Button */}
-                            <motion.button
-                                whileTap={{ scale: 0.9 }}
-                                onClick={onToggleMobileMenu}
-                                className="lg:hidden w-10 h-10 rounded-full flex items-center justify-center"
-                                style={{ color: 'var(--text-primary)', background: 'var(--accent-soft)' }}
-                                aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-                            >
-                                {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-                            </motion.button>
                         </div>
                     </div>
                 </div>
             </motion.header>
 
-            {/* Mobile Menu */}
+            {/* Mobile Nav Overhaul */}
             <AnimatePresence>
                 {isMobileMenuOpen && (
-                    <>
-                        {/* Backdrop */}
-                        <motion.div
-                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                            className="fixed inset-0 z-40"
-                            style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }}
-                            onClick={onToggleMobileMenu}
-                        />
-                        {/* Drawer */}
-                        <motion.div
-                            initial={{ x: '100%' }}
-                            animate={{ x: 0 }}
-                            exit={{ x: '100%' }}
-                            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                            className="fixed right-0 top-0 bottom-0 w-80 max-w-[85vw] z-50 overflow-y-auto"
-                            style={{ background: 'var(--bg-primary)', borderLeft: '1px solid var(--border-primary)' }}
-                        >
-                            <div className="p-6">
-                                <div className="flex items-center justify-between mb-8">
-                                    <div>
-                                        <span className="text-xl font-semibold block" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
-                                            Inner Root
-                                        </span>
-                                        <span className="text-[9px] tracking-widest uppercase" style={{ color: 'var(--text-tertiary)' }}>
-                                            Heritage · Wellness · AI
-                                        </span>
-                                    </div>
-                                    <button
-                                        onClick={onToggleMobileMenu}
-                                        className="w-9 h-9 rounded-full flex items-center justify-center"
-                                        style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
-                                        aria-label="Close menu"
-                                    >
-                                        <X size={18} />
-                                    </button>
-                                </div>
+                    <motion.div
+                        initial={{ opacity: 0, scale: 1.1 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.1 }}
+                        className="fixed inset-0 z-[100] flex flex-col p-8"
+                        style={{ background: 'var(--brand-obsidian)' }}
+                    >
+                        <div className="flex justify-between items-center mb-16">
+                            <span className="text-2xl font-black tracking-tighter uppercase">INNER ROOT</span>
+                            <button onClick={onToggleMobileMenu} className="w-14 h-14 rounded-full flex items-center justify-center bg-white/5 text-accent">
+                                <X size={32} />
+                            </button>
+                        </div>
 
-                                <nav className="flex flex-col gap-1" role="navigation" aria-label="Mobile navigation">
-                                    {/* Home in mobile only */}
+                        <nav className="flex flex-col gap-8">
+                            {navItems.map((item, i) => (
+                                <motion.div
+                                    key={item.path}
+                                    initial={{ x: -50, opacity: 0 }}
+                                    animate={{ x: 0, opacity: 1 }}
+                                    transition={{ delay: i * 0.1 }}
+                                >
                                     <Link
-                                        to="/"
+                                        to={item.path}
                                         onClick={onToggleMobileMenu}
-                                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all duration-200"
-                                        style={{
-                                            color: isActive('/') ? 'var(--accent)' : 'var(--text-secondary)',
-                                            background: isActive('/') ? 'var(--accent-soft)' : 'transparent',
-                                        }}
+                                        className="text-4xl font-display italic text-white/40 hover:text-accent transition-colors block"
                                     >
-                                        Home
+                                        {item.label}
                                     </Link>
-                                    {navItems.map((item, i) => (
-                                        <motion.div
-                                            key={item.path}
-                                            initial={{ opacity: 0, x: 20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: i * 0.05 }}
-                                        >
-                                            <Link
-                                                to={item.path}
-                                                onClick={onToggleMobileMenu}
-                                                className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all duration-200"
-                                                style={{
-                                                    color: isActive(item.path) ? 'var(--accent)' : 'var(--text-secondary)',
-                                                    background: isActive(item.path) ? 'var(--accent-soft)' : 'transparent',
-                                                }}
-                                            >
-                                                {item.icon && <item.icon size={18} />}
-                                                {item.label}
-                                            </Link>
-                                        </motion.div>
-                                    ))}
-                                </nav>
+                                </motion.div>
+                            ))}
+                        </nav>
 
-                                <div className="divider my-6" />
-
-                                {/* Mobile CTA — primary conversion action */}
-                                <Link to="/signup" onClick={onToggleMobileMenu} className="btn btn-primary w-full justify-center">
-                                    Start Free
-                                </Link>
-                                <Link to="/login" onClick={onToggleMobileMenu} className="btn btn-secondary w-full justify-center mt-3">
-                                    <LogIn size={16} /> Sign In
-                                </Link>
-                                <Link to="/dashboard" onClick={onToggleMobileMenu}
-                                    className="w-full flex items-center justify-center gap-2 mt-3 py-2.5 text-sm rounded-xl transition-colors"
-                                    style={{ color: 'var(--text-tertiary)' }}>
-                                    <LayoutDashboard size={15} /> Go to Dashboard
-                                </Link>
-                            </div>
-                        </motion.div>
-                    </>
+                        <div className="mt-auto">
+                            <Link to="/signup" onClick={onToggleMobileMenu} className="w-full py-6 rounded-3xl text-center font-bold uppercase tracking-widest bg-accent text-white block">
+                                Get Started
+                            </Link>
+                        </div>
+                    </motion.div>
                 )}
             </AnimatePresence>
         </>

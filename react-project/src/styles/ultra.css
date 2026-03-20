@@ -6,21 +6,22 @@
 
 /* ── Fluid type that scales from mobile → 8K (7680px) ──── */
 :root {
-    --display-1: clamp(3rem, 8vw, 9rem);
-    /* Hero H1 */
-    --display-2: clamp(2rem, 5vw, 6rem);
-    /* Section headers */
-    --display-3: clamp(1.5rem, 3vw, 4rem);
-    /* Sub-headers */
-    --body-lg: clamp(1rem, 1.5vw, 1.5rem);
-    /* Lead paragraph */
+    /* ── 💠 Cinematic Atmosphere ── */
+    --display-1: clamp(3.5rem, 10vw, 11rem);
+    --display-2: clamp(2.5rem, 6vw, 7.5rem);
+    --display-3: clamp(1.75rem, 4vw, 5rem);
+    --body-lg: clamp(1.125rem, 2vw, 1.75rem);
 
-    /* 8K-ready container */
-    --container-8k: min(96vw, 1920px);
+    --container-8k: min(94vw, 2400px);
 
-    /* Grain / noise texture (pure CSS) */
-    --noise-opacity-light: 0.022;
-    --noise-opacity-dark: 0.035;
+    /* Atmospheric Mesh Gradients */
+    --mesh-aurora: 
+        radial-gradient(at 0% 0%, rgba(212, 175, 55, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(85, 107, 47, 0.08) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(212, 175, 55, 0.08) 0px, transparent 50%);
+    
+    --mesh-deep: 
+        radial-gradient(circle at 50% -20%, #1A1C14 0%, #0E100A 100%);
 
     /* Cinematic shadow stack */
     --shadow-cinematic:
@@ -30,28 +31,15 @@
         0 64px 128px rgba(0, 0, 0, 0.06);
 
     --shadow-amber-glow:
-        0 0 20px rgba(217, 119, 6, 0.12),
-        0 0 60px rgba(217, 119, 6, 0.08),
-        0 0 120px rgba(217, 119, 6, 0.04);
-
-    /* Multi-stop gradient meshes */
-    --mesh-hero-light:
-        radial-gradient(ellipse 80% 60% at 20% -10%, rgba(217, 119, 6, 0.18) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 50% at 80% 110%, rgba(20, 83, 45, 0.12) 0%, transparent 55%),
-        radial-gradient(ellipse 50% 40% at 50% 50%, rgba(245, 190, 78, 0.06) 0%, transparent 70%),
-        radial-gradient(ellipse 100% 80% at 50% -20%, rgba(254, 247, 236, 1) 0%, rgba(245, 237, 224, 0.8) 100%);
-
-    --mesh-hero-dark:
-        radial-gradient(ellipse 80% 60% at 20% -10%, rgba(245, 190, 78, 0.10) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 50% at 80% 110%, rgba(134, 239, 172, 0.06) 0%, transparent 55%),
-        radial-gradient(ellipse 50% 40% at 50% 50%, rgba(245, 190, 78, 0.04) 0%, transparent 70%),
-        radial-gradient(ellipse 100% 80% at 50% -20%, rgba(10, 13, 12, 1) 0%, rgba(15, 22, 18, 0.9) 100%);
+        0 0 20px rgba(212, 175, 55, 0.15),
+        0 0 60px rgba(212, 175, 55, 0.10),
+        0 0 120px rgba(212, 175, 55, 0.05);
 
     /* Bento card gradients */
-    --bento-1: linear-gradient(135deg, rgba(217, 119, 6, 0.07) 0%, rgba(217, 119, 6, 0.02) 100%);
+    --bento-1: linear-gradient(135deg, rgba(212, 175, 55, 0.07) 0%, rgba(212, 175, 55, 0.02) 100%);
     --bento-2: linear-gradient(135deg, rgba(20, 83, 45, 0.07) 0%, rgba(20, 83, 45, 0.02) 100%);
-    --bento-3: linear-gradient(135deg, rgba(124, 58, 237, 0.07) 0%, rgba(124, 58, 237, 0.02) 100%);
-    --bento-4: linear-gradient(135deg, rgba(201, 162, 39, 0.07) 0%, rgba(201, 162, 39, 0.02) 100%);
+    --bento-3: linear-gradient(135deg, rgba(99, 102, 241, 0.07) 0%, rgba(99, 102, 241, 0.02) 100%);
+    --bento-4: linear-gradient(135deg, rgba(212, 175, 55, 0.07) 0%, rgba(212, 175, 55, 0.02) 100%);
 }
 
 /* ── Noise texture overlay (CSS-only grain effect) ──────── */
@@ -124,12 +112,12 @@
 .hero-mesh {
     position: absolute;
     inset: 0;
-    background: var(--mesh-hero-light);
+    background: var(--mesh-aurora);
     transition: background 0.5s;
 }
 
 [data-theme="dark"] .hero-mesh {
-    background: var(--mesh-hero-dark);
+    background: var(--mesh-deep);
 }
 
 /* ── Animated gradient orbs ──────────────────────────────── */
@@ -144,7 +132,7 @@
 .orb-1 {
     width: clamp(400px, 50vw, 900px);
     height: clamp(400px, 50vw, 900px);
-    background: radial-gradient(circle, rgba(217, 119, 6, 0.18) 0%, transparent 65%);
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.18) 0%, transparent 65%);
     top: -10%;
     right: -10%;
     animation-duration: 22s;
@@ -153,7 +141,7 @@
 .orb-2 {
     width: clamp(300px, 40vw, 700px);
     height: clamp(300px, 40vw, 700px);
-    background: radial-gradient(circle, rgba(20, 83, 45, 0.12) 0%, transparent 65%);
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 65%);
     bottom: -5%;
     left: -8%;
     animation-duration: 28s;
@@ -163,7 +151,7 @@
 .orb-3 {
     width: clamp(200px, 25vw, 500px);
     height: clamp(200px, 25vw, 500px);
-    background: radial-gradient(circle, rgba(245, 190, 78, 0.10) 0%, transparent 65%);
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.10) 0%, transparent 65%);
     top: 40%;
     left: 30%;
     animation-duration: 16s;
@@ -171,11 +159,11 @@
 }
 
 [data-theme="dark"] .orb-1 {
-    background: radial-gradient(circle, rgba(245, 190, 78, 0.12) 0%, transparent 65%);
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, transparent 65%);
 }
 
 [data-theme="dark"] .orb-2 {
-    background: radial-gradient(circle, rgba(134, 239, 172, 0.08) 0%, transparent 65%);
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 65%);
 }
 
 @keyframes orbDrift {
@@ -213,7 +201,7 @@
     position: absolute;
     inset: 0;
     opacity: 0;
-    background: linear-gradient(135deg, rgba(217, 119, 6, 0.05) 0%, transparent 60%);
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, transparent 60%);
     transition: opacity 0.5s var(--ease-out);
     pointer-events: none;
 }
@@ -221,11 +209,28 @@
 .card-8k:hover {
     transform: translateY(-8px);
     box-shadow: var(--shadow-cinematic);
-    border-color: rgba(217, 119, 6, 0.25);
+    border-color: rgba(245, 158, 11, 0.35);
 }
 
 .card-8k:hover::before {
     opacity: 1;
+}
+
+/* ── Hyper Card (Featured/Recommended) ───────────────────── */
+.card-8k-hyper {
+    position: relative;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(14, 16, 10, 0.98) 100%);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.8), 0 0 40px rgba(212, 175, 55, 0.05);
+    overflow: hidden;
+    transition: all 0.6s var(--ease-out);
+}
+
+.card-8k-hyper:hover {
+    transform: translateY(-16px) scale(1.015);
+    box-shadow: 0 60px 120px -30px rgba(0, 0, 0, 0.9), 0 0 60px rgba(212, 175, 55, 0.15);
+    border-color: var(--gold-300);
 }
 
 /* Bento grid */
@@ -283,8 +288,8 @@
     border-radius: inherit;
     background: conic-gradient(from var(--border-angle, 0deg),
             transparent 0deg,
-            rgba(217, 119, 6, 0.6) 60deg,
-            rgba(245, 190, 78, 0.8) 120deg,
+            rgba(212, 175, 55, 0.4) 60deg,
+            var(--gold-400) 120deg,
             transparent 180deg);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -419,12 +424,12 @@
 /* ── CTA gradient block ──────────────────────────────────── */
 .cta-block {
     position: relative;
-    border-radius: var(--radius-3xl);
+    border-radius: var(--radius-xl);
     padding: clamp(3rem, 7vw, 8rem) clamp(2rem, 5vw, 6rem);
     text-align: center;
     overflow: hidden;
-    background: linear-gradient(135deg, var(--color-accent) 0%, #c05500 45%, #92200a 100%);
-    box-shadow: 0 24px 80px rgba(217, 119, 6, 0.30), var(--shadow-amber-glow);
+    background: linear-gradient(135deg, var(--gold-600) 0%, var(--gold-900) 100%);
+    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.8), var(--shadow-amber-glow);
 }
 
 .cta-block::before {
@@ -432,8 +437,8 @@
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(ellipse 70% 60% at 20% 20%, rgba(255, 255, 255, 0.18) 0%, transparent 55%),
-        radial-gradient(ellipse 50% 40% at 80% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+        radial-gradient(ellipse 70% 60% at 20% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 80% 80%, rgba(212, 175, 55, 0.1) 0%, transparent 50%);
     pointer-events: none;
 }
 
@@ -622,4 +627,87 @@
 .trust-pill svg {
     color: var(--color-success);
     flex-shrink: 0;
+}
+
+/* ── SPATIAL & 3D PREMIUM UTILITIES ─────────────────────── */
+.perspective-1000 {
+    perspective: 1000px;
+}
+
+.preserve-3d {
+    transform-style: preserve-3d;
+}
+
+.glass-morphism {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.02);
+}
+
+[data-theme="dark"] .glass-morphism {
+    background: rgba(10, 10, 12, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.weightless-float {
+    animation: weightless 6s ease-in-out infinite;
+}
+
+@keyframes weightless {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    33% { transform: translateY(-12px) rotate(1deg); }
+    66% { transform: translateY(4px) rotate(-1deg); }
+}
+
+.hover-3d {
+    transition: transform 0.5s var(--ease-out);
+}
+
+.hover-3d:hover {
+    transform: perspective(1000px) rotateX(4deg) rotateY(-4deg) translateY(-8px);
+    box-shadow: 0 20px 40px rgba(99, 102, 241, 0.12);
+}
+
+.spatial-glow {
+    position: relative;
+}
+
+.spatial-glow::after {
+    content: '';
+    position: absolute;
+    inset: -20px;
+    background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+                rgba(251, 191, 36, 0.2) 0%, 
+                transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.cosmic-glow {
+    position: relative;
+}
+
+.cosmic-glow::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(135deg, #fbbf24, #6366f1, #fbbf24);
+    background-size: 200% auto;
+    border-radius: inherit;
+    z-index: -1;
+    animation: gradientFlow 4s linear infinite;
+    opacity: 0.5;
+}
+
+@keyframes liquid-glow {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+}
+
+.spatial-glow:hover::after {
+    opacity: 1;
 }

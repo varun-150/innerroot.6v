@@ -94,20 +94,22 @@ Comprehensive management interface to oversee the platform:
 
 ### 🔧 Backend
 
+-------------------------------------------------------------
 | Technology                | Purpose                        |
 | ------------------------- | ------------------------------ |
 | **Spring Boot 3.5.10**    | Backend application framework  |
 | **Java 21**               | Core programming language      |
-| **PostgreSQL (Supabase)** | Cloud database storage         |
+| **MySQL 8.0 / Local**      | Core database storage         |
 | **Spring Security**       | Authentication & authorization |
 | **JWT Authentication**    | Secure session handling        |
 | **OAuth2 (Google Login)** | Social authentication          |
 | **Maven**                 | Dependency management          |
+--------------------------------------------------------------
 
 ---
 
 ### 🎨 Frontend
-
+--------------------------------------------------------------
 | Technology                    | Purpose                    |
 | ----------------------------- | -------------------------- |
 | **React 19 (Vite)**           | Frontend framework         |
@@ -117,6 +119,7 @@ Comprehensive management interface to oversee the platform:
 | **Lucide React Icons**        | UI icons                   |
 | **React Leaflet / Leaflet**   | Interactive Maps           |
 | **D3.js / React Simple Maps** | Interactive visualizations |
+--------------------------------------------------------------
 
 ---
 
@@ -143,10 +146,9 @@ inner-root/
 
 ### 📌 Prerequisites
 
-* Java JDK 21+
+* MySQL 8.0+ installed and running
 * Node.js (latest LTS recommended)
 * Maven installed (or Maven Wrapper)
-* PostgreSQL / Supabase account
 
 ---
 
@@ -156,11 +158,14 @@ inner-root/
 cd inner-root-backend
 ```
 
-Configure database credentials in:
+Configure core platform settings (Database, JWT, Google OAuth, and NVIDIA NIM) in:
 
 ```
 src/main/resources/application.properties
 ```
+
+> [!IMPORTANT]
+> **AI Services:** This platform uses **NVIDIA NIM** for sentient heritage guidance. Ensure you have a valid `nvapi` key configured in `application.properties` or as an environment variable `NVIDIA_API_KEY`.
 
 Run the backend:
 
@@ -222,7 +227,7 @@ Founder & Lead Developer & UI/UX Designer
 ### GANGI REDDY GARI HEM SATHVIK REDDY
 Co-Founder
 
-### MD .RUHAN
+### MD .ROOHAN
 Backend Engineer
 
 ---

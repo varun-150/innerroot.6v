@@ -4,6 +4,8 @@ import {
     MapPin, Search, Landmark, Sparkles, Heart, BookOpen, Coffee,
     ArrowRight, X, Info, Globe, Calendar, Users
 } from 'lucide-react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 import { Link } from 'react-router-dom';
 import { exploreData } from '../data/exploreData';
 import SEO from '../components/ui/SEO';
@@ -79,6 +81,21 @@ const Explore = () => {
     const heroInView = useInView(heroRef, { once: true });
     const gridInView = useInView(gridRef, { once: true, margin: '-80px' });
 
+    // ── GSAP Staggered Entrance ──
+    useGSAP(() => {
+        if (gridInView) {
+            gsap.from(".heritage-card", {
+                y: 60,
+                opacity: 0,
+                duration: 1.2,
+                stagger: 0.08,
+                ease: "expo.out",
+                rotateX: -10,
+                perspective: 1000
+            });
+        }
+    }, { scope: gridRef, dependencies: [gridInView] });
+
     const filteredItems = allItems.filter(item => {
         const matchesSearch = item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
             item.subtitle?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -92,260 +109,271 @@ const Explore = () => {
     };
 
     return (
-        <>
-            <SEO title="Heritage Explorer — Inner Root" description="Explore India's cultural heritage through interactive maps and deep cultural insights." />
+        <div className="bg-obsidian-pure min-h-screen text-white/90 selection:bg-accent/30">
+            <SEO title="Sacred Cartography — Inner Root" description="Navigate the high-frequency heritage of India through our interactive sacred cartography." />
 
-            {/* ===== HERO ===== */}
+            {/* ===== PREMIUM HERO ===== */}
             <section
                 ref={heroRef}
-                className="relative overflow-hidden pt-32 pb-16 lg:pt-40 lg:pb-24"
+                className="relative overflow-hidden pt-40 pb-24 lg:pt-56 lg:pb-32"
             >
-                <div className="sacred-geometry" style={{ opacity: 0.03 }} />
-
-                {/* Visual Map Backdrop (Simulated Interactive Map) */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-6xl h-full opacity-10 pointer-events-none">
-                    <svg viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-                        <path d="M200 100 Q 250 50 400 80 T 600 150 T 700 300 T 550 500 T 300 550 T 150 400 T 200 100" stroke="var(--accent)" strokeWidth="1" strokeDasharray="4 4" />
-                        {stateNames.map((s, idx) => (
-                            <circle key={s} cx={200 + idx * 60} cy={150 + (idx % 3) * 100} r="4" fill="var(--accent)" />
-                        ))}
-                    </svg>
+                <div className="sacred-geometry opacity-[0.05]" />
+                
+                {/* Ancient Future Ambient BG */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[180%] h-[180%] opacity-20 pointer-events-none">
+                    <div className="absolute inset-0 bg-gradient-radial from-accent/10 via-transparent to-transparent animate-pulse-slow" />
                 </div>
 
-                <div className="max-w-5xl mx-auto px-6 text-center relative z-10">
+                <div className="max-w-7xl mx-auto px-6 relative z-10">
                     <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={heroInView ? { opacity: 1, y: 0 } : {}}
-                        transition={{ duration: 0.7 }}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={heroInView ? { opacity: 1, scale: 1 } : {}}
+                        transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+                        className="text-center"
                     >
-                        <Link
-                            to="/heritage-map"
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 text-xs font-semibold tracking-widest uppercase hover:scale-105 transition-transform cursor-pointer"
-                            style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
-                        >
-                            <MapPin size={14} /> Open Full Interactive Map
-                        </Link>
-                        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-5" style={{ fontFamily: 'var(--font-display)' }}>
-                            Explore India's{' '}
-                            <span className="text-gradient">Sacred Landmarks</span>
+                        <span className="text-accent font-black uppercase text-[11px] tracking-[0.8em] mb-14 block">
+                            Sacred Cartography of Civilization
+                        </span>
+                        
+                        <h1 className="text-7xl md:text-[10rem] font-display font-black leading-[0.75] mb-20 tracking-tighter uppercase">
+                            EXPLORE THE <br/> <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent via-white to-accent/60">SACRED REALM</span>
                         </h1>
-                        <p className="text-base sm:text-lg max-w-2xl mx-auto mb-10" style={{ color: 'var(--text-secondary)' }}>
-                            Navigate through 500+ monuments and temples. Our interactive state-grid provides deep context, audio guides, and mythological history for every site.
-                        </p>
 
-                        {/* Category Filters */}
-                        <div className="flex flex-wrap justify-center gap-3 mt-12 mb-8">
-                            {categories.map((cat) => (
-                                <button
-                                    key={cat.id}
-                                    onClick={() => setActiveCategory(cat.id)}
-                                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300"
-                                    style={{
-                                        background: activeCategory === cat.id ? 'var(--accent)' : 'var(--bg-glass)',
-                                        color: activeCategory === cat.id ? '#fff' : 'var(--text-secondary)',
-                                        border: '1px solid var(--border-glass)',
-                                        boxShadow: activeCategory === cat.id ? '0 8px 20px var(--accent-glow)' : 'var(--shadow-sm)'
-                                    }}
-                                >
-                                    <cat.icon size={16} />
-                                    {cat.name}
-                                </button>
-                            ))}
-                        </div>
+                        <div className="max-w-5xl mx-auto space-y-12">
+                            {/* Premium Search Console */}
+                            <div className="relative group card-8k shimmer-border p-3 overflow-hidden rounded-[3rem] bg-surface/40 backdrop-blur-3xl focus-within:ring-2 ring-accent/20 transition-all">
+                                <div className="flex flex-col md:flex-row items-center gap-4">
+                                    <div className="relative flex-1 w-full">
+                                        <Search className="absolute left-8 top-1/2 -translate-y-1/2 text-accent/40 group-focus-within:text-accent transition-colors" size={24} />
+                                        <input 
+                                            type="text"
+                                            placeholder="Search by site, era, or tradition..."
+                                            className="w-full bg-transparent border-none py-8 pl-20 pr-10 text-2xl text-white placeholder:text-white/10 outline-none font-heading"
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                        />
+                                    </div>
+                                    
+                                    <div className="flex flex-wrap justify-center gap-3 p-2 border-t md:border-t-0 md:border-l border-white/5 w-full md:w-auto">
+                                        {categories.map(cat => (
+                                            <button
+                                                key={cat.id}
+                                                onClick={() => setActiveCategory(cat.id)}
+                                                className={`px-10 py-6 rounded-2xl whitespace-nowrap font-heading font-black uppercase text-[10px] tracking-[0.2em] transition-all relative overflow-hidden group/btn ${
+                                                    activeCategory === cat.id 
+                                                    ? 'text-obsidian-pure' 
+                                                    : 'text-white/40 hover:text-white'
+                                                }`}
+                                            >
+                                                {activeCategory === cat.id && (
+                                                    <motion.div 
+                                                        layoutId="cat-active"
+                                                        className="absolute inset-0 bg-accent shadow-amber-glow"
+                                                        transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                                                    />
+                                                )}
+                                                <span className="relative z-10 flex items-center gap-3">
+                                                    {cat.icon && <cat.icon size={14} strokeWidth={activeCategory === cat.id ? 2.5 : 1.5} />}
+                                                    {cat.name}
+                                                </span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
 
-                        {/* Search + Info Bar */}
-                        <div className="max-w-2xl mx-auto flex flex-col sm:flex-row items-center gap-4 bg-card p-2 rounded-2xl border border-primary shadow-lg">
-                            <div className="relative flex-1 w-full">
-                                <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-tertiary)' }} />
-                                <input
-                                    type="text"
-                                    placeholder="Search by name, state, or era..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full bg-transparent pl-11 pr-4 py-3 text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-accent"
-                                    style={{ color: 'var(--text-primary)' }}
-                                />
-                            </div>
-                            <div className="hidden sm:flex items-center gap-2 px-4 py-2 border-l border-primary text-xs whitespace-nowrap" style={{ color: 'var(--text-tertiary)' }}>
-                                <Landmark size={14} className="text-accent" />
-                                <span>{allItems.length} records documented</span>
-                            </div>
+                            {/* Resonance Prompt */}
+                            <p className="text-xl italic text-white/40 font-display">
+                                "Navigate the high-frequency heritage of 5,000 years, encoded for the digital era."
+                            </p>
                         </div>
                     </motion.div>
                 </div>
             </section>
 
-            {/* ===== HERITAGE GRID ===== */}
-            <section ref={gridRef} className="section-padding" style={{ paddingTop: 0 }}>
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {filteredItems.map((item, i) => {
-                            return (
-                                <motion.div
-                                    key={item.id}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={gridInView ? { opacity: 1, y: 0 } : {}}
-                                    transition={{ delay: i * 0.02, duration: 0.5 }}
-                                    onClick={() => openItem(item)}
-                                    className="group cursor-pointer rounded-2xl overflow-hidden transition-all duration-500"
-                                    style={{
-                                        background: 'var(--bg-card)',
-                                        border: '1px solid var(--border-primary)',
-                                        boxShadow: 'var(--shadow-sm)',
-                                    }}
-                                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-6px)'; e.currentTarget.style.boxShadow = 'var(--shadow-card-hover)'; }}
-                                    onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
-                                >
-                                    {/* Image Container */}
-                                    <div className="relative h-48 overflow-hidden">
-                                        <img
-                                            src={item.image}
-                                            alt={item.title}
-                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                                        <div className="absolute bottom-3 left-3 flex items-center gap-2">
-                                            <span className="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider backdrop-blur-md bg-white/10 text-white border border-white/20">
-                                                {(item.category || 'general').replace('-', ' ')}
-                                            </span>
+            {/* ===== PREMIUM HERITAGE GRID ===== */}
+            <section ref={gridRef} className="pb-40 px-6">
+                <div className="max-w-7xl mx-auto">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                        {filteredItems.map((item) => (
+                            <motion.div
+                                key={item.id}
+                                layout
+                                onClick={() => openItem(item)}
+                                className="heritage-card group cursor-pointer rounded-[2.5rem] overflow-hidden transition-all duration-700 card-8k shimmer-border bg-surface/30 backdrop-blur-2xl hover:bg-surface/50 border border-white/5"
+                            >
+                                {/* Immersive Image Container */}
+                                <div className="relative h-64 overflow-hidden">
+                                    <img
+                                        src={item.image}
+                                        alt={item.title}
+                                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 grayscale-[30%] group-hover:grayscale-0"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-obsidian-pure via-transparent to-transparent opacity-80" />
+                                    
+                                    <div className="absolute top-5 left-5">
+                                        <div className="px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-[0.2em] backdrop-blur-xl bg-accent/20 text-accent border border-accent/30 shadow-amber-glow">
+                                            {(item.category || 'heritage').replace('-', ' ')}
                                         </div>
                                     </div>
+                                </div>
 
-                                    {/* Content */}
-                                    <div className="p-5">
-                                        <h3 className="text-lg font-bold mb-1" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
-                                            {item.title}
-                                        </h3>
-                                        <p className="text-[11px] font-medium mb-3" style={{ color: 'var(--accent)' }}>
-                                            {item.subtitle}
-                                        </p>
-                                        <p className="text-xs line-clamp-2 mb-4" style={{ color: 'var(--text-tertiary)' }}>
-                                            {item.description}
-                                        </p>
+                                {/* Refined Metadata */}
+                                <div className="p-8">
+                                    <h3 className="text-2xl font-display font-black mb-2 text-white group-hover:text-accent transition-colors tracking-tight">
+                                        {item.title}
+                                    </h3>
+                                    <p className="text-[11px] font-black uppercase tracking-[0.4em] text-accent/60 mb-6 italic">
+                                        {item.subtitle}
+                                    </p>
+                                    <p className="text-sm leading-relaxed text-white/40 line-clamp-2 mb-8 font-light">
+                                        {item.description}
+                                    </p>
 
-                                        <div className="flex items-center justify-between pt-4 border-t border-primary">
-                                            <div className="flex items-center gap-1.5 text-[10px]" style={{ color: 'var(--text-tertiary)' }}>
-                                                <MapPin size={12} />
-                                                <span>{item.origin}</span>
-                                            </div>
-                                            <div className="flex items-center gap-1 text-[10px] font-bold" style={{ color: 'var(--accent)' }}>
-                                                <span>Explore</span>
-                                                <ArrowRight size={12} />
-                                            </div>
+                                    <div className="flex items-center justify-between pt-6 border-t border-white/5">
+                                        <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-white/20">
+                                            <MapPin size={14} className="text-accent/40" />
+                                            <span>{item.origin}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-accent opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 transition-all duration-500">
+                                            <span>Explore</span>
+                                            <ArrowRight size={14} />
                                         </div>
                                     </div>
-                                </motion.div>
-                            );
-                        })}
+                                </div>
+                            </motion.div>
+                        ))}
                     </div>
 
                     {filteredItems.length === 0 && (
-                        <div className="text-center py-24" style={{ color: 'var(--text-tertiary)' }}>
-                            <Search size={64} className="mx-auto mb-6 opacity-20" />
-                            <h3 className="text-xl font-bold mb-2">No matching heritage found</h3>
-                            <p className="text-sm">Try adjusting your search or category filters.</p>
+                        <div className="text-center py-40 card-8k rounded-[4rem] bg-surface/10">
+                            <Search size={80} className="mx-auto mb-8 opacity-10 text-accent" strokeWidth={1} />
+                            <h3 className="text-4xl font-display font-black mb-4">Frequency Mismatch</h3>
+                            <p className="text-white/30 font-black uppercase tracking-[0.4em] text-xs">No heritage logs found for this query</p>
                             <button
                                 onClick={() => { setSearchQuery(''); setActiveCategory('all'); }}
-                                className="mt-6 text-accent font-semibold underline"
+                                className="mt-10 btn btn-primary px-12 py-5 text-[10px] font-black tracking-widest uppercase"
                             >
-                                Clear all filters
+                                Recalibrate Filters
                             </button>
                         </div>
                     )}
                 </div>
             </section>
 
-            {/* ===== ITEM DETAIL MODAL ===== */}
+            {/* ===== SACRED MODAL (CINEMATIC VIEW) ===== */}
             <AnimatePresence>
                 {selectedItem && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-hidden">
-                        {/* Backdrop */}
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-10 overflow-hidden">
+                        {/* High-Resolution Backdrop */}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                            className="absolute inset-0 bg-obsidian-pure/90 backdrop-blur-2xl"
                             onClick={() => setSelectedItem(null)}
                         />
 
-                        {/* Modal Container */}
+                        {/* Immersive Scroll Container */}
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            initial={{ opacity: 0, scale: 0.9, y: 40 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="relative z-[101] w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[2rem] sm:rounded-[2.5rem] bg-[var(--bg-primary)] border border-[var(--border-primary)] shadow-2xl flex flex-col"
+                            exit={{ opacity: 0, scale: 0.9, y: 40 }}
+                            className="relative z-[101] w-full max-w-6xl max-h-full overflow-y-auto no-scrollbar rounded-[4rem] bg-surface/30 border border-white/5 shadow-2xl flex flex-col glass-morphism backdrop-blur-3xl"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            {/* Hero Image in Modal */}
-                            <div className="relative h-64 sm:h-80 w-full shrink-0">
+                            {/* Cinematic Hero */}
+                            <div className="relative h-[50vh] min-h-[400px] w-full shrink-0">
                                 <img src={selectedItem.image} alt={selectedItem.title} className="w-full h-full object-cover" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-obsidian-pure via-obsidian-pure/40 to-transparent" />
+                                
                                 <button
                                     onClick={() => setSelectedItem(null)}
-                                    className="absolute top-4 right-4 sm:top-6 sm:right-6 w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md bg-black/40 text-white border border-white/20 hover:bg-black/60 transition-colors z-10"
+                                    className="absolute top-10 right-10 w-16 h-16 rounded-[2rem] flex items-center justify-center backdrop-blur-3xl bg-white/5 text-white/40 border border-white/10 hover:text-white hover:bg-white/10 hover:rotate-90 transition-all duration-700 z-50"
                                 >
-                                    <X size={20} />
+                                    <X size={32} strokeWidth={1.5} />
                                 </button>
 
-                                <div className="absolute bottom-6 left-6 right-6 sm:bottom-8 sm:left-8 sm:right-8">
-                                    <span className="px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest backdrop-blur-md bg-accent/20 text-accent border border-accent/30 mb-3 sm:mb-4 inline-block">
-                                        {(selectedItem.category || 'general').replace('-', ' ')}
-                                    </span>
-                                    <h2 className="text-2xl sm:text-4xl font-bold text-white mb-1 sm:mb-2" style={{ fontFamily: 'var(--font-display)' }}>
-                                        {selectedItem.title}
-                                    </h2>
-                                    <p className="text-white/80 text-xs sm:text-sm font-medium">{selectedItem.subtitle}</p>
+                                <div className="absolute bottom-16 left-16 right-16">
+                                    <motion.div
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: 0.4 }}
+                                    >
+                                        <div className="px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.5em] backdrop-blur-3xl bg-accent/20 text-accent border border-accent/20 mb-8 inline-block shadow-amber-glow">
+                                            {(selectedItem.category || 'sacred heritage').replace('-', ' ')}
+                                        </div>
+                                        <h2 className="text-6xl md:text-8xl font-display font-black text-white mb-4 tracking-tighter uppercase leading-[0.9]">
+                                            {selectedItem.title}
+                                        </h2>
+                                        <p className="text-xl md:text-2xl text-accent font-display italic opacity-80">{selectedItem.subtitle}</p>
+                                    </motion.div>
                                 </div>
                             </div>
 
-                            {/* Content Area */}
-                            <div className="p-6 sm:p-10 shrink-0">
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                                    {/* Main Content */}
-                                    <div className="lg:col-span-2 space-y-8">
+                            {/* Artifact Details Area */}
+                            <div className="p-10 lg:p-20">
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-20">
+                                    {/* Primary Dossier */}
+                                    <div className="lg:col-span-2 space-y-16">
                                         <section>
-                                            <h4 className="text-[10px] sm:text-xs uppercase tracking-widest font-bold mb-3 sm:mb-4 text-accent">Historical Context</h4>
-                                            <p className="text-sm sm:text-base leading-relaxed" style={{ color: 'var(--text-primary)' }}>
+                                            <div className="flex items-center gap-6 mb-8">
+                                                <div className="w-12 h-[1px] bg-accent" />
+                                                <h4 className="text-[11px] uppercase tracking-[0.6em] font-black text-accent">Chronicle & Context</h4>
+                                            </div>
+                                            <p className="text-xl md:text-2xl leading-relaxed text-white/70 font-display">
                                                 {selectedItem.description}
                                             </p>
                                         </section>
 
-                                        <section className="p-5 sm:p-6 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-primary)] shadow-inner">
-                                            <h4 className="text-[10px] sm:text-xs uppercase tracking-widest font-bold mb-2 sm:mb-3 text-accent">Significance</h4>
-                                            <p className="text-xs sm:text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                                        <section className="card-8k p-10 md:p-14 rounded-[3rem] bg-accent/5 border border-accent/10 relative overflow-hidden group/sig">
+                                            <Sparkles size={120} className="absolute -top-10 -right-10 opacity-[0.03] text-accent group-hover/sig:rotate-12 transition-transform duration-1000" />
+                                            <h4 className="text-[10px] uppercase tracking-[0.5em] font-black mb-6 text-accent">Esoteric Significance</h4>
+                                            <p className="text-lg leading-relaxed text-white/50 italic font-medium">
                                                 {selectedItem.significance}
                                             </p>
                                         </section>
                                     </div>
 
-                                    {/* Sidebar Info */}
-                                    <div className="space-y-4 sm:space-y-6">
-                                        <div className="p-4 sm:p-5 rounded-2xl space-y-4 bg-[var(--accent-soft)] border border-[var(--border-primary)] shadow-sm">
+                                    {/* Intelligence Panel */}
+                                    <div className="space-y-10">
+                                        <div className="card-8k p-10 rounded-[3rem] space-y-8 bg-surface/20 border border-white/5">
                                             <div>
-                                                <span className="text-[9px] sm:text-[10px] uppercase tracking-tighter block opacity-60 mb-1">Origin / Region</span>
-                                                <span className="text-xs sm:text-sm font-bold flex items-center gap-2">
-                                                    <MapPin size={14} className="text-accent shrink-0" />
-                                                    <span className="truncate">{selectedItem.origin}</span>
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-white/20 block mb-3">Origin / Region</span>
+                                                <span className="text-lg font-black flex items-center gap-4 text-white">
+                                                    <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center text-accent">
+                                                        <MapPin size={20} />
+                                                    </div>
+                                                    {selectedItem.origin}
                                                 </span>
                                             </div>
+
+                                            <div className="h-[1px] bg-white/5 w-full" />
+
                                             {selectedItem.wikiUrl && (
                                                 <a
                                                     href={selectedItem.wikiUrl}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="inline-flex items-center gap-2 text-xs font-bold text-accent hover:underline mt-2 transition-all hover:gap-3"
+                                                    className="flex items-center justify-between group/link"
                                                 >
-                                                    <BookOpen size={14} />
-                                                    View on Wikipedia <ArrowRight size={12} />
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-white/30">Library Link</span>
+                                                    <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-white/40 group-hover/link:border-accent group-hover/link:text-accent transition-all">
+                                                        <BookOpen size={20} />
+                                                    </div>
                                                 </a>
                                             )}
                                         </div>
 
                                         <button
-                                            className="w-full py-3 sm:py-4 rounded-xl text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-transform hover:scale-[1.02] shadow-[0_8px_20px_var(--accent-glow)] bg-[var(--accent)]"
+                                            className="w-full py-8 rounded-[2rem] text-obsidian-pure font-black text-xs uppercase tracking-[0.4em] flex items-center justify-center gap-4 transition-all hover:scale-[1.03] active:scale-95 shadow-amber-glow bg-accent"
                                         >
-                                            <Heart size={16} /> Add to Favorites
+                                            <Heart size={18} fill="currentColor" /> Harvest to Core
                                         </button>
+                                        
+                                        <p className="text-[9px] text-center text-white/10 font-black uppercase tracking-[0.3em]">
+                                            Last Updated by Root protocols
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -353,7 +381,7 @@ const Explore = () => {
                     </div>
                 )}
             </AnimatePresence>
-        </>
+        </div>
     );
 };
 

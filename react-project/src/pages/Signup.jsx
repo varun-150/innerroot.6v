@@ -156,13 +156,15 @@ const Signup = () => {
                                     transition={{ duration: 0.3 }}
                                 >
                                     {/* Logo + Heading */}
-                                    <div className="text-center mb-8">
-                                        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 overflow-hidden"
-                                            style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-primary)' }}>
+                                    <div className="text-center mb-10">
+                                        <div className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 overflow-hidden bg-white/5 border border-white/5 shadow-2xl">
                                             <img src={logo} alt="Inner Root Logo" className="w-full h-full object-contain" />
                                         </div>
-                                        <h1 className="text-2xl font-bold mb-1" style={{ fontFamily: 'var(--font-display)' }}>Begin Your Journey</h1>
-                                        <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>Create your Inner Root account</p>
+                                        <h1 className="text-3xl font-display font-black tracking-widest uppercase mb-2">Begin Your Journey</h1>
+                                        <div className="flex items-center justify-center gap-2">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                                            <p className="text-[10px] uppercase font-bold text-white/40 tracking-[0.2em]">Initiate Your Digital Avatar</p>
+                                        </div>
                                     </div>
 
                                     {/* Google Button */}
@@ -269,10 +271,10 @@ const Signup = () => {
                                         </div>
 
                                         <button type="submit" disabled={loading}
-                                            className="btn btn-primary w-full justify-center" style={{ height: 48 }}>
+                                            className="w-full py-5 rounded-2xl font-black uppercase text-xs tracking-[0.2em] transition-all bg-gold-600 text-obsidian-pure hover:scale-[1.02] active:scale-[0.98] shadow-[0_20px_40px_rgba(217,119,6,0.2)]">
                                             {loading ? (
-                                                <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                                            ) : <><UserPlus size={17} /> Create Account</>}
+                                                <div className="w-5 h-5 rounded-full border-2 border-obsidian-pure border-t-transparent animate-spin mx-auto" />
+                                            ) : 'Manifest Identity'}
                                         </button>
                                     </form>
                                 </motion.div>

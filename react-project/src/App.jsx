@@ -13,7 +13,6 @@ import MandalaBg from './components/layout/MandalaBg';
 import Particles from './components/layout/Particles';
 import ChatBot from './components/features/ChatBot';
 
-// Wrapper to get current location for Header
 const AppContent = () => {
   const { theme, toggleTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

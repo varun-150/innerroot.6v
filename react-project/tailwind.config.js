@@ -32,9 +32,12 @@ export default {
                     soft: 'var(--color-forest-soft)',
                 },
                 glass: 'var(--color-overlay)',
+                'obsidian-pure': 'rgb(3 3 3 / <alpha-value>)',
+                surface: 'rgb(10 10 10 / <alpha-value>)',
             },
             fontFamily: {
                 display: ['Cormorant Garamond', 'serif'],
+                heading: ['Poppins', 'sans-serif'],
                 body: ['Poppins', 'sans-serif']
             }
         },

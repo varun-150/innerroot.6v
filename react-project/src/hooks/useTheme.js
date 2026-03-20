@@ -1,20 +1,14 @@
 import { useState, useEffect } from 'react';
-import { THEME_STORAGE_KEY } from '../utils/constants';
 
 export const useTheme = () => {
-    const [theme, setTheme] = useState('light');
+    const [theme] = useState('dark');
 
     useEffect(() => {
-        const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || 'light';
-        setTheme(savedTheme);
-        document.body.dataset.theme = savedTheme;
+        document.body.dataset.theme = 'dark';
     }, []);
 
     const toggleTheme = () => {
-        const newTheme = theme === 'light' ? 'dark' : 'light';
-        setTheme(newTheme);
-        localStorage.setItem(THEME_STORAGE_KEY, newTheme);
-        document.body.dataset.theme = newTheme;
+        // No-op to prevent errors if called
     };
 
     return { theme, toggleTheme };

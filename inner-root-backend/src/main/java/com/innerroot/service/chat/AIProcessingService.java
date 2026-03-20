@@ -1,6 +1,7 @@
 package com.innerroot.service.chat;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.innerroot.config.AIConfig;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -16,43 +17,51 @@ import java.util.Map;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class AIProcessingService {
 
-    @Value("${openrouter.api.key:}")
-    private String openRouterApiKey;
+    private final AIConfig aiConfig;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
     public String generateResponse(String message, String knowledgeCtx) {
+        String systemPrompt = "You are Aura AI, the Sentient Heritage Guide of Inner Root. You are deeply rooted in the timeless wisdom of Bharat — "
+                + "spanning the Vedas, Upanishads, Ayurveda, and the profound architectural marvels of India. "
+                + "Your purpose is to guide seekers with poetic precision, empathy, and cultural depth. "
+                + "Use this Sacred Knowledge Context to weave your response: " + knowledgeCtx
+                + ". Always maintain a tone that is serene, enlightened, and intellectually premium.";
+        return generateAIResponse(systemPrompt, message);
+    }
+
+    public String generateAIResponse(String systemPrompt, String message) {
         log.info("AI Processing module: Generating response with LLM...");
 
-        if (openRouterApiKey == null || openRouterApiKey.trim().isEmpty()) {
-            log.warn("OpenRouter API Key is missing. Returning fallback response.");
-            return "Based on my wisdom (" + knowledgeCtx
-                    + "), I guide you on your journey. (API Key not configured in backend)";
+        String apiKey = aiConfig.getKey();
+        String apiUrl = aiConfig.getUrl();
+        String model = aiConfig.getModel();
+
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            log.warn("NVIDIA API Key is missing. Returning fallback response.");
+            return "Based on my wisdom, I guide you on your journey. (AI Config missing)";
         }
 
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("Authorization", "Bearer " + openRouterApiKey);
-            headers.set("HTTP-Referer", "http://localhost:8080");
-            headers.set("X-Title", "Inner Root Backend Engine");
+            headers.set("Authorization", "Bearer " + apiKey);
 
             Map<String, Object> body = new HashMap<>();
-            body.put("model", "google/gemini-2.0-flash-lite-001");
+            body.put("model", model != null ? model : "meta/llama-3.1-8b-instruct");
 
             List<Map<String, String>> messages = new ArrayList<>();
-            messages.add(Map.of("role", "system", "content",
-                    "You are the Inner Root Heritage Companion, an AI guide. Be rooted in traditional Indian wisdom. Use this knowledge retrieval context to form your answer: "
-                            + knowledgeCtx));
+            messages.add(Map.of("role", "system", "content", systemPrompt));
             messages.add(Map.of("role", "user", "content", message));
             body.put("messages", messages);
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
 
             ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
-                    "https://openrouter.ai/api/v1/chat/completions",
+                    apiUrl != null ? apiUrl : "https://integrate.api.nvidia.com/v1/chat/completions",
                     org.springframework.http.HttpMethod.POST,
                     entity,
                     new org.springframework.core.ParameterizedTypeReference<Map<String, Object>>() {
@@ -68,8 +77,7 @@ public class AIProcessingService {
             }
         } catch (Exception e) {
             log.error("AI API call failed", e);
-            return "I apologize, but I am having trouble connecting to the wisdom ether right now. (Knowledge Context used: "
-                    + knowledgeCtx + ")";
+            return "I apologize, but I am having trouble connecting to the wisdom ether right now.";
         }
 
         return "Internal AI processing error.";
