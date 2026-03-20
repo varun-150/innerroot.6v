@@ -1,0 +1,11 @@
+# Root Gitignore
+node_modules/
+.env
+.env.local
+.DS_Store
+*.log
+inner-root-backend/target/
+react-project/dist/
+react-project/node_modules/
+.agents/
+.gemini/
