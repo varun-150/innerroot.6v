@@ -1,21 +1,23 @@
-import React from 'react';
-import Home from '../pages/Home';
-import Explore from '../pages/Explore';
-import Tours from '../pages/Tours';
-import Wellness from '../pages/Wellness';
-import Library from '../pages/Library';
-import Community from '../pages/Community';
-import About from '../pages/About';
-import Login from '../pages/Login';
-import Signup from '../pages/Signup';
-import Dashboard from '../pages/Dashboard';
-import Privacy from '../pages/Privacy';
-import Terms from '../pages/Terms';
-import Subscription from '../pages/Subscription';
-import SeedGenerator from '../pages/SeedGenerator';
-import HeritageExplorer from '../pages/HeritageExplorer';
-import Contact from '../pages/Contact';
-import Monetization from '../pages/Monetization';
+import React, { lazy } from 'react';
+
+// Lazy load pages for better performance
+const Home = lazy(() => import('../pages/Home'));
+const Explore = lazy(() => import('../pages/Explore'));
+const Tours = lazy(() => import('../pages/Tours'));
+const Wellness = lazy(() => import('../pages/Wellness'));
+const Library = lazy(() => import('../pages/Library'));
+const Community = lazy(() => import('../pages/Community'));
+const About = lazy(() => import('../pages/About'));
+const Login = lazy(() => import('../pages/Login'));
+const Signup = lazy(() => import('../pages/Signup'));
+const Dashboard = lazy(() => import('../pages/Dashboard'));
+const Privacy = lazy(() => import('../pages/Privacy'));
+const Terms = lazy(() => import('../pages/Terms'));
+const Subscription = lazy(() => import('../pages/Subscription'));
+const SeedGenerator = lazy(() => import('../pages/SeedGenerator'));
+const HeritageExplorer = lazy(() => import('../pages/HeritageExplorer'));
+const Contact = lazy(() => import('../pages/Contact'));
+const Monetization = lazy(() => import('../pages/Monetization'));
 import ProtectedRoute from '../components/auth/ProtectedRoute';
 
 export const routes = [
