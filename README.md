@@ -11,8 +11,8 @@ The platform aims to make traditional wisdom accessible in a contemporary digita
 
 * Promote awareness of **Indian cultural heritage and traditions**
 * Provide accessible **mental wellness and spiritual guidance**
-* Create a digital community focused on **self-growth and cultural connection**
 * Use modern technologies to make ancient knowledge **interactive and engaging**
+* Personalize the heritage experience through **AI intelligence**
 
 ---
 
@@ -54,16 +54,6 @@ Focused on emotional balance and mindful living:
 
 ---
 
-### 🤝 Community & Interaction
-
-Building meaningful connections:
-
-* **Discussion Forums**
-  Share experiences, discuss traditions, spirituality, and personal growth.
-
-* **Events & Workshops**
-  Cultural programs, wellness sessions, webinars, and community activities.
-
 * **Personalized Dashboard**
   Monitor progress, saved content, activity history, and wellness journey.
 
@@ -75,8 +65,6 @@ Comprehensive management interface to oversee the platform:
 
 * **Manage Heritage Locations:** Add, edit, or remove interactive map markers and cultural data.
 * **User Management:** Monitor user roles, access, and activities.
-* **Event Management:** Create and track workshops, webinars, and community programs.
-* **Post Moderation:** Oversee discussion forums to maintain a safe community space.
 
 ---
 
@@ -87,6 +75,15 @@ Comprehensive management interface to oversee the platform:
 * Secure authentication & role-based access
 * Scalable full-stack architecture
 * Modern responsive UI design
+
+---
+
+## 🤖 Automation & CI/CD
+
+The platform utilizes **GitHub Actions** for automated build checks and deployment stability:
+* **Frontend CI:** Automatic build verification for the React/Vite project.
+* **Backend CI:** Java/Maven build checks ensured on every push.
+* **Netlify Integration:** Seamless frontend deployment triggered by successful Git commits.
 
 ---
 
