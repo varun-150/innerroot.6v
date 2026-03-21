@@ -4,7 +4,7 @@ import { motion, useInView, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import {
-    LayoutDashboard, Compass, Heart, Users, BookOpen,
+    LayoutDashboard, Compass, Heart, BookOpen,
     Bell, Settings, LogOut, ChevronDown, Calendar,
     TrendingUp, Brain, Flame, Target, ArrowRight,
     Sun, Moon, Filter, MapPin, Sparkles,
@@ -20,7 +20,6 @@ const sidebarItems = [
     { icon: LayoutDashboard, label: 'Overview', id: 'overview' },
     { icon: Compass, label: 'Heritage', id: 'heritage' },
     { icon: Heart, label: 'Wellness', id: 'wellness' },
-    { icon: Users, label: 'Community', id: 'community' },
     { icon: BookOpen, label: 'Library', id: 'library' },
     { icon: User, label: 'Profile', id: 'profile' },
     { icon: Settings, label: 'Settings', id: 'settings' },
@@ -657,40 +656,6 @@ const Dashboard = () => {
                                         </div>
                                     </motion.div>
 
-                                    {/* Upcoming Community Event */}
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={inView ? { opacity: 1, y: 0 } : {}}
-                                        transition={{ delay: 0.6, duration: 0.5 }}
-                                        className="card p-6 sm:p-8"
-                                    >
-                                        <div className="flex items-center gap-2 mb-5">
-                                            <Calendar size={18} style={{ color: 'var(--accent)' }} />
-                                            <span className="text-xs font-semibold tracking-widest uppercase" style={{ color: 'var(--accent)' }}>
-                                                Upcoming Event
-                                            </span>
-                                        </div>
-                                        <h3 className="text-xl font-bold mb-2" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
-                                            Full Moon Meditation Circle
-                                        </h3>
-                                        <p className="text-sm mb-5 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                                            Join our community for a guided Purnima meditation session with chanting and reflection.
-                                        </p>
-                                        <div className="flex flex-wrap gap-4 mb-5">
-                                            <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-tertiary)' }}>
-                                                <Clock size={14} />
-                                                <span>March 14, 2026 · 7:00 PM</span>
-                                            </div>
-                                            <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-tertiary)' }}>
-                                                <Users size={14} />
-                                                <span>128 attending</span>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <Link to="/community" className="btn btn-primary btn-sm">RSVP Now</Link>
-                                            <Link to="/community" className="btn btn-ghost btn-sm" style={{ color: 'var(--text-secondary)' }}>View All Events</Link>
-                                        </div>
-                                    </motion.div>
                                 </div>
                             </>
                         )}

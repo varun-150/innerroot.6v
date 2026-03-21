@@ -4,8 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import {
     Menu, X,
-    MapPin, Heart, Users, BookOpen,
-    LogIn, LayoutDashboard, Compass, Sparkles, Info
+    MapPin, Heart, BookOpen,
+    LogIn, LayoutDashboard, Compass, Info
 } from 'lucide-react';
 
 import logo from '../../assets/logo.webp';
@@ -14,9 +14,7 @@ const navItems = [
     { path: '/explore', label: 'Explore', icon: Compass },
     { path: '/heritage-map', label: 'Explore Map', icon: MapPin },
     { path: '/wellness', label: 'Spiritual Wellness', icon: Heart },
-    { path: '/community', label: 'Sattva Community', icon: Users },
     { path: '/library', label: 'Ancient Library', icon: BookOpen },
-    { path: '/subscription', label: 'Sushupti Plans', icon: Sparkles },
     { path: '/about', label: 'About Us', icon: Info },
 ];
 

@@ -33,11 +33,7 @@ export const getWisdomQuotes = () => api.get('/wisdom');
 export const getCultureItems = () => api.get('/culture');
 export const getHeritageSites = () => api.get('/heritage-sites');
 export const getLibraryItems = () => api.get('/library');
-export const getCommunityPosts = () => api.get('/community/posts');
-export const createPost = (post) => api.post('/community/posts', post);
-export const likePost = (id) => api.post(`/community/posts/${id}/like`);
 export const getGuides = () => api.get('/guides');
-export const getEvents = () => api.get('/events');
 
 export const authAPI = {
     login: (email, password) => api.post('/auth/login', { email, password }).then(res => res.data),
@@ -50,12 +46,6 @@ export const authAPI = {
 export const japaAPI = {
     save: (japaData) => api.post('/japa', japaData).then(res => res.data),
     getHistory: () => api.get('/japa').then(res => res.data),
-};
-
-export const communityAPI = {
-    getPosts: () => api.get('/community/posts').then(res => res.data),
-    createPost: (title, content) => api.post('/community/posts', { title, content }).then(res => res.data),
-    likePost: (id) => api.post(`/community/posts/${id}/like`).then(res => res.data),
 };
 
 export const wisdomAPI = {
@@ -73,10 +63,6 @@ export const heritageAPI = {
 
 export const libraryAPI = {
     getAll: () => api.get('/library').then(res => res.data),
-};
-
-export const eventAPI = {
-    getAll: () => api.get('/events').then(res => res.data),
 };
 
 export const moodAPI = {

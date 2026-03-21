@@ -15,10 +15,6 @@ const footerLinks = {
         { label: 'Daily Reflections', to: '/wellness' },
         { label: 'Meditation Guide', to: '/wellness' },
     ],
-    Community: [
-        { label: 'Spiritual Circles', to: '/community' },
-        { label: 'Events', to: '/community' },
-    ],
     Company: [
         { label: 'About Inner Root', to: '/about' },
         { label: 'Contact Us', to: '/contact' },
@@ -197,7 +193,6 @@ const Footer = () => (
                     {[
                         { label: 'Privacy Policy', to: '/privacy' },
                         { label: 'Terms of Use', to: '/terms' },
-                        { label: 'Membership', to: '/subscription' },
                     ].map(({ label, to }) => (
                         <Link
                             key={label}

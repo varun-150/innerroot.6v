@@ -97,7 +97,7 @@ const Monetization = () => {
                                 features={[
                                     "Basic culture exploration",
                                     "Limited meditations (3 per week)",
-                                    "Community access",
+                                    "Cultural library access",
                                     "Daily wisdom quotes"
                                 ]}
                                 buttonText="Get Started"
@@ -206,7 +206,7 @@ const Monetization = () => {
                                 { title: "Authentic Positioning", desc: "A platform built by Indians, for Indians, ensuring deep cultural resonance.", icon: Shield },
                                 { title: "Cultural Partnerships", desc: "Direct alignment with temples, ashrams, and prestigious cultural orgs.", icon: Heart },
                                 { title: "Educational Angle", desc: "B2B revenue streams from schools, building brand credibility early.", icon: GraduationCap },
-                                { title: "Community First", desc: "Allowing users to create and curate content, driving organic growth.", icon: Users }
+                                { title: "Heritage First", desc: "Allowing users to explore and curate content, driving organic growth.", icon: Users }
                             ].map(({ icon: Icon, ...item }, i) => (
                                 <div key={i} className="flex gap-4">
                                     <div className="w-10 h-10 rounded-full bg-heritage-gold/10 flex items-center justify-center shrink-0">
