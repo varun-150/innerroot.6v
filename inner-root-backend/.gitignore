@@ -21,3 +21,7 @@ hs_err_pid*
 .env
 .env.local
 application-local.properties
+.DS_Store
+.idea/
+.vscode/
+*.log

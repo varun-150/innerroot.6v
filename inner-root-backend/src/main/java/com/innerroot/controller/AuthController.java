@@ -5,6 +5,7 @@ import com.innerroot.model.User;
 import com.innerroot.repository.UserRepository;
 import com.innerroot.service.AuthService;
 import com.innerroot.service.GoogleOAuthService;
+import com.innerroot.service.WebhookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ public class AuthController {
     private final AuthService authService;
     private final GoogleOAuthService googleOAuthService;
     private final UserRepository userRepository;
+    private final WebhookService webhookService;
 
     /**
      * POST /api/auth/register
@@ -32,6 +34,13 @@ public class AuthController {
     public ResponseEntity<?> register(@Valid @RequestBody SignupRequest request) {
         try {
             AuthResponse response = authService.register(request);
+            
+            // Trigger automation workflow
+            webhookService.triggerEvent("USER_SIGNUP", Map.of(
+                "email", request.getEmail(),
+                "name", request.getName()
+            ));
+
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

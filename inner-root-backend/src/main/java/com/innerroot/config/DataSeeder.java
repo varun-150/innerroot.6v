@@ -17,6 +17,7 @@ public class DataSeeder implements CommandLineRunner {
         private final CommunityPostRepository discussionRepository;
         private final GuideRepository guideRepository;
         private final EventRepository eventRepository;
+        private final WellnessContentRepository wellnessRepository;
 
         @Override
         public void run(String... args) throws Exception {
@@ -27,6 +28,7 @@ public class DataSeeder implements CommandLineRunner {
                 seedDiscussions();
                 seedGuides();
                 seedEvents();
+                seedWellness();
         }
 
         private void seedWisdom() {
@@ -422,6 +424,43 @@ public class DataSeeder implements CommandLineRunner {
                                         .title("Meditation Workshop")
                                         .dateString("Sunday, 7:00 AM")
                                         .type("wellness")
+                                        .build());
+                }
+        }
+
+        private void seedWellness() {
+                if (wellnessRepository.count() == 0) {
+                        wellnessRepository.save(WellnessContent.builder()
+                                        .title("Morning Sun Salutation")
+                                        .type("yoga")
+                                        .description("A series of 12 powerful yoga poses that provide a great cardiovascular workout.")
+                                        .duration("15 min")
+                                        .difficulty("beginner")
+                                        .imageUrl("https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80")
+                                        .build());
+                        wellnessRepository.save(WellnessContent.builder()
+                                        .title("Transcendental Meditation")
+                                        .type("meditation")
+                                        .description("A simple, natural technique that allows your mind to settle inward beyond thought.")
+                                        .duration("20 min")
+                                        .difficulty("intermediate")
+                                        .imageUrl("https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80")
+                                        .build());
+                        wellnessRepository.save(WellnessContent.builder()
+                                        .title("Om Chanting")
+                                        .type("chanting")
+                                        .description("The primordial sound of the universe, helping align your energy centers.")
+                                        .duration("10 min")
+                                        .difficulty("beginner")
+                                        .audioUrl("https://www.soundscape.com/om.mp3")
+                                        .build());
+                        wellnessRepository.save(WellnessContent.builder()
+                                        .title("Anulom Vilom Pranayama")
+                                        .type("breathing")
+                                        .description("Alternate nostril breathing to balance the nervous system and calm the mind.")
+                                        .duration("5 min")
+                                        .difficulty("beginner")
+                                        .imageUrl("https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80")
                                         .build());
                 }
         }

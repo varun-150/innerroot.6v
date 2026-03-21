@@ -4,6 +4,7 @@ import com.innerroot.model.MoodEntry;
 import com.innerroot.model.User;
 import com.innerroot.repository.MoodEntryRepository;
 import com.innerroot.repository.UserRepository;
+import com.innerroot.service.WebhookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/mood")
@@ -21,6 +23,7 @@ public class MoodController {
 
     private final MoodEntryRepository moodRepository;
     private final UserRepository userRepository;
+    private final WebhookService webhookService;
 
     @GetMapping
     public ResponseEntity<List<MoodEntry>> getUserMoods() {
@@ -44,6 +47,17 @@ public class MoodController {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         entry.setUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(moodRepository.save(entry));
+        MoodEntry saved = moodRepository.save(entry);
+
+        // Trigger automation for Mood-based guidance
+        webhookService.triggerEvent("MOOD_LOGGED", Map.of(
+            "email", user.getEmail(),
+            "name", user.getName(),
+            "mood", saved.getMood() != null ? saved.getMood() : "",
+            "intensity", saved.getIntensity() != null ? saved.getIntensity() : 0,
+            "notes", saved.getNotes() != null ? saved.getNotes() : ""
+        ));
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 }
