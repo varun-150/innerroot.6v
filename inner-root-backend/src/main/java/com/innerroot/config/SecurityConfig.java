@@ -42,12 +42,41 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/health").permitAll()
+                        .requestMatchers("/api/contact/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
-                        // Protected endpoints
-                        .requestMatchers("/api/users/**").authenticated()
-                        .anyRequest().permitAll())
+                        
+                        // Permit ALL GET requests for global content exploration
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, 
+                            "/api/heritage-sites/**", 
+                            "/api/wellness/**",
+                            "/api/wisdom/**",
+                            "/api/library/**",
+                            "/api/culture/**",
+                            "/api/guides/**",
+                            "/api/events/**",
+                            "/api/community/**").permitAll()
+
+                        // Require ADMIN for modifying global content
+                        .requestMatchers(
+                            "/api/heritage-sites/**", 
+                            "/api/wellness/**",
+                            "/api/wisdom/**",
+                            "/api/library/**",
+                            "/api/culture/**",
+                            "/api/guides/**",
+                            "/api/events/**").hasRole("ADMIN")
+
+                        // Require Authentication for User-specific endpoints
+                        .requestMatchers(
+                            "/api/users/**", 
+                            "/api/japa/**", 
+                            "/api/mood/**", 
+                            "/api/chat/**").authenticated()
+
+                        // Deny by Default
+                        .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         // Allow H2 console frames
