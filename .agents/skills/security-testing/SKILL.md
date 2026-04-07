@@ -309,3 +309,6 @@ API keys in code → **Environment variables, secret management**
 **Test continuously:** Security testing is ongoing, not one-time.
 
 **With Agents:** Agents automate vulnerability scanning, track remediation, and validate fixes. Use agents to maintain security posture at scale.
+
+
+

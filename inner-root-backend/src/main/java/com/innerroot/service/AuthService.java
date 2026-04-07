@@ -3,13 +3,11 @@ package com.innerroot.service;
 import com.innerroot.dto.*;
 import com.innerroot.model.User;
 import com.innerroot.repository.UserRepository;
-import com.innerroot.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +19,6 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
 
     public AuthResponse register(SignupRequest request) {
@@ -48,11 +45,7 @@ public class AuthService {
         User savedUser = userRepository.save(user);
         logger.info("New user registered: {}", savedUser.getEmail());
 
-        // Generate JWT
-        String token = jwtTokenProvider.generateTokenFromEmail(savedUser.getEmail());
-
         return new AuthResponse(
-                token,
                 savedUser.getId(),
                 savedUser.getName(),
                 savedUser.getEmail(),
@@ -67,11 +60,8 @@ public class AuthService {
 
     public AuthResponse login(LoginRequest request) {
         // Authenticate
-        Authentication authentication = authenticationManager.authenticate(
+        authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-
-        // Generate JWT
-        String token = jwtTokenProvider.generateToken(authentication);
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -79,7 +69,6 @@ public class AuthService {
         logger.info("User logged in: {}", user.getEmail());
 
         return new AuthResponse(
-                token,
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
@@ -116,11 +105,7 @@ public class AuthService {
             logger.info("Google user logged in: {}", email);
         }
 
-        // Generate JWT
-        String token = jwtTokenProvider.generateTokenFromEmail(user.getEmail());
-
         return new AuthResponse(
-                token,
                 user.getId(),
                 user.getName(),
                 user.getEmail(),

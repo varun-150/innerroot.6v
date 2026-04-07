@@ -17,7 +17,7 @@ const Privacy = () => {
                 <Reveal delay={0.2}>
                     <div className="prose prose-invert max-w-none text-[var(--muted)] space-y-6">
                         <div className="p-4 rounded-lg bg-heritage-gold/10 border border-heritage-gold/20 text-heritage-gold text-sm italic mb-8">
-                            Last updated: October 26, 2024
+                            Last updated: March 22, 2026
                         </div>
 
                         <p className="text-lg leading-relaxed">

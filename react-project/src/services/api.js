@@ -76,8 +76,30 @@ export const wellnessAPI = {
     getRecommendation: (mood, intensity) => api.get('/wellness/recommend', { params: { mood, intensity } }).then(res => res.data),
 };
 
-export const contactAPI = {
-    submit: (data) => api.post('/contact', data).then(res => res.data),
+export const adminAPI = {
+    getUsers: () => api.get('/admin/users').then(res => res.data),
+    deleteUser: (id) => api.delete(`/admin/users/${id}`).then(res => res.data),
+    updateUserRole: (id, role) => api.patch(`/admin/users/${id}/role`, { role }).then(res => res.data),
+    toggleUserStatus: (id) => api.patch(`/admin/users/${id}/status`).then(res => res.data),
+    resetPassword: (id) => api.post(`/admin/users/${id}/reset-password`).then(res => res.data),
+    addUser: (user) => api.post('/admin/users', user).then(res => res.data),
+    updateUser: (id, user) => api.put(`/admin/users/${id}`, user).then(res => res.data),
+    getStats: () => api.get('/admin/stats').then(res => res.data),
+    getEntities: (type) => api.get(`/admin/entities/${type}`).then(res => res.data),
+    deleteEntity: (type, id) => api.delete(`/admin/entities/${type}/${id}`).then(res => res.data),
+    // Generic CRUD for other entities (since they require ADMIN role for non-GET methods)
+    saveCultureItem: (item) => api.post('/culture', item).then(res => res.data),
+    deleteCultureItem: (id) => api.delete(`/culture/${id}`).then(res => res.data),
+    saveWellnessContent: (content) => api.post('/wellness', content).then(res => res.data),
+    deleteWellnessContent: (id) => api.delete(`/wellness/${id}`).then(res => res.data),
+    saveLibraryItem: (item) => api.post('/library', item).then(res => res.data),
+    deleteLibraryItem: (id) => api.delete(`/library/${id}`).then(res => res.data),
+    saveHeritageSite: (site) => api.post('/heritage-sites', site).then(res => res.data),
+    deleteHeritageSite: (id) => api.delete(`/heritage-sites/${id}`).then(res => res.data),
+    saveEvent: (event) => api.post('/events', event).then(res => res.data),
+    deleteEvent: (id) => api.delete(`/events/${id}`).then(res => res.data),
+    saveWisdomQuote: (quote) => api.post('/wisdom', quote).then(res => res.data),
+    deleteWisdomQuote: (id) => api.delete(`/wisdom/${id}`).then(res => res.data),
 };
 
 export default api;

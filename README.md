@@ -94,9 +94,9 @@ The platform utilizes **GitHub Actions** for automated build checks and deployme
 -------------------------------------------------------------
 | Technology                | Purpose                        |
 | ------------------------- | ------------------------------ |
-| **Spring Boot 3.5.10**    | Backend application framework  |
+| **Spring Boot 3.5.13**    | Backend application framework  |
 | **Java 21**               | Core programming language      |
-| **MySQL 8.0 / Local**      | Core database storage         |
+| **MySQL 8.0**             | Database (Schema: `innerrootdb`) |
 | **Spring Security**       | Authentication & authorization |
 | **JWT Authentication**    | Secure session handling        |
 | **OAuth2 (Google Login)** | Social authentication          |
@@ -141,6 +141,16 @@ inner-root/
 
 ## 🚀 Installation & Setup
 
+### ⚡ Fast Start (Windows)
+For a quick launch of both the frontend and backend, use the provided automation script:
+
+1. Open a terminal in the project root.
+2. Run the start script:
+   ```cmd
+   .\start-all.bat
+   ```
+This will open two separate command windows: one for the Vite frontend and one for the Spring Boot backend.
+
 ### 📌 Prerequisites
 
 * MySQL 8.0+ installed and running
@@ -163,6 +173,14 @@ src/main/resources/application.properties
 
 > [!IMPORTANT]
 > **AI Services:** This platform uses **NVIDIA NIM** for sentient heritage guidance. Ensure you have a valid `nvapi` key configured in `application.properties` or as an environment variable `NVIDIA_API_KEY`.
+
+> [!NOTE]
+> **MySQL Configuration:** The backend is pre-configured to connect to:
+> - **Database:** `innerrootdb`
+> - **User:** `root`
+> - **Password:** `Varun@150`
+>
+> Ensure your local MySQL instance is running and the database `innerrootdb` exists (it will be created automatically if not present).
 
 Run the backend:
 

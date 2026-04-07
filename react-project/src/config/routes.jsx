@@ -1,6 +1,7 @@
 import React, { lazy } from 'react';
 
 // Lazy load pages for better performance
+const LandingPage = lazy(() => import('../pages/LandingPage'));
 const Home = lazy(() => import('../pages/Home'));
 const Explore = lazy(() => import('../pages/Explore'));
 const Tours = lazy(() => import('../pages/Tours'));
@@ -16,10 +17,13 @@ const SeedGenerator = lazy(() => import('../pages/SeedGenerator'));
 const HeritageExplorer = lazy(() => import('../pages/HeritageExplorer'));
 const Contact = lazy(() => import('../pages/Contact'));
 const Monetization = lazy(() => import('../pages/Monetization'));
+const AdminDashboard = lazy(() => import('../pages/AdminDashboard'));
 import ProtectedRoute from '../components/auth/ProtectedRoute';
+import AdminRoute from '../components/auth/AdminRoute';
 
 export const routes = [
-    { path: '/', element: <Home />, exact: true },
+    { path: '/', element: <LandingPage />, exact: true },
+    { path: '/v1', element: <Home /> },
     { path: '/explore', element: <Explore /> },
     { path: '/tours', element: <Tours /> },
     { path: '/wellness', element: <Wellness /> },
@@ -33,6 +37,7 @@ export const routes = [
     { path: '/terms', element: <Terms /> },
     { path: '/monetization', element: <Monetization /> },
     { path: '/dashboard', element: <ProtectedRoute><Dashboard /></ProtectedRoute> },
-    { path: '/tools/sql-seed-generator', element: <SeedGenerator /> },
+    { path: '/admin', element: <AdminRoute><AdminDashboard /></AdminRoute> },
+    { path: '/tools/sql-seed-generator', element: <ProtectedRoute><SeedGenerator /></ProtectedRoute> },
     { path: '*', element: <Home /> }, // Fallback route
 ];

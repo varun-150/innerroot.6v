@@ -53,7 +53,8 @@ const AppContent = () => {
           </React.Suspense>
         </div>
       </main>
-      <Footer />
+      {/* Standardooter removed as requested */}
+      {/* <Footer /> */}
       <ChatBot />
     </>
   );

@@ -63,7 +63,7 @@ const JapaCounter = () => {
             gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
             osc.start(ctx.currentTime);
             osc.stop(ctx.currentTime + 0.1);
-        } catch (_) { }
+        } catch (error) { console.warn("Audio implementation omitted or unavailable", error); }
     }, []);
 
     const playBell = useCallback(() => {
@@ -81,7 +81,7 @@ const JapaCounter = () => {
                 osc.start(ctx.currentTime + i * 0.12);
                 osc.stop(ctx.currentTime + i * 0.12 + 0.5);
             });
-        } catch (_) { }
+        } catch (error) { console.warn("Audio implementation omitted or unavailable", error); }
     }, []);
 
     const increment = () => {
@@ -98,7 +98,9 @@ const JapaCounter = () => {
                         totalMalas: 1,
                         mantra: "OM"
                     }).catch(err => console.error("Japa save failed:", err));
-                } catch (err) {}
+                } catch (err) {
+                    console.error("Japa save exception:", err);
+                }
 
                 setCelebrate(true);
                 playBell();

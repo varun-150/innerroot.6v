@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import {
     Menu, X,
     MapPin, Heart, BookOpen,
-    LogIn, LayoutDashboard, Compass, Info
+    LogIn, LayoutDashboard, Compass, Info, Shield
 } from 'lucide-react';
 
 import logo from '../../assets/logo.webp';
@@ -25,8 +25,10 @@ const Header = ({ theme, onToggleTheme, isMobileMenuOpen, onToggleMobileMenu }) 
     const [scrolled, setScrolled] = useState(false);
     const [hidden, setHidden] = useState(false);
     const [lastScroll, setLastScroll] = useState(0);
+    const isDashboardOrAdmin = location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/admin');
 
     useEffect(() => {
+        if (isDashboardOrAdmin) return;
         const handleScroll = () => {
             const curr = window.scrollY;
             setScrolled(curr > 50);
@@ -39,19 +41,25 @@ const Header = ({ theme, onToggleTheme, isMobileMenuOpen, onToggleMobileMenu }) 
 
     const isActive = (path) => location.pathname === path;
 
+    if (isDashboardOrAdmin) return null;
+
     return (
         <>
             <motion.header
                 initial={{ y: -100, opacity: 0 }}
                 animate={{ y: hidden ? -100 : 0, opacity: 1 }}
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className={`fixed top-4 left-4 right-4 z-50 transition-all duration-700 rounded-[2rem] overflow-hidden`}
+                 className={`fixed top-4 left-4 right-4 z-50 transition-all duration-700 rounded-[2rem] overflow-hidden`}
                 style={{
-                    background: scrolled ? 'rgba(10, 10, 10, 0.6)' : 'transparent',
+                    background: scrolled ? (user?.role === 'ADMIN' ? 'rgba(10, 15, 20, 0.7)' : 'rgba(10, 10, 10, 0.6)') : 'transparent',
                     backdropFilter: scrolled ? 'blur(32px) saturate(200%)' : 'none',
                     WebkitBackdropFilter: scrolled ? 'blur(32px) saturate(200%)' : 'none',
-                    border: scrolled ? '1px solid rgba(184, 115, 51, 0.2)' : '1px solid transparent',
-                    boxShadow: scrolled ? 'var(--shadow-8k)' : 'none',
+                    border: scrolled 
+                        ? (user?.role === 'ADMIN' ? '1px solid rgba(14, 165, 233, 0.3)' : '1px solid rgba(184, 115, 51, 0.2)') 
+                        : '1px solid transparent',
+                    boxShadow: scrolled 
+                        ? (user?.role === 'ADMIN' ? '0 0 40px rgba(14, 165, 233, 0.15), var(--shadow-8k)' : 'var(--shadow-8k)') 
+                        : 'none',
                 }}
             >
                 <div className="max-w-7xl mx-auto px-6 py-4">
@@ -110,6 +118,26 @@ const Header = ({ theme, onToggleTheme, isMobileMenuOpen, onToggleMobileMenu }) 
                         {/* Actions */}
                         <div className="flex items-center gap-4">
                              {/* Theme toggle removed for permanent dark mode */}
+                            {isAuthenticated && user?.role === 'ADMIN' && (
+                                <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-system-soft border border-system-500/30">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-system-500 animate-pulse" />
+                                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-system-500">System Admin</span>
+                                </div>
+                            )}
+
+                            {isAuthenticated && user?.role === 'ADMIN' && (
+                                <Link
+                                    to="/admin"
+                                    className={`w-11 h-11 rounded-2xl flex items-center justify-center border transition-all duration-300 ${
+                                        location.pathname === '/admin' 
+                                        ? 'bg-system-500 border-system-500 text-white shadow-lg shadow-system- glow' 
+                                        : 'bg-system-soft border-system-500/20 text-system-500 hover:bg-system-500/20'
+                                    }`}
+                                    title="Admin Control Center"
+                                >
+                                    <Shield size={18} />
+                                </Link>
+                            )}
 
                             {!isAuthenticated ? (
                                 <Link
@@ -125,7 +153,12 @@ const Header = ({ theme, onToggleTheme, isMobileMenuOpen, onToggleMobileMenu }) 
                             ) : (
                                 <Link
                                     to="/dashboard"
-                                    className="w-11 h-11 rounded-2xl flex items-center justify-center border border-accent/20 bg-accent-soft text-accent"
+                                    className={`w-11 h-11 rounded-2xl flex items-center justify-center border transition-all duration-300 ${
+                                        location.pathname === '/dashboard'
+                                        ? 'bg-accent border-accent text-white shadow-lg shadow-accent/30'
+                                        : 'bg-accent-soft border-accent/20 text-accent hover:bg-accent/20'
+                                    }`}
+                                    title="User Dashboard"
                                 >
                                     <LayoutDashboard size={18} />
                                 </Link>

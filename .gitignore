@@ -9,11 +9,10 @@ react-project/dist/
 react-project/node_modules/
 .agents/
 .gemini/
-OllamaSetup.exe
 WhatsApp Image *.jpg
 *.webp
 v1.html
 README.html
 apache-maven-*/
 !inner-root-backend/src/
-!react-project/src/
+!react-project/src/b

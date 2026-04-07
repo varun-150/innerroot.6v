@@ -20,6 +20,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(length = 36)
     private String id;
 
     @NotBlank
@@ -105,6 +106,11 @@ public class User {
 
     @Builder.Default
     private Boolean onboardingCompleted = false;
+
+    @Builder.Default
+    private Boolean active = true;
+
+    private LocalDateTime lastLogin;
 
     public enum AuthProvider {
         LOCAL, GOOGLE

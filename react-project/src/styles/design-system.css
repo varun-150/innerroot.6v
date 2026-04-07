@@ -33,6 +33,15 @@
     --olive-900: #1A1C14; /* Luxury Black Olive */
     --olive-pure: #0E100A;
 
+    /* ── 🔵 System / Admin Palette (High-Tech Contrast) ── */
+    --system-50:  #F0F9FF;
+    --system-100: #E0F2FE;
+    --system-400: #38BDF8; /* Sky Blue */
+    --system-500: #0EA5E9; /* Electric Cyan */
+    --system-600: #0284C7;
+    --system-glow: rgba(14, 165, 233, 0.35);
+    --system-soft: rgba(14, 165, 233, 0.10);
+
     /* ── ✨ Semantic Foundation — Richer Contrast ── */
     --color-bg: var(--olive-pure);
     --color-bg-subtle: #1A1C14;

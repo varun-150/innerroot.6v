@@ -18,9 +18,12 @@ public class DataSeeder implements CommandLineRunner {
         private final GuideRepository guideRepository;
         private final EventRepository eventRepository;
         private final WellnessContentRepository wellnessRepository;
+        private final UserRepository userRepository;
+        private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
         @Override
         public void run(String... args) throws Exception {
+                seedUsers();
                 seedWisdom();
                 seedCulture();
                 seedTours();
@@ -29,6 +32,32 @@ public class DataSeeder implements CommandLineRunner {
                 seedGuides();
                 seedEvents();
                 seedWellness();
+        }
+
+        private void seedUsers() {
+                if (userRepository.count() == 0) {
+                        // Admin Account
+                        userRepository.save(User.builder()
+                                        .name("System Administrator")
+                                        .email("admin@innerroot.com")
+                                        .password(passwordEncoder.encode("InnerRoot2026!"))
+                                        .role(User.Role.ADMIN)
+                                        .provider(User.AuthProvider.LOCAL)
+                                        .active(true)
+                                        .onboardingCompleted(true)
+                                        .build());
+
+                        // Demo User Account
+                        userRepository.save(User.builder()
+                                        .name("Demo Explorer")
+                                        .email("user@innerroot.com")
+                                        .password(passwordEncoder.encode("InnerRoot2026!"))
+                                        .role(User.Role.USER)
+                                        .provider(User.AuthProvider.LOCAL)
+                                        .active(true)
+                                        .onboardingCompleted(true)
+                                        .build());
+                }
         }
 
         private void seedWisdom() {

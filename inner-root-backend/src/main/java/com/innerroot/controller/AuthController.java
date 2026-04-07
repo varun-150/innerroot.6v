@@ -1,14 +1,19 @@
 package com.innerroot.controller;
 
 import com.innerroot.dto.*;
+import com.innerroot.model.RefreshToken;
 import com.innerroot.model.User;
 import com.innerroot.repository.UserRepository;
+import com.innerroot.security.JwtTokenProvider;
 import com.innerroot.service.AuthService;
 import com.innerroot.service.GoogleOAuthService;
+import com.innerroot.service.RefreshTokenService;
 import com.innerroot.service.WebhookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,23 +30,28 @@ public class AuthController {
     private final GoogleOAuthService googleOAuthService;
     private final UserRepository userRepository;
     private final WebhookService webhookService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenService refreshTokenService;
 
     /**
      * POST /api/auth/register
-     * Register a new user with email/password
      */
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody SignupRequest request) {
         try {
             AuthResponse response = authService.register(request);
             
-            // Trigger automation workflow
+            ResponseCookie jwtCookie = jwtTokenProvider.generateJwtCookie(response.getEmail());
+            refreshTokenService.createRefreshToken(response.getId()); // Optional: Refresh tokens for new users
+
             webhookService.triggerEvent("USER_SIGNUP", Map.of(
                 "email", request.getEmail(),
                 "name", request.getName()
             ));
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                    .body(response);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
@@ -49,13 +59,20 @@ public class AuthController {
 
     /**
      * POST /api/auth/login
-     * Login with email/password
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         try {
-            AuthResponse response = authService.login(request);
-            return ResponseEntity.ok(response);
+            AuthResponse authResponse = authService.login(request);
+            ResponseCookie jwtCookie = jwtTokenProvider.generateJwtCookie(authResponse.getEmail());
+            
+            // Clean up old refresh tokens and create new one
+            refreshTokenService.deleteByUserId(authResponse.getId());
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(authResponse.getId());
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                    .body(Map.of("user", authResponse, "refreshToken", refreshToken.getToken()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Invalid email or password"));
@@ -64,12 +81,10 @@ public class AuthController {
 
     /**
      * POST /api/auth/google
-     * Authenticate via Google OAuth access token
      */
     @PostMapping("/google")
     public ResponseEntity<?> googleAuth(@Valid @RequestBody GoogleAuthRequest request) {
         try {
-            // Verify the access token with Google
             Map<String, Object> googleUser = googleOAuthService.verifyAccessToken(request.getAccessToken());
 
             String email = (String) googleUser.get("email");
@@ -77,10 +92,15 @@ public class AuthController {
             String picture = (String) googleUser.get("picture");
             String googleId = (String) googleUser.get("sub");
 
-            // Login or register the Google user
-            AuthResponse response = authService.googleAuth(email, name, picture, googleId);
-            return ResponseEntity.ok(response);
+            AuthResponse authResponse = authService.googleAuth(email, name, picture, googleId);
+            ResponseCookie jwtCookie = jwtTokenProvider.generateJwtCookie(authResponse.getEmail());
 
+            refreshTokenService.deleteByUserId(authResponse.getId());
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(authResponse.getId());
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                    .body(Map.of("user", authResponse, "refreshToken", refreshToken.getToken()));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Google authentication failed: " + e.getMessage()));
@@ -88,8 +108,42 @@ public class AuthController {
     }
 
     /**
+     * POST /api/auth/logout
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails != null) {
+            User user = userRepository.findByEmail(userDetails.getUsername()).orElse(null);
+            if (user != null) {
+                refreshTokenService.deleteByUserId(user.getId());
+            }
+        }
+        ResponseCookie jwtCookie = jwtTokenProvider.getCleanJwtCookie();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .body(Map.of("message", "Logged out successfully"));
+    }
+
+    /**
+     * POST /api/auth/refresh
+     */
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> request) {
+        String refreshToken = request.get("refreshToken");
+        return refreshTokenService.findByToken(refreshToken)
+                .map(refreshTokenService::verifyExpiration)
+                .map(RefreshToken::getUser)
+                .map(user -> {
+                    ResponseCookie jwtCookie = jwtTokenProvider.generateJwtCookie(user.getEmail());
+                    return ResponseEntity.ok()
+                            .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                            .body(Map.of("message", "Token refreshed successfully"));
+                })
+                .orElse(ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "Refresh token is not in database!")));
+    }
+
+    /**
      * GET /api/auth/me
-     * Get current authenticated user's profile
      */
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
@@ -101,19 +155,16 @@ public class AuthController {
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        java.util.HashMap<String, Object> response = new java.util.HashMap<>();
-        response.put("id", user.getId());
-        response.put("name", user.getName());
-        response.put("email", user.getEmail());
-        response.put("profilePicture", user.getProfilePicture() != null ? user.getProfilePicture() : "");
-        response.put("role", user.getRole().name());
-        response.put("provider", user.getProvider().name());
-        response.put("createdAt", user.getCreatedAt() != null ? user.getCreatedAt().toString() : "");
-        response.put("interests", user.getInterests() != null ? user.getInterests() : "");
-        response.put("meditationStreak", user.getMeditationStreak() != null ? user.getMeditationStreak() : 0);
-        response.put("longestStreak", user.getLongestStreak() != null ? user.getLongestStreak() : 0);
-        response.put("totalSessions", user.getTotalSessions() != null ? user.getTotalSessions() : 0);
-        response.put("unlockedBadges", user.getUnlockedBadges() != null ? user.getUnlockedBadges() : "");
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(Map.of(
+            "id", user.getId(),
+            "name", user.getName(),
+            "email", user.getEmail(),
+            "profilePicture", user.getProfilePicture() != null ? user.getProfilePicture() : "",
+            "role", user.getRole().name(),
+            "meditationStreak", user.getMeditationStreak() != null ? user.getMeditationStreak() : 0,
+            "longestStreak", user.getLongestStreak() != null ? user.getLongestStreak() : 0,
+            "totalSessions", user.getTotalSessions() != null ? user.getTotalSessions() : 0,
+            "unlockedBadges", user.getUnlockedBadges() != null ? user.getUnlockedBadges() : ""
+        ));
     }
 }

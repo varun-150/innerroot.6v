@@ -192,7 +192,7 @@ const Dashboard = () => {
         try {
             await authAPI.updateProfile({
                 name: profileName,
-                // Add any other fields you want to update
+                email: profileEmail,
             });
             setProfileSaved(true);
             setTimeout(() => setProfileSaved(false), 2500);
@@ -245,7 +245,7 @@ const Dashboard = () => {
         <>
             <SEO title="Dashboard — Inner Root" description="Your personal wellness and heritage dashboard." />
 
-            <div className="flex min-h-screen relative overflow-hidden" style={{ background: 'var(--bg-primary)', paddingTop: 0, marginTop: '-1rem' }}>
+            <div className="flex min-h-screen relative overflow-hidden" style={{ background: 'var(--bg-primary)', paddingTop: '4rem' }}>
                 {/* Background Decor */}
                 <div className="absolute inset-0 pointer-events-none opacity-30 overflow-hidden">
                     <div className="orb orb-1 !w-[600px] !h-[600px] top-[-10%] left-[-10%]" />
@@ -316,101 +316,121 @@ const Dashboard = () => {
                 >
                     {/* Top Bar */}
                     <div
-                        className="sticky top-16 lg:top-0 z-20 flex items-center justify-between px-6 lg:px-8 h-18 glass-morphism"
+                        className="sticky top-16 lg:top-0 z-20 flex items-center justify-between px-6 lg:px-8 h-12 lg:h-16 glass-morphism"
                         style={{
                             borderBottom: '1px solid var(--border-secondary)',
                         }}
                     >
-                        <div className="flex items-center justify-between mb-16">
-                            <div>
-                                <motion.span
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    className="text-accent font-black uppercase text-[10px] tracking-[0.4em] mb-4 block"
-                                >
-                                    Executive Overview
-                                </motion.span>
-                                <h1 className="text-4xl md:text-6xl font-display font-black tracking-tighter uppercase">
-                                    YOUR <span className="text-accent underline decoration-accent/20 underline-offset-8">SANCTUARY</span>
-                                </h1>
-                            </div>
-
-                            <div className="flex items-center gap-6">
-                                <div className="hidden md:flex flex-col items-end">
-                                    <span className="text-[10px] uppercase font-bold text-white/40 tracking-widest">Aura Resonance</span>
-                                    <span className="text-xl font-display font-black text-accent">89.4%</span>
-                                </div>
-                                <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center text-white/40 hover:text-accent transition-all cursor-pointer relative">
-                                    <Bell size={24} />
-                                    <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-accent animate-ping" />
-                                </div>
-                            </div>
+                        <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-white/20">Dashboard</span>
+                            <span className="text-white/10">/</span>
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-accent">Overview</span>
                         </div>
 
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-4">
                             <Link
                                 to="/tools/sql-seed-generator"
-                                className="hidden lg:inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-colors"
-                                style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
+                                className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors border border-accent/20"
+                                style={{ background: 'rgba(212,175,55,0.05)', color: 'var(--accent)' }}
                             >
                                 <Database size={14} />
                                 <span>SQL Seed Tool</span>
                             </Link>
 
                             {/* Date Range Filter */}
-                            <select
-                                value={dateRange}
-                                onChange={(e) => setDateRange(e.target.value)}
-                                className="hidden sm:block text-xs px-3 py-2 rounded-lg border-none appearance-none cursor-pointer"
-                                style={{
-                                    background: 'var(--accent-soft)',
-                                    color: 'var(--text-secondary)',
-                                    fontFamily: 'var(--font-body)',
-                                }}
-                            >
-                                <option value="7days">Last 7 Days</option>
-                                <option value="30days">Last 30 Days</option>
-                                <option value="90days">Last 90 Days</option>
-                            </select>
+                            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg" style={{ background: 'var(--accent-soft)' }}>
+                                <Calendar size={14} className="text-accent/50" />
+                                <select
+                                    value={dateRange}
+                                    onChange={(e) => setDateRange(e.target.value)}
+                                    className="text-[10px] font-bold uppercase tracking-wider bg-transparent border-none appearance-none cursor-pointer outline-none"
+                                    style={{
+                                        color: 'var(--text-secondary)',
+                                        fontFamily: 'var(--font-body)',
+                                    }}
+                                >
+                                    <option value="7days">Last 7 Days</option>
+                                    <option value="30days">Last 30 Days</option>
+                                    <option value="90days">Last 90 Days</option>
+                                </select>
+                            </div>
 
                             {/* Notifications */}
                             <button
-                                className="relative w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+                                className="relative w-8 h-8 rounded-lg flex items-center justify-center transition-colors border border-white/5"
                                 style={{ color: 'var(--text-secondary)', background: 'var(--accent-soft)' }}
                             >
-                                <Bell size={18} />
-                                <span className="absolute top-2 right-2 w-2 h-2 rounded-full" style={{ background: 'var(--accent)' }} />
+                                <Bell size={16} />
+                                <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
                             </button>
 
-                            {/* Profile avatar — click to open Profile section */}
+                            {/* Profile avatar */}
                             <button
                                 onClick={() => setActiveSection('profile')}
-                                title={`${displayName} — View Profile`}
-                                style={{
-                                    width: 40, height: 40,
-                                    borderRadius: '50%',
-                                    background: 'linear-gradient(135deg, var(--accent), var(--accent-hover))',
-                                    color: '#fff',
-                                    fontWeight: 700,
-                                    fontSize: '0.8125rem',
-                                    border: '2px solid transparent',
-                                    cursor: 'pointer',
-                                    transition: 'box-shadow 0.2s, border-color 0.2s',
-                                    flexShrink: 0,
-                                }}
-                                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 0 0 3px var(--accent-glow)'; e.currentTarget.style.borderColor = 'var(--accent)'; }}
-                                onMouseLeave={e => { e.currentTarget.style.boxShadow = ''; e.currentTarget.style.borderColor = 'transparent'; }}
+                                className="flex items-center gap-2 px-1.5 py-1.5 rounded-xl border border-white/5 hover:border-accent/30 transition-all bg-white/5"
                             >
-                                {user?.profilePicture
-                                    ? <img src={user.profilePicture} alt={displayName} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
-                                    : displayInitials
-                                }
+                                <div
+                                    style={{
+                                        width: 28, height: 28,
+                                        borderRadius: '0.75rem',
+                                        background: 'linear-gradient(135deg, var(--accent), var(--accent-hover))',
+                                        color: '#fff',
+                                        fontWeight: 800,
+                                        fontSize: '10px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        flexShrink: 0,
+                                    }}
+                                >
+                                    {user?.profilePicture
+                                        ? <img src={user.profilePicture} alt={displayName} className="w-full h-full rounded-[inherit] object-cover" />
+                                        : displayInitials
+                                    }
+                                </div>
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-white/60 hidden md:block px-1">
+                                    {displayName.split(' ')[0]}
+                                </span>
+                                <ChevronDown size={12} className="text-white/20 hidden md:block" />
                             </button>
                         </div>
                     </div>
 
                     {/* Dashboard Content */}
-                    <div ref={dashboardRef} className="p-6 lg:p-8 space-y-8 perspective-1000">
+                    <div ref={dashboardRef} className="p-6 lg:p-10 space-y-10 perspective-1000">
+
+                        {/* Page Header Area */}
+                        {activeSection === 'overview' && (
+                            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 border-b border-white/5 pb-8">
+                                <div>
+                                    <motion.span
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        className="text-accent font-black uppercase text-[10px] tracking-[0.4em] mb-4 block"
+                                    >
+                                        Executive Overview
+                                    </motion.span>
+                                    <h1 className="text-4xl md:text-7xl font-display font-black tracking-tighter uppercase leading-none">
+                                        YOUR <span className="text-accent underline decoration-accent/20 underline-offset-8">SANCTUARY</span>
+                                    </h1>
+                                </div>
+
+                                <div className="flex items-center gap-8">
+                                    <div className="flex flex-col items-end">
+                                        <span className="text-[10px] uppercase font-bold text-white/40 tracking-widest mb-1">Aura Resonance</span>
+                                        <div className="flex items-baseline gap-2">
+                                            <span className="text-3xl font-display font-black text-accent">89.4%</span>
+                                            <TrendingUp size={16} className="text-green-500" />
+                                        </div>
+                                    </div>
+                                    <div className="h-12 w-[1px] bg-white/5 hidden md:block" />
+                                    <div className="hidden xl:flex flex-col items-end">
+                                        <span className="text-[10px] uppercase font-bold text-white/40 tracking-widest mb-1">Local Time</span>
+                                        <span className="text-xl font-display font-bold text-white/80">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         {/* ══ PROFILE SECTION ══ */}
                         {activeSection === 'profile' && (

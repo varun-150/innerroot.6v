@@ -3,12 +3,16 @@ package com.innerroot.security;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.WebUtils;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -24,10 +28,41 @@ public class JwtTokenProvider {
     @Value("${app.jwt.expiration-ms}")
     private long jwtExpirationMs;
 
+    @Value("${app.jwt.cookie-name:jwt}")
+    private String jwtCookie;
+
     private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(
                 java.util.Base64.getEncoder().encodeToString(jwtSecret.getBytes()));
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public ResponseCookie generateJwtCookie(String email) {
+        String jwt = generateTokenFromEmail(email);
+        return ResponseCookie.from(jwtCookie, jwt)
+                .path("/api")
+                .maxAge(jwtExpirationMs / 1000)
+                .httpOnly(true)
+                .secure(true) // Should be true in production
+                .sameSite("Strict")
+                .build();
+    }
+
+    public ResponseCookie getCleanJwtCookie() {
+        return ResponseCookie.from(jwtCookie, "")
+                .path("/api")
+                .maxAge(0)
+                .httpOnly(true)
+                .build();
+    }
+
+    public String getJwtFromCookies(HttpServletRequest request) {
+        Cookie cookie = WebUtils.getCookie(request, jwtCookie);
+        if (cookie != null) {
+            return cookie.getValue();
+        } else {
+            return null;
+        }
     }
 
     public String generateToken(Authentication authentication) {
