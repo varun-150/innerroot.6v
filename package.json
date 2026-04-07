@@ -1,0 +1,11 @@
+{
+  "name": "inner-root-workspace",
+  "private": true,
+  "scripts": {
+    "dev:frontend": "npm run dev --prefix react-project",
+    "dev:backend": "cd inner-root-backend && ./mvnw spring-boot:run",
+    "build:frontend": "npm run build --prefix react-project",
+    "tunnel": "npm run tunnel --prefix react-project",
+    "start:all": "pwsh -Command \"Start-Process pwsh -ArgumentList '-NoExit', '-Command', 'npm run dev:frontend'; Start-Process pwsh -ArgumentList '-NoExit', '-Command', 'npm run dev:backend'\""
+  }
+}
