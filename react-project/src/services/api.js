@@ -76,6 +76,10 @@ export const wellnessAPI = {
     getRecommendation: (mood, intensity) => api.get('/wellness/recommend', { params: { mood, intensity } }).then(res => res.data),
 };
 
+export const contactAPI = {
+    submit: (contactData) => api.post('/contact', contactData).then(res => res.data),
+};
+
 export const adminAPI = {
     getUsers: () => api.get('/admin/users').then(res => res.data),
     deleteUser: (id) => api.delete(`/admin/users/${id}`).then(res => res.data),
