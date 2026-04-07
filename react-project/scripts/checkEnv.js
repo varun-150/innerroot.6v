@@ -20,7 +20,7 @@ if (missing.length) {
   // doesn't fail outright. These values will be overridden by Vite from a
   // proper .env.local file when present.
   if (!process.env.VITE_API_URL) {
-    process.env.VITE_API_URL = 'http://localhost:4000/api';
+    process.env.VITE_API_URL = 'http://localhost:8080/api';
   }
   if (!process.env.VITE_GOOGLE_CLIENT_ID) {
     process.env.VITE_GOOGLE_CLIENT_ID = 'placeholder-client-id';

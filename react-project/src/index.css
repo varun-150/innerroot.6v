@@ -1,7 +1,7 @@
 /* ── Tailwind base layer ── */
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* ── Design system modules ── */
 @import "./styles/design-system.css";
