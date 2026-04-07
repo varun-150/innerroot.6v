@@ -49,5 +49,9 @@ export const WebSocketProvider = ({ children }) => {
 };
 
 export const useWebSocketClient = () => {
-    return useContext(WebSocketContext);
+    const context = useContext(WebSocketContext);
+    if (!context) {
+        throw new Error('useWebSocketClient must be used within a WebSocketProvider');
+    }
+    return context;
 };

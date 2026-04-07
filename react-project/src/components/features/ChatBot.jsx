@@ -40,7 +40,7 @@ const ChatBot = () => {
                     content: msg.content,
                     timestamp: msg.timestamp
                 }));
-                
+
                 if (history.length > 0) {
                     setMessages(history);
                 } else {
@@ -52,9 +52,12 @@ const ChatBot = () => {
         } catch (error) {
             console.error('Error fetching chat history:', error);
             // Fallback to default message if backend fails
-            if (messages.length === 0) {
-                setMessages([{ role: 'bot', content: 'Namaste! I am your Heritage Companion. How can I assist you with your cultural or wellness journey today?' }]);
-            }
+            setMessages(prev => {
+                if (prev.length === 0) {
+                    return [{ role: 'bot', content: 'Namaste! I am your Heritage Companion. How can I assist you with your cultural or wellness journey today?' }];
+                }
+                return prev;
+            });
         } finally {
             setIsFetchingHistory(false);
         }
