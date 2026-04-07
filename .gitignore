@@ -14,5 +14,8 @@ WhatsApp Image *.jpg
 v1.html
 README.html
 apache-maven-*/
+!react-project/src/
 !inner-root-backend/src/
-!react-project/src/b
+!package.json
+!README.md
+!start-all.bat
