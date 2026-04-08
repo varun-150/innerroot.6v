@@ -6,9 +6,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import com.innerroot.config.AIConfig;
 import com.innerroot.config.WebhookConfig;
+import com.innerroot.config.AppProperties;
 
 @SpringBootApplication
-@EnableConfigurationProperties({AIConfig.class, WebhookConfig.class})
+@EnableConfigurationProperties({AIConfig.class, WebhookConfig.class, AppProperties.class})
 public class InnerRootApplication {
 
     public static void main(String[] args) {
