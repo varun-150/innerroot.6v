@@ -21,7 +21,7 @@ const navItems = [
 const Header = ({ theme, onToggleTheme, isMobileMenuOpen, onToggleMobileMenu }) => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { user, isAuthenticated, logout } = useAuth();
+    const { user, isAuthenticated } = useAuth();
     const [scrolled, setScrolled] = useState(false);
     const [hidden, setHidden] = useState(false);
     const [lastScroll, setLastScroll] = useState(0);
